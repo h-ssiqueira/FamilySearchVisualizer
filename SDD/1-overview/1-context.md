@@ -4,7 +4,7 @@
 FamilySearch hosts a large, shared, free family tree. Its own interface is dense and exposes many features. FamilySearch Visualizer is a small companion app that presents the tree in a simple, readable, progressively detailed way, starting from the signed-in user.
 
 ## 1.2 Problem statement
-*(Assumption – confirm wording)* Users who only want to *see* their family structure must navigate a feature-heavy UI. They need a compact view that starts at themselves and grows one step at a time.
+Users who only want to *see* their family structure must navigate a feature-heavy UI. They need a compact view that starts at themselves and grows one step at a time.
 
 ## 1.3 Stakeholders
 | Stakeholder | Interest |
@@ -35,10 +35,10 @@ FamilySearch hosts a large, shared, free family tree. Its own interface is dense
 
 ## 1.6 Constraints
 - No backend: every call is made from the browser; no secret can be kept.
-- FamilySearch requires an app key (developer key), and redirect URIs must be pre-registered with FamilySearch developer support.
+- ~~FamilySearch requires an app key (developer key), and redirect URIs must be pre-registered with FamilySearch developer support.~~
 - GitHub Pages cannot set HTTP response headers and has no server-side routing.
-- Real family data requires a **production** app key, which needs FamilySearch's compatibility review; the integration (sandbox) environment has test data only. No key exists yet.
-- Only documented FamilySearch APIs may be used (undocumented ones can get the key disabled).
+- ~~Real family data requires a **production** app key, which needs FamilySearch's compatibility review; the integration (sandbox) environment has test data only. No key exists yet.~~
+- ~~Only documented FamilySearch APIs may be used (undocumented ones can get the key disabled).~~
 - Data belongs to FamilySearch users and may include living people: privacy by default.
 
 ## 1.7 Assumptions
