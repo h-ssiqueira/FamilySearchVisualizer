@@ -1,9 +1,11 @@
+## Retrieve current user information
 GET https://www.familysearch.org/platform/users/current
 * users[*].birthDate
 * users[*].displayName
 * users[*].gender
 * users[*].personId
 ___
+## Retrieve person information
 GET https://www.familysearch.org/service/tree/tree-data/v8/person/GJ8L-919/details
 ### Data about the person
 * ageAtDeath
