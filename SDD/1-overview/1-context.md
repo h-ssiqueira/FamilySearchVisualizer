@@ -12,11 +12,11 @@ FamilySearch hosts a large, shared, free family tree. Its own interface is dense
 | End user (hobbyist genealogist) | Quick, readable view of their own tree |
 | Maintainer (h-ssiqueira) | Low-cost hosting, maintainable code base |
 | FamilySearch | API provider; enforces developer key, redirect URIs, throttling |
-| Google | Identity provider for the sign-in step |
+| Google | Optional sign-in method offered on FamilySearch's login page (no direct integration) |
 
 ## 1.4 Scope
 **In scope**
-- Sign in with Google, then authorize against FamilySearch.
+- Sign in through FamilySearch (OAuth2 + PKCE); the user may choose Google on FamilySearch's login page.
 - Read the current user and relatives' details from FamilySearch.
 - Render three tree views (see [objective](2-objective.md)).
 
@@ -29,8 +29,7 @@ FamilySearch hosts a large, shared, free family tree. Its own interface is dense
 ## 1.5 External systems
 | System | Role | Notes |
 |--------|------|-------|
-| Google Identity | Sign-in | OAuth2/OIDC, client-side |
-| FamilySearch Identity (`ident.familysearch.org`) | OAuth2 authorization + token endpoint | Beta: `identbeta.familysearch.org` |
+| FamilySearch Identity (`ident.familysearch.org`) | OAuth2 authorization + token endpoint; Google is selectable on its login page | Beta: `identbeta.familysearch.org` |
 | FamilySearch API | `users/current`, person details | Per-user throttling (HTTP 429 + `Retry-After`) |
 | GitHub Pages / Actions | Hosting / CI-CD | Static files only |
 
@@ -38,6 +37,8 @@ FamilySearch hosts a large, shared, free family tree. Its own interface is dense
 - No backend: every call is made from the browser; no secret can be kept.
 - FamilySearch requires an app key (developer key), and redirect URIs must be pre-registered with FamilySearch developer support.
 - GitHub Pages cannot set HTTP response headers and has no server-side routing.
+- Real family data requires a **production** app key, which needs FamilySearch's compatibility review; the integration (sandbox) environment has test data only. No key exists yet.
+- Only documented FamilySearch APIs may be used (undocumented ones can get the key disabled).
 - Data belongs to FamilySearch users and may include living people: privacy by default.
 
 ## 1.7 Assumptions

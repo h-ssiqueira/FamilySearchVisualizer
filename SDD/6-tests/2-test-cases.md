@@ -5,7 +5,7 @@ Format: Given / When / Then. Level: U unit, C component, I integration, E end-to
 ## Authentication
 | ID | Req | Level | Case |
 |----|-----|-------|------|
-| TC-01 | FR-01 | C/E | Given no session, when the app opens, then only the Google sign-in is shown |
+| TC-01 | FR-01 | C/E | Given no session, when the app opens, then only the "Sign in with FamilySearch" button is shown |
 | TC-02 | FR-02 | U | PKCE: `code_challenge` equals base64url(SHA-256(verifier)); verifier length/charset valid |
 | TC-03 | FR-02 | I | Redirect with matching `state` → token exchange sent with `code_verifier` |
 | TC-04 | FR-02, NFR-04 | I | Redirect with wrong/missing `state` → flow aborted, no token request |
@@ -56,9 +56,10 @@ Format: Given / When / Then. Level: U unit, C component, I integration, E end-to
 | TC-51 | NFR-06 | E | axe: no serious/critical violations on login, V1, V2, V3 |
 | TC-52 | NFR-06 | C | Gender conveyed by more than color |
 | TC-53 | NFR-02 | I | Request count for the first batch of 4 generations ≤ 31 |
-| TC-54 | NFR-05 | I | No network request to hosts other than Google and FamilySearch |
+| TC-54 | NFR-05 | I | No network request to hosts other than FamilySearch |
 | TC-55 | security | U | Name containing `<script>` or HTML renders as text |
 | TC-56 | NFR-07 | E | Layout usable at 360 px width |
 | TC-57 | NFR-08 | C | All visible strings come from the i18n catalog |
 | TC-58 | FR-12 | I | Stop during "load all" aborts in-flight requests; already loaded nodes stay visible |
 | TC-59 | FR-12, NFR-02 | C | Tree with 1,000+ nodes: only visible nodes are rendered; pan/zoom stays responsive |
+| TC-60 | NFR-11, ADR-10 | U | API client refuses any URL not on the documented-endpoint allow-list and any non-GET method |

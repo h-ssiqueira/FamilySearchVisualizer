@@ -129,3 +129,27 @@ ViewTree  { view: "V1"|"V2"|"V3"; root: PersonId; nodes: TreeNode[]; edges: Tree
 ## Open points
 - Confirm with the samples in `8-attachments/examples.md` how `spouses[*].parent1/parent2` are populated (which one is the person?).
 - Confirm whether `users/current` and person details use the same `personId` format.
+
+---
+# Documented API alternative (proposed, ADR-10 / OQ-06)
+
+> The API sections at the top of this file describe the `service/tree/tree-data/v8` endpoint, which is **not documented**. FamilySearch's compatibility rules say apps using undocumented APIs have their key disabled. The documented alternative below keeps the same domain model; only the mapping layer changes.
+
+| Need | Documented endpoint (base `https://api.familysearch.org`) | Notes |
+|------|-----------------------------------------------------------|-------|
+| Current user | `GET /platform/users/current` | As today, on the `api.` host (FamilySearch asks that API requests use `api.familysearch.org`) |
+| V1: ancestors | `GET /platform/tree/ancestry?person={id}&generations={n}&personDetails=` | Several generations per call (the guide states a maximum of 9). Each person carries an **ahnen number** that gives their position in the pedigree: this answers the left/right placement (OQ-10) |
+| V2: children of a couple | `GET /platform/tree/descendancy?person={id}&generations=1&marriageDetails=&personDetails=` | Descendants numbered with d'Aboville numbers; spouses are included and numbered with `-S#` |
+| V3: spouses of children and their children | same call with `generations=2` | One level more, as defined for V3 |
+| Single person with relatives (lazy expansion of a card) | person / relationship resources (e.g. *person with relationships*) | **To verify** exact resource and fields in the spike |
+
+Payloads follow the GEDCOM X JSON format (`persons[]`, `relationships[]`, `display` properties such as name, gender, lifespan, birth/death date and place, ascendancy/descendancy number). Exact field names must be confirmed against real sandbox responses; the domain model above does not change.
+
+## Effect on request count (estimate, to be validated)
+| View | Prototype endpoint | Documented API |
+|------|--------------------|----------------|
+| V1, g generations | up to 2^(g+1) − 1 requests | about ceil(g / 9) requests (more for the ends of very large trees) |
+| V2 | +0 for names, +C for dates | one descendancy call per couple shown |
+| V3 | +C | one descendancy call (2 generations) per couple shown |
+
+Unlimited depth (ADR-09) then means: load up to 9 generations per call, and continue from the persons at the edge of the previous result.

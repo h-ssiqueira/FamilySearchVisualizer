@@ -1,24 +1,12 @@
 # Authentication and authorization
 
 ## 1. Overview
-Two sequential sign-ins, both in the browser:
+**One sign-in, on FamilySearch's own page.** The app redirects the browser to FamilySearch's authorization endpoint (OAuth2 authorization code + PKCE). On that page the user signs in with a FamilySearch account or, if offered, with Google. FamilySearch then returns an authorization code that the app exchanges for the access token required by the API.
 
-| Step | Provider | Protocol | Purpose |
-|------|----------|----------|---------|
-| 1 | Google | OAuth2 / OIDC (Google Identity Services) | User authentication (mechanism: **OQ-01**, see section 2) |
-| 2 | FamilySearch | OAuth2 authorization code + PKCE | Obtain an access token to read the user's tree |
-
-## 2. Purpose of step 1 and a technical caveat
-**Author's intent (OQ-01):** the Google login authenticates the user so that the app can integrate with the APIs and retrieve information.
-
-**Caveat:** FamilySearch's API authorizes calls only with a **FamilySearch access token** (step 2). A Google credential cannot be exchanged for it by the app, and the app has no backend that could do such an exchange. So there are two ways to meet the intent:
-
-| Option | How | Consequence |
-|--------|-----|-------------|
-| (a) Google as a sign-in method *on FamilySearch's own login page* | The app only runs the FamilySearch flow; the user may choose Google there (*to verify that FamilySearch offers this for the account type*) | Simplest and the most robust: one OAuth flow, one token, no Google client to maintain |
-| (b) Separate Google sign-in inside the app, before the FamilySearch flow | As drawn in diagram 2 | Google gives identity only; it adds a second login and cannot protect data, because checks run in the visitor's browser and can be bypassed |
-
-Recommendation: confirm (a) with the spike; keep (b) only if the app needs to know the Google identity (e.g. for future per-user settings). Until decided, the SDD keeps (b) as the working design.
+## 2. Google
+- Google is only an identity provider **inside FamilySearch's login flow**. The app does not integrate with Google: no Google client, no Google SDK, no Google credential in the browser (ADR-03, OQ-01 resolved).
+- The author supplied the address `https://ident.familysearch.org/oauth2/authorization/google`. It could not be inspected (the site blocks automated access) and it is not part of the documented OAuth flow. The app should **not** call it directly: starting at the documented authorization endpoint lets the user pick Google on FamilySearch's page and guarantees the code/token return to the app.
+- To verify in the sandbox: that the Google option is shown for the user's account type.
 
 ## 3. FamilySearch OAuth2 + PKCE
 - **Authorization endpoint**: `https://ident.familysearch.org/cis-web/oauth2/v3/authorization` (beta: `identbeta.familysearch.org`).
@@ -34,7 +22,6 @@ Sources: FamilySearch developer docs — Authorization Code Flow; Authorization 
 |------|---------|----------|
 | `code_verifier`, `state` | `sessionStorage` | Until the redirect returns, then deleted |
 | FamilySearch access token | JS memory only (ADR-07) | Tab session; lost on reload → silent re-login |
-| Google credential | JS memory | Tab session |
 | Family data cache | JS memory | Tab session; wiped on logout |
 
 - `state` is random (CSPRNG), single-use, compared on return.
@@ -49,4 +36,13 @@ Sources: FamilySearch developer docs — Authorization Code Flow; Authorization 
 
 ## 6. Open points
 - Token lifetime / refresh for public clients (verify in the spike).
-- Whether Google sign-in is a separate in-app step or part of FamilySearch's login page (OQ-01).
+- Whether a public (secret-less) client type exists: newer FamilySearch developer pages mention a client ID **and client secret**, which a browser app cannot keep (OQ-14).
+
+## 7. Getting an app key (prerequisite, R-04)
+Based on the FamilySearch developer guides:
+1. **Developer account.** Creating it gives access to the **integration** (sandbox) environment, which holds test data. A separate app key is needed for each type of app.
+2. **Register the app** and its redirect URIs (localhost and the GitHub Pages URL). Redirect URIs must be pre-registered by FamilySearch.
+3. **Beta and production keys** need the *compatibility review*: signed agreements (compatible product affiliate agreement, security assessment, production app key request and use agreement), demonstration of the product, and use of **documented APIs only**. After acceptance the key is enabled for production data.
+4. Until step 3 is done, users can only see test data. Plan the project in two phases: build and test on sandbox, then apply for production (OQ-13).
+
+Sources: FamilySearch developer docs — Getting Started; Compatible Review Process; Authorization Code Flow.

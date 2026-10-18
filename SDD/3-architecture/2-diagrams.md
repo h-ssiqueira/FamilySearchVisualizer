@@ -28,25 +28,26 @@ FamilySearchViewer -> FamilySearchViewer : Process
 return Display tree results
 @enduml
 ```
-> Note: the diagram above has no step where the app obtains a FamilySearch access token. Diagram 2 adds it.
+> Note: the diagram above has no step where the app obtains a FamilySearch access token, and Google is shown as a separate login of the app. Diagram 2 corrects both: Google is only a sign-in method on FamilySearch's login page.
 
 ## 2. Authentication sequence (proposed)
+Google is chosen by the user on FamilySearch's page; the app never talks to Google.
 ```
 @startuml
 actor User
 participant "SPA (GitHub Pages)" as SPA
-participant "Google Identity" as G
 participant "FamilySearch Identity" as FSI
+participant "Google" as G
 participant "FamilySearch API" as FSA
 
-User -> SPA : open app
-SPA -> G : sign-in request
-G --> SPA : ID token (credential)
-SPA -> SPA : check iss/aud/exp (OQ-01: is this a separate step or part of FamilySearch's own login page?)
-
+User -> SPA : open app, click "Sign in"
 SPA -> SPA : create code_verifier, code_challenge (S256), state
 SPA -> FSI : redirect /authorization?client_id&redirect_uri\n&response_type=code&code_challenge&code_challenge_method=S256&state
-User -> FSI : authenticate and consent
+User -> FSI : choose sign-in method (FamilySearch account or Google)
+opt Google chosen
+  FSI -> G : sign-in handled between FamilySearch and Google
+  G --> FSI : identity confirmed
+end
 FSI --> SPA : redirect_uri?code&state
 SPA -> SPA : verify state
 SPA -> FSI : POST /token (grant_type=authorization_code, client_id, code, code_verifier, redirect_uri)
@@ -98,9 +99,7 @@ package "Browser SPA" {
   [UI / Views] --> [Auth]
   [FamilySearch client] --> [Auth] : access token
 }
-cloud "Google Identity" as G
 cloud "FamilySearch Identity + API" as FS
-[Auth] --> G
 [Auth] --> FS
 [Request queue + cache] --> FS
 @enduml

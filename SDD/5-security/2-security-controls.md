@@ -14,7 +14,7 @@
 
 ## 2. Browser hardening
 GitHub Pages cannot send custom response headers, so use `<meta>` where possible:
-- CSP (meta): `default-src 'self'`; `script-src 'self'` plus Google Identity Services script host; `connect-src 'self' https://*.familysearch.org https://ident.familysearch.org` plus Google endpoints needed; `frame-src` for Google sign-in; `object-src 'none'`; `base-uri 'none'`. Finalize after the spike (exact hosts).
+- CSP (meta): `default-src 'self'`; `script-src 'self'` (no external scripts); `connect-src 'self' https://api.familysearch.org https://ident.familysearch.org` (the beta host `identbeta.familysearch.org` in non-production builds); `frame-src 'none'`; `object-src 'none'`; `base-uri 'none'`. Finalize after the spike (exact hosts).
 - No inline scripts; no `eval`.
 - `rel="noopener noreferrer"` on external links.
 - Note: `frame-ancestors` and some headers are not enforceable via `<meta>`; if clickjacking protection is needed, put the site behind a proxy/CDN that can set headers (e.g. custom domain via a CDN).
@@ -33,5 +33,5 @@ GitHub Pages cannot send custom response headers, so use `<meta>` where possible
 - Show a short privacy notice on the login page (what is read, that nothing is stored).
 
 ## 5. Compliance
-- Follow FamilySearch developer terms; read-only, honor throttling; confirm the permitted use of the person-details endpoint (R-01, OQ-06).
-- Google sign-in: configure only the origins/redirects needed in the Google Cloud project.
+- Follow FamilySearch developer terms and compatibility rules; read-only, honor throttling.
+- **Documented endpoints only**: an allow-list of URL patterns in the API client enforces this (R-01, ADR-10, OQ-06).

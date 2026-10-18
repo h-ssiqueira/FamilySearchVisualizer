@@ -6,7 +6,6 @@
 | Source code, SDD, workflows | GitHub repository | Only asset owned by the project |
 | Family data | FamilySearch | Not stored by this app; nothing to back up |
 | FamilySearch developer key and registered redirect URIs | FamilySearch developer account | Public client id; registration details must be documented (who owns the account, contact, registered URIs) |
-| Google OAuth client configuration | Google Cloud project | Document project owner, authorized origins |
 | Domain / Pages configuration | GitHub settings / DNS | Document settings |
 
 ## 2. Backup
@@ -22,8 +21,8 @@
 | GitHub Pages unavailable | Wait; or publish the built `dist` to an alternative static host (needs new redirect URIs registered, see below) | Best effort |
 | Repository deleted/corrupted | Restore from mirror/clone; re-enable Pages and Actions | < 1 day |
 | Developer key revoked or redirect URI changed | Contact FamilySearch developer support, register the new URI, update build variables, redeploy | Days (external dependency) |
-| Google OAuth client deleted | Recreate client, update client id and authorized origins, redeploy | < 1 day |
-| Site URL change (rename, custom domain) | Register new redirect URI **before** switching; update Google origins and the Vite `base` | Plan ahead |
+| App key disabled (e.g. undocumented API usage) | Stop using the endpoint, contact FamilySearch developer support, request re-enabling | Days (external dependency) |
+| Site URL change (rename, custom domain) | Register new redirect URI **before** switching; update the Vite `base` | Plan ahead |
 | Compromised dependency | Revert lock file, publish fixed build, rotate nothing (no secrets) but invalidate by logout notice if tokens could be exposed | Hours |
 
 ## 4. Data recovery for users

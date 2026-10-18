@@ -1,13 +1,13 @@
 # Flows
 
 ## F1 – First visit and login
-1. User opens the app → Google sign-in screen.
-2. Google credential received → app creates PKCE verifier, challenge and `state`, stores verifier/state in `sessionStorage`, redirects to FamilySearch authorization.
+1. User opens the app → login screen with one "Sign in with FamilySearch" button.
+2. App creates PKCE verifier, challenge and `state`, stores verifier/state in `sessionStorage`, redirects to FamilySearch authorization. On FamilySearch's page the user signs in with a FamilySearch account or chooses Google.
 3. FamilySearch redirects back with `code` and `state`; the app verifies `state`, exchanges the code (with `code_verifier`) for an access token, removes `code`/`state` from the URL, clears verifier/state from storage.
 4. App calls `users/current`, stores the `personId` as root, opens V1.
 Diagram: [authentication sequence](../3-architecture/2-diagrams.md).
 
-Failure paths: Google cancelled → stay on login; `state` mismatch → abort with error; user denies consent → show "access required"; token exchange fails → retry login.
+Failure paths: user cancels on FamilySearch's page → stay on login; `state` mismatch → abort with error; user denies consent → show "access required"; token exchange fails → retry login.
 
 ## F2 – Build and show V1
 1. The first batch of generations loads automatically (proposed: 4).
@@ -28,7 +28,7 @@ Queue receives 429/503 → read `Retry-After` → pause **all** queued requests 
 
 ## F6 – Token expiry / logout
 - 401 → mark session expired → login prompt, keep `rootId`, `view` and loaded generations in memory → after re-login, resume.
-- Logout → clear tokens, cache, view state, `sessionStorage`; return to the Google screen.
+- Logout → clear tokens, cache, view state, `sessionStorage`; return to the login screen.
 
 ## F7 – Cancel
 Changing view/root, or pressing Stop, aborts in-flight requests (`AbortController`) and drops queued tasks; results of cancelled tasks are discarded.

@@ -14,5 +14,5 @@ Targets marked *(proposed)* are starting points to be confirmed.
 | NFR-08 | Internationalization | UI strings externalized; languages: OQ-08. Dates formatted per locale. |
 | NFR-09 | Maintainability | TypeScript `strict`; ESLint + Prettier in CI; unit-test coverage ≥ 80 % on domain/api layers *(proposed)*. |
 | NFR-10 | Operability | Deployed automatically by GitHub Actions; rollback by re-running a previous successful deployment. |
-| NFR-11 | Compliance | Respect FamilySearch developer terms and throttling guidance; read-only usage. |
+| NFR-11 | Compliance | Respect FamilySearch developer terms and throttling guidance; read-only usage; call **documented endpoints only** (undocumented ones can get the app key disabled). |
 | NFR-12 | Resilience to API change | All FamilySearch DTOs go through one mapping layer with runtime validation, so API changes fail loudly in one place. |

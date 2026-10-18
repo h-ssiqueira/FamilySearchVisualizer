@@ -5,8 +5,8 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 ## Authentication
 | ID | Requirement | Pri |
 |----|-------------|-----|
-| FR-01 | The user signs in with Google; the sign-in is the user's way to authenticate before the app retrieves data through the APIs (exact mechanism: OQ-01). | M |
-| FR-02 | After Google sign-in the app starts FamilySearch OAuth2 authorization code flow with PKCE (S256) and `state`. | M |
+| FR-01 | The user signs in through FamilySearch's own login page, where Google can be chosen as the sign-in method. The app has no separate Google sign-in. | M |
+| FR-02 | The app uses the FamilySearch OAuth2 authorization code flow with PKCE (S256) and `state` to obtain the access token. | M |
 | FR-03 | The user can sign out; tokens and cached family data are wiped from memory and browser storage. | M |
 | FR-04 | When the FamilySearch token expires or is rejected (401), the user is asked to re-authenticate, keeping the selected view. | S |
 

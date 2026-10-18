@@ -4,7 +4,7 @@
 ```
 src/
   config/        environment (client ids, base URLs, limits)
-  auth/          googleAuth, familySearchAuth, pkce, tokenStore
+  auth/          familySearchAuth, pkce, tokenStore
   api/           familySearchClient, requestQueue, endpoints, dto (schemas), mappers
   domain/        types (Person, Couple, ...), rules (siblings, dates, pedigree collapse)
   tree/          treeBuilder (V1/V2/V3), layout, selectors
@@ -24,7 +24,6 @@ src/
 ## 3. Modules
 | Module | Responsibility | Main public API |
 |--------|----------------|-----------------|
-| `auth/googleAuth` | Google sign-in, expose "signed in with Google" state | `signIn()`, `signOut()`, `useGoogleSession()` |
 | `auth/familySearchAuth` | PKCE login, state check, token exchange, token in memory | `startLogin()`, `handleRedirect()`, `getAccessToken()`, `logout()` |
 | `api/familySearchClient` | The single door to FamilySearch | `getCurrentUser()`, `getPersonDetails(id, signal)` |
 | `api/requestQueue` | Concurrency limit, `Retry-After`, back-off, cancellation | `enqueue(task)` |
@@ -43,6 +42,9 @@ type ViewLevel = "V1" | "V2" | "V3";
 interface FamilySearchClient {
   getCurrentUser(signal?: AbortSignal): Promise<CurrentUser>;
   getPersonDetails(id: PersonId, signal?: AbortSignal): Promise<Person>;
+  // ADR-10 (documented API), if adopted:
+  getAncestry(id: PersonId, generations: number, signal?: AbortSignal): Promise<Person[]>;
+  getDescendancy(id: PersonId, generations: 1 | 2, signal?: AbortSignal): Promise<Person[]>;
 }
 
 interface TreeBuilder {
@@ -51,6 +53,8 @@ interface TreeBuilder {
 ```
 
 ## 4. Tree building algorithm
+The steps below are written for the prototype endpoint (one request per person). With ADR-10 the same builder calls `getAncestry` / `getDescendancy` through the `FamilySearchClient` interface, so one request returns many nodes; the stream of `ViewTree` updates and the cancellation rules stay the same.
+
 **V1 (ancestors)** – breadth-first by generation:
 1. Fetch root details (full).
 2. For each person in generation *g*, read `parentSets[0]` → parents (light). Fetch the parents' details for generation *g+1* (full), within the concurrency limit.

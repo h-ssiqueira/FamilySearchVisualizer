@@ -20,22 +20,35 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 
 ## Decisions confirmed so far
 - Pure client-side SPA hosted on GitHub Pages (no backend).
-- Login = Google sign-in, then FamilySearch OAuth2 authorization code + PKCE. Intent: the login authenticates the user so the app can retrieve data through the APIs (see the technical caveat in [auth](5-security/1-auth-authorization.md), OQ-01).
+- Login: the user signs in on **FamilySearch's own login page** (OAuth2 authorization code + PKCE). Google is one of the sign-in methods offered *there*; the app has no separate Google sign-in, no Google client and no Google SDK (OQ-01 resolved).
 - V1 ancestor depth is **unlimited**: loaded incrementally, generation by generation, always cancellable (ADR-09).
-- First-version views: V1 direct line, V2 + siblings/children of each couple, V3 + spouses of those children and their children (see [objective](1-overview/2-objective.md)).
+- Views confirmed (OQ-03 resolved): V1 direct line; V2 = V1 + all children of every couple shown; V3 = V2 + the spouses of those children and their children, one level only (see [objective](1-overview/2-objective.md)).
+- No FamilySearch developer key exists yet (OQ-07): getting one is the first project milestone.
+- The sample files contain real personal data and must be sanitized (OQ-09 confirmed, action A3).
+
+## Action items
+| ID | Action | Why |
+|----|--------|-----|
+| A1 | Create a FamilySearch developer account and an integration (sandbox) app; register redirect URIs (localhost, GitHub Pages) | No key = no login, no API calls |
+| A2 | Run the spike in [arch vision](3-architecture/1-arch-vision.md) (PKCE from a browser, CORS, token lifetime, one ancestry call) | Confirms ADR-01 is viable |
+| A3 | Remove or anonymize real data in `4-design/3-interfaces.md` and `8-attachments/examples.md`; if it was ever on a public branch, treat it as exposed and rewrite history or ask GitHub to purge caches | Privacy of (possibly living) people |
+| A4 | Ask FamilySearch developer support: public (secret-less) browser client? CORS? production review for a personal project? | Unknowns that decide the architecture |
+| A5 | Decide OQ-06 (documented API) before building the tree builder | Avoids rework and key suspension |
 
 ## Open questions
 | ID | Question | Affects |
 |----|----------|---------|
-| OQ-01 | Author's intent: Google login authenticates the user so the app can call the APIs. Caveat: FamilySearch's API accepts only a FamilySearch token, not a Google credential. Is Google (a) just one way to sign in on FamilySearch's own login page, so the app needs only the FamilySearch flow, or (b) a separate sign-in in the app that only identifies the visitor? | 5-security, FR-01, ADR-03 |
+| OQ-01 | ~~Google login mechanism~~ **Resolved:** Google is used on FamilySearch's login page; the app never talks to Google. Note: the URL `https://ident.familysearch.org/oauth2/authorization/google` could not be opened (the site blocks automated access) and it is not part of the documented flow, so the app should start from the documented authorization endpoint and let the user choose Google there. | 5-security |
 | OQ-02 | ~~Maximum generations~~ **Resolved: unlimited.** Remaining: how many generations to auto-load before asking the user to continue (proposed: 4)? | FR-12, ADR-09 |
-| OQ-03 | Confirm V2 and V3 interpretation (see objective, section "Views"). | FR-13, FR-14 |
+| OQ-03 | ~~V2/V3 interpretation~~ **Resolved: confirmed.** | FR-13, FR-14 |
 | OQ-04 | People can have several parent sets (biological, adoptive, step) and several spouses. Show only the first/preferred, or let the user switch? | FR-19, data model |
-| OQ-05 | Do all cards need dates/places (one request per person) or can cards show name only until selected? | NFR-02, flows |
-| OQ-06 | The person-details endpoint (`service/tree/tree-data/v8/...`) looks like the website's internal API. Is there an agreement/permission, or should it be replaced by the documented `api.familysearch.org` API? | R-01 |
-| OQ-07 | Is a FamilySearch developer key already registered? Redirect URIs (GitHub Pages URL, localhost) must be pre-registered with FamilySearch. | 5-security, 7-operations |
+| OQ-05 | Do all cards need dates/places or can cards show name only until selected? | NFR-02, flows |
+| OQ-06 | **Critical.** FamilySearch's compatibility rules say an app using undocumented APIs is not listed and its app key is disabled. `service/tree/tree-data/v8/...` is not documented. Proposal (ADR-10): use the documented `api.familysearch.org/platform/tree/ancestry` and `descendancy` endpoints (several generations per call). Adopt? | R-01, data model, module design |
+| OQ-07 | **No developer key yet.** Integration (sandbox) key comes with a developer account; beta and production require the compatibility review. Until then the app can show test data only. Accept? | R-04, roadmap |
 | OQ-08 | UI languages (en only, or pt-BR as well)? | NFR-08 |
-| OQ-09 | `3-interfaces.md` and `8-attachments/examples.md` look like raw API samples. If they contain real people (especially living ones) they should be anonymized before being public. | NFR-05 |
-| OQ-10 | Placement of parents in the binary tree (father left / mother right, or `parent1` left)? | data model, FR-11 |
+| OQ-09 | ~~Do the samples contain real people?~~ **Yes** (author's answer). See action A3. | NFR-05, R-05 |
+| OQ-10 | Placement of parents in the binary tree (father left / mother right, or `parent1` left)? If ADR-10 is adopted, ahnen numbering (father = even, mother = odd) answers this. | data model, FR-11 |
 | OQ-11 | Is client-side error reporting (e.g. Sentry) acceptable, or zero telemetry? | 7-operations |
 | OQ-12 | Final URL (user page, project page, custom domain)? | 7-operations, OAuth redirect |
+| OQ-13 | Production review requires signed agreements and a security assessment. Is that acceptable for a personal project, or is v1 limited to sandbox/beta data? Who signs (person or organization)? | roadmap, R-04 |
+| OQ-14 | Newer FamilySearch developer pages mention a client ID **and client secret**. A browser app cannot keep a secret: does a public (PKCE-only) client type exist? | ADR-02, A4 |
