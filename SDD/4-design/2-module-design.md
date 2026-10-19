@@ -3,8 +3,8 @@
 ## 1. Source layout (proposed)
 ```
 src/
-  config/        environment (client ids, base URLs, limits)
-  auth/          familySearchAuth, pkce, tokenStore
+  config/        environment (login/API addresses, base path, limits)
+  auth/          login, tokenStore
   api/           familySearchClient, requestQueue, endpoints, dto (schemas), mappers
   domain/        types (Person, Couple, ...), rules (siblings, dates, pedigree collapse)
   tree/          treeBuilder (V1/V2/V3), layout, selectors
@@ -24,7 +24,7 @@ src/
 ## 3. Modules
 | Module | Responsibility | Main public API |
 |--------|----------------|-----------------|
-| `auth/familySearchAuth` | PKCE login, state check, token exchange, token in memory | `startLogin()`, `handleRedirect()`, `getAccessToken()`, `logout()` |
+| `auth/login` | Navigate to the configured login address, take the token (mechanism: OQ-21), hold it in memory, logout | `startLogin()`, `setToken()`, `getToken()`, `logout()` |
 | `api/familySearchClient` | The single door to FamilySearch | `getCurrentUser()`, `getPersonDetails(id, signal)` |
 | `api/requestQueue` | Concurrency limit, `Retry-After`, back-off, cancellation | `enqueue(task)` |
 | `api/mappers` | DTO → domain with validation and date fallback | `toPerson(dto)`, `toCurrentUser(dto)` |

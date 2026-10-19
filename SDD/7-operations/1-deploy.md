@@ -4,12 +4,12 @@
 ## Details (proposed)
 
 ## 1. Environments
-| Environment | Host | FamilySearch | Purpose |
-|-------------|------|--------------|---------|
-| Local | `http://localhost:<port>` | Local redirect URI | Development and tests |
-| Production | GitHub Pages (URL: OQ-12) | Production redirect URI | Users |
+| Environment | Host | Purpose |
+|-------------|------|---------|
+| Local | `http://localhost:5173/FamilySearchVisualizer/` | Development and tests |
+| Production | GitHub Pages `https://h-ssiqueira.github.io/FamilySearchVisualizer/` | Users |
 
-Each environment has its own redirect URI. Client ids and base URLs are injected at **build time** through public environment variables (they are not secrets).
+The base path and the login/API addresses (`VITE_BASE_PATH`, `VITE_FS_LOGIN_URL`, `VITE_FS_API_BASE`) are injected at **build time** through public environment variables (they are not secrets). No OAuth client id or redirect URI is needed.
 
 ## 2. Pipeline (GitHub Actions)
 | Trigger | Jobs |
@@ -39,7 +39,7 @@ Workflow rules:
 Re-run the deployment workflow of the last good commit (or revert the commit on `main`). Details in [backup & recovery](3-backup-recovery.md).
 
 ## 6. Pre-go-live checklist
-- [ ] `client_id` and redirect URIs configured for each environment
+- [ ] `VITE_BASE_PATH`, `VITE_FS_LOGIN_URL` and `VITE_FS_API_BASE` set for production
 - [ ] Endpoint allow-list test passes
 - [ ] CSP finalized with actual hosts
 - [ ] No real personal data in the repository

@@ -11,8 +11,7 @@
 | Server-state, cache, retries | TanStack Query | Own queue (see ADR-05); either way must honor `Retry-After` |
 | UI state | React state / Zustand | Keep small: selected view, depth, root person |
 | Tree layout | `d3-hierarchy` (layout only) rendered as SVG by React | React Flow if interactive node editing/zoom is wanted out of the box |
-| Sign-in | FamilySearch OAuth2 + PKCE only; Google is chosen by the user on FamilySearch's page | No Google SDK needed |
-| FamilySearch auth | Hand-written PKCE with WebCrypto (small, auditable) | `oidc-client-ts` if a library is preferred |
+| Sign-in | Navigate to FamilySearch's Google login address; no OAuth, Google or PKCE library | Small in-house token module (in-memory) |
 | Validation | Zod (runtime schema of API responses) | Valibot |
 | Styling | CSS Modules or Tailwind | Pick one; accessibility tokens (contrast, focus) shared |
 | i18n | `react-i18next` or `LinguiJS` (OQ-08) | – |

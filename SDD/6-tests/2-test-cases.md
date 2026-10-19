@@ -5,14 +5,14 @@ Format: Given / When / Then. Level: U unit, C component, I integration, E end-to
 ## Authentication
 | ID | Req | Level | Case |
 |----|-----|-------|------|
-| TC-01 | FR-01 | C/E | Given no session, when the app opens, then only the "Sign in with FamilySearch" button is shown |
-| TC-02 | FR-02 | U | PKCE: `code_challenge` equals base64url(SHA-256(verifier)); verifier length/charset valid |
-| TC-03 | FR-02 | I | Redirect with matching `state` → token exchange sent with `code_verifier` |
-| TC-04 | FR-02, NFR-04 | I | Redirect with wrong/missing `state` → flow aborted, no token request |
-| TC-05 | FR-02 | I | User denies consent (`error` param) → friendly message, retry possible |
+| TC-01 | FR-01 | C/E | Given no session, when the app opens, then only the "Sign in with Google (FamilySearch)" button is shown |
+| TC-02 | FR-01 | C | The login button navigates to the configured login address (`VITE_FS_LOGIN_URL`) and to nothing else |
+| TC-03 | FR-02 | I | Once a token is available, API calls carry `Authorization: Bearer` and only go to `www.familysearch.org` |
+| TC-04 | FR-02, NFR-04 | I | The token never appears in the URL, console output, error messages, `localStorage` or `sessionStorage` |
+| TC-05 | FR-01 | I | User cancels or login fails → friendly message, retry possible |
 | TC-06 | FR-03 | I | Logout → memory, `sessionStorage` and cache cleared; protected view not reachable |
 | TC-07 | FR-04 | I | 401 on a person request → re-login prompt; after login, same view and loaded generations resumed |
-| TC-08 | NFR-04 | I | After redirect the `code` is not present in the URL/history |
+| TC-08 | NFR-04 | I | A token or login parameter that arrives in the URL is removed with `history.replaceState` before the router starts |
 
 ## Data and mapping
 | ID | Req | Level | Case |

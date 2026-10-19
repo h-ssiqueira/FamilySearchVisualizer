@@ -3,18 +3,19 @@
 ## 1. Threats and controls (STRIDE-lite)
 | Threat | Example | Control |
 |--------|---------|---------|
-| Spoofing | Forged OAuth redirect | `state` check, exact registered redirect URI, PKCE S256 |
+| Spoofing | Phishing link or fake login page | The app only navigates to the configured FamilySearch login address (fixed, allow-listed); the privacy notice tells the user to check the address |
 | Tampering | Modified third-party script | Few dependencies, lock file, Dependabot, SRI for any external script (prefer none) |
 | Information disclosure | Token or family data leaked | Token in memory, no PII in logs, no analytics by default, `Referrer-Policy: no-referrer` (via `<meta>`) |
 | XSS | Malicious text inside a FamilySearch name or place (user-generated content) | Render via React text nodes only; ban `dangerouslySetInnerHTML` (ESLint); strict CSP |
-| CSRF / login CSRF | Attacker injects an authorization code | `state` + PKCE verifier bound to the tab |
+| Token injection | An attacker makes the app use the attacker's token | Token accepted only through the defined intake path and validated with `users/current` |
 | Denial of service (self-inflicted) | Request storm triggers throttling for the user | Concurrency limit, depth limit, `Retry-After`, cancellation |
-| Elevation of privilege | Use of the token for writes | Client exposes GET only; token scope minimal |
+| Elevation of privilege | Use of the token for writes | Client exposes GET only; the token itself is the account's full session, so it is never stored or sent anywhere except `www.familysearch.org` |
+| Session token theft | XSS steals the token and takes over the FamilySearch account | Strict CSP, no third-party scripts, React text rendering only, token in memory only |
 | Repudiation | n/a (no server) | – |
 
 ## 2. Browser hardening
 GitHub Pages cannot send custom response headers, so use `<meta>` where possible:
-- CSP (meta): `default-src 'self'`; `script-src 'self'` (no external scripts); `connect-src 'self' https://api.familysearch.org https://ident.familysearch.org` (the beta host `identbeta.familysearch.org` in non-production builds); `frame-src 'none'`; `object-src 'none'`; `base-uri 'none'`. Finalize after the spike (exact hosts).
+- CSP (meta): `default-src 'self'`; `script-src 'self'` (no external scripts); `connect-src 'self' https://www.familysearch.org`; `frame-src 'none'`; `object-src 'none'`; `base-uri 'none'`. Finalize after the spike (exact hosts).
 - No inline scripts; no `eval`.
 - `rel="noopener noreferrer"` on external links.
 - Note: `frame-ancestors` and some headers are not enforceable via `<meta>`; if clickjacking protection is needed, put the site behind a proxy/CDN that can set headers (e.g. custom domain via a CDN).

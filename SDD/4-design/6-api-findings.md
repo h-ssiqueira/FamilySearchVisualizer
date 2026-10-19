@@ -13,7 +13,7 @@ Request headers that matter: `Accept: application/json`, `Accept-Language` (the 
 ## 2. How the samples were captured (important for feasibility)
 - They come from the **FamilySearch website itself**: same-origin requests (`Sec-Fetch-Site: same-origin`), sent with the site's cookies, from the website's own pages.
 - The Bearer token in both requests has the **same value as the `fssessionid` cookie**: it is the website's login session id, not a token issued to a third-party application.
-- Consequences for a static app on `github.io`: (1) cross-origin calls need CORS headers from `www.familysearch.org`, which is unknown; (2) the browser will not send the website's cookies to a different site; (3) it is unknown whether an OAuth access token is accepted by `tree-data/v8`. See R-02 and OQ-21.
+- Consequences for a static app on `github.io`: (1) cross-origin calls need CORS headers from `www.familysearch.org`, which is unknown; (2) the browser will not send the website's cookies to a different site; (3) the decision is to obtain the token through the Google login address of the identity service (see the auth doc); how that token reaches a page on `github.io` is unverified. See R-02 and OQ-21.
 
 ## 3. Person details: fields the app uses
 | App need | Field | Notes |

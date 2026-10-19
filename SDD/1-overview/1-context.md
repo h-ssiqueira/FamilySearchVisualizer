@@ -12,11 +12,11 @@ FamilySearch hosts a large, shared, free family tree. Its own interface is dense
 | End user (hobbyist genealogist) | Quick, readable view of their own tree |
 | Maintainer (h-ssiqueira) | Low-cost hosting, maintainable code base |
 | FamilySearch | API provider; enforces throttling |
-| Google | Optional sign-in method offered on FamilySearch's login page (no direct integration) |
+| Google | Identity provider behind FamilySearch's login (no direct integration from the app) |
 
 ## 1.4 Scope
 **In scope**
-- Sign in through FamilySearch (OAuth2 + PKCE); the user may choose Google on FamilySearch's login page.
+- Sign in with Google through FamilySearch's identity service.
 - Read the current user and relatives' details from FamilySearch.
 - Render three tree views (see [objective](2-objective.md)).
 
@@ -29,15 +29,15 @@ FamilySearch hosts a large, shared, free family tree. Its own interface is dense
 ## 1.5 External systems
 | System | Role | Notes |
 |--------|------|-------|
-| FamilySearch Identity (`ident.familysearch.org`) | OAuth2 authorization + token endpoint; Google is selectable on its login page | Beta: `identbeta.familysearch.org` |
+| FamilySearch Identity (`ident.familysearch.org`) | Google login (`/oauth2/authorization/google`); creates the session/token | How the token reaches the SPA is unverified (OQ-21) |
 | FamilySearch API | `users/current`, person details | Per-user throttling (HTTP 429 + `Retry-After`) |
 | GitHub Pages / Actions | Hosting / CI-CD | Static files only |
 
 ## 1.6 Constraints
 - No backend: every call is made from the browser; no secret can be kept.
-- The OAuth `client_id` and redirect URIs are build-time configuration; how they are obtained is out of scope of this SDD.
+- Authentication relies on the FamilySearch session token produced by the Google login address in `examples.md`; whether a page on `github.io` can receive it is unverified (OQ-21).
 - GitHub Pages cannot set HTTP response headers and has no server-side routing.
-- Prefer documented FamilySearch APIs (ADR-10); the internal `tree-data` endpoint may change without notice.
+- The app uses the website's internal endpoints exactly as in `examples.md` (ADR-10 not adopted); they may change without notice.
 - Data belongs to FamilySearch users and may include living people: privacy by default.
 
 ## 1.7 Assumptions

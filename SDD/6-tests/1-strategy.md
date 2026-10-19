@@ -3,11 +3,11 @@
 ## 1. Pyramid
 | Level | Scope | Tools (proposed) | Share |
 |-------|-------|------------------|-------|
-| Unit | domain rules, mappers (date fallback, missing parents), PKCE helpers, tree builder, layout | Vitest | Most |
+| Unit | domain rules, mappers (date fallback, missing parents), in-memory token store, tree builder, layout | Vitest | Most |
 | Component | `PersonCard`, `TreeCanvas`, Login, error/loading states, keyboard navigation | Vitest + React Testing Library | Many |
 | Contract | FamilySearch responses vs. schemas (using anonymized fixtures) | Vitest + Zod schemas | Some |
 | Integration | auth flow and view building against a mocked API (throttling, 401, 404) | MSW | Some |
-| End-to-end | login redirect (mocked identity), V1→V2→V3 navigation | Playwright | Few |
+| End-to-end | login navigation (mocked identity), V1→V2→V3 navigation | Playwright | Few |
 | Non-functional | accessibility (axe), request-count budget per view, bundle size | axe-core, Playwright, CI checks | Targeted |
 
 ## 2. Test data
@@ -16,7 +16,7 @@
 
 ## 3. Mocking external systems
 - FamilySearch API: MSW handlers; scripted `429 + Retry-After`, `401`, `5xx`, slow responses.
-- FamilySearch identity: stubbed in unit/integration tests; in E2E the redirect is intercepted and a fake code returned.
+- FamilySearch identity: stubbed in unit/integration tests; in E2E the login navigation is intercepted and a fake token is injected.
 - Real systems are exercised only in a **manual smoke test** against a real FamilySearch account (needs credentials; not automated in CI).
 
 ## 4. Quality gates (CI)
