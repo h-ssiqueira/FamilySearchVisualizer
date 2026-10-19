@@ -36,8 +36,10 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-20 | Loading, empty, partial-failure and error states are visible and recoverable (retry per node). | M |
 | FR-21 | Pan and zoom of the tree canvas. | S |
 | FR-22 | Export current view as image/PDF. | C |
-| FR-24 | Cards have a fixed height (90 px) and a width of 250 px (up to 330 px for long places, OQ-19); long text is truncated with an ellipsis and available in a tooltip. | M |
-| FR-25 | Dates are shown as `yyyy-MM-dd` when complete; partial, approximate or range dates show only what is known or the raw text; no invented day/month. | M |
+| FR-24 | Cards have a fixed size (250 × 90 px); long text is truncated with an ellipsis and the full text is available in a tooltip. | M |
+| FR-25 | Dates are shown as `yyyy-MM-dd` when complete; partial, approximate or range dates show only what is known or the raw text; no invented day/month. Age is shown only for deceased people; living people show only the birth date. | M |
 | FR-26 | Partners are joined by a horizontal line labelled with the marriage date and location; children hang from both parents with orthogonal lines; no arrowheads. | M |
-| FR-27 | Gender is shown by card colour (blue = male, pink = female, neutral = unknown) **and** by a non-colour cue (NFR-06). | M |
-| FR-28 | Layout as sketched: ancestors above, descendants below; man left and woman right in a parent couple; a person's spouse to the right (OQ-17, OQ-18). | M |
+| FR-27 | Gender is shown by card colour (blue = male, pink = female, neutral grey = unknown) **and** by a non-colour cue (NFR-06). | M |
+| FR-28 | Layout as sketched: vertical, ancestors above and descendants below (root at the bottom); man left and woman right in a parent couple; a person's spouse to the right. | M |
+| FR-29 | Several children of a couple are drawn side by side in one row below the couple; each child's slot reserves room for spouses only if they exist. | M |
+| FR-30 | Several spouses of one person are drawn to the right at the same level, each with its own marriage link; a person without a known spouse gets no spouse card and no placeholder. | M |

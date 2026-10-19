@@ -24,7 +24,7 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 - V1 ancestor depth is **unlimited**: loaded incrementally, generation by generation, always cancellable (ADR-09).
 - Views confirmed (OQ-03 resolved): V1 direct line; V2 = V1 + all children of every couple shown; V3 = V2 + the spouses of those children and their children, one level only (see [objective](1-overview/2-objective.md)).
 - Developer key, app registration and FamilySearch's compatibility review are **out of scope** of this SDD (author's decision). The OAuth `client_id` and the redirect URIs are treated as build-time configuration.
-- `4-design/3-interfaces.md` is a draw.io card/layout sketch with synthetic data; the [UI spec](4-design/5-ui-spec.md) is derived from it. Whether `8-attachments/examples.md` holds real personal data is still to be checked (action A3).
+- `4-design/3-interfaces.md` is a draw.io card/layout sketch with synthetic data; the [UI spec](4-design/5-ui-spec.md) is derived from it. UI decisions: living people show no age; unknown gender is neutral grey; several children side by side with room for spouses only if they exist; several spouses at the same level; vertical orientation with the root at the bottom; fixed 250 px cards with truncation (OQ-15 to OQ-19). Whether `8-attachments/examples.md` holds real personal data is still to be checked (action A3).
 
 ## Action items
 | ID | Action | Why |
@@ -53,8 +53,9 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 | OQ-12 | Final URL (user page, project page, custom domain)? | 7-operations, OAuth redirect |
 | OQ-13 | ~~Production review~~ **Dropped** (out of scope, author's decision). | – |
 | OQ-14 | ~~Public client type / client secret~~ **Dropped** (out of scope, author's decision). | – |
-| OQ-15 | Age for living people: current age, or no age? | 4-design/5-ui-spec |
-| OQ-16 | Colour for unknown gender (proposal: neutral grey)? | 4-design/5-ui-spec |
-| OQ-17 | Layout for several children, several spouses and a missing partner? | 4-design/5-ui-spec |
-| OQ-18 | Vertical orientation with the root at the bottom (as sketched) final, or also offer horizontal? | 4-design/5-ui-spec |
-| OQ-19 | Fixed 250 px cards with truncation, or growing up to 330 px for long places? | 4-design/5-ui-spec |
+| OQ-15 | ~~Age for living people~~ **Decided:** no age. | 4-design/5-ui-spec |
+| OQ-16 | ~~Unknown gender colour~~ **Decided:** neutral grey. | 4-design/5-ui-spec |
+| OQ-17 | ~~Several children / spouses~~ **Decided:** children side by side with room for spouses if they exist; several spouses at the same level; no spouse means no card. | 4-design/5-ui-spec |
+| OQ-18 | ~~Orientation~~ **Decided:** vertical, root at the bottom. | 4-design/5-ui-spec |
+| OQ-19 | ~~Card width~~ **Decided:** fixed 250 px with truncation (tooltip shows full text). | 4-design/5-ui-spec |
+| OQ-20 | Families with very many children in one row (e.g. 15+): one long row with pan/zoom, or wrap into several rows? | 4-design/5-ui-spec |
