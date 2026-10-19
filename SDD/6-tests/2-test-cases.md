@@ -63,3 +63,14 @@ Format: Given / When / Then. Level: U unit, C component, I integration, E end-to
 | TC-58 | FR-12 | I | Stop during "load all" aborts in-flight requests; already loaded nodes stay visible |
 | TC-59 | FR-12, NFR-02 | C | Tree with 1,000+ nodes: only visible nodes are rendered; pan/zoom stays responsive |
 | TC-60 | NFR-11, ADR-10 | U | API client refuses any URL not on the documented-endpoint allow-list and any non-GET method |
+
+## UI cards and layout
+| ID | Req | Level | Case |
+|----|-----|-------|------|
+| TC-61 | FR-17 | C | The sketch's example renders exactly four lines: `John Example` / `1800-12-31 - 1900-01-01 (99)` / `São Paulo, São Paulo, Brazil - São Paulo, São Paulo, Brazil` / `XXXX-XXX` |
+| TC-62 | FR-25 | U | Complete date → `yyyy-MM-dd`; year only → `1800`; approximate/range text → raw text; none → empty |
+| TC-63 | FR-24 | C | Very long place names are truncated with an ellipsis; tooltip shows the full text; card height stays 90 px |
+| TC-64 | FR-27, NFR-06 | C | Male, female and unknown cards differ by colour **and** by a non-colour cue; text contrast ≥ 4.5:1 |
+| TC-65 | FR-26 | C | A couple shows a horizontal link with marriage date and place; missing marriage data hides only the missing parts |
+| TC-66 | FR-28 | U | Parent couple: male card left of female card; child placed under the couple; spouse right of the person |
+| TC-67 | FR-26 | C | Parent–child links are orthogonal, have no arrowheads, and meet at the top centre of the child card |
