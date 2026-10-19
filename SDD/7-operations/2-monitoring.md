@@ -9,7 +9,7 @@ There is no server, so there are no server logs or metrics. Monitoring focuses o
 | Availability | Site reachable, bundle loads | Scheduled GitHub Actions canary (HTTP 200 on the site, expected asset present) |
 | Dependencies | Known vulnerabilities, outdated actions | Dependabot alerts, `npm audit` |
 | FamilySearch API drift | Response shape changes, 4xx/5xx rise | Contract tests on fixtures (CI); periodic manual smoke test with a test account, since automated checks would need user credentials |
-| Developer key | Key/redirect URI still valid and not disabled (undocumented API use can disable it) | Smoke test after any change; calendar reminder for key renewal if applicable |
+| OAuth configuration | `client_id` and redirect URI still work | Smoke test after any change |
 | Client errors | Unhandled exceptions | React error boundary with friendly message; optional reporting only if OQ-11 allows |
 
 ## 2. Client-side diagnostics (privacy-safe)

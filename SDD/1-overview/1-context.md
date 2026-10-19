@@ -4,14 +4,14 @@
 FamilySearch hosts a large, shared, free family tree. Its own interface is dense and exposes many features. FamilySearch Visualizer is a small companion app that presents the tree in a simple, readable, progressively detailed way, starting from the signed-in user.
 
 ## 1.2 Problem statement
-Users who only want to *see* their family structure must navigate a feature-heavy UI. They need a compact view that starts at themselves and grows one step at a time.
+*(Assumption – confirm wording)* Users who only want to *see* their family structure must navigate a feature-heavy UI. They need a compact view that starts at themselves and grows one step at a time.
 
 ## 1.3 Stakeholders
 | Stakeholder | Interest |
 |-------------|----------|
 | End user (hobbyist genealogist) | Quick, readable view of their own tree |
 | Maintainer (h-ssiqueira) | Low-cost hosting, maintainable code base |
-| FamilySearch | API provider; enforces developer key, redirect URIs, throttling |
+| FamilySearch | API provider; enforces throttling |
 | Google | Optional sign-in method offered on FamilySearch's login page (no direct integration) |
 
 ## 1.4 Scope
@@ -35,10 +35,9 @@ Users who only want to *see* their family structure must navigate a feature-heav
 
 ## 1.6 Constraints
 - No backend: every call is made from the browser; no secret can be kept.
-- ~~FamilySearch requires an app key (developer key), and redirect URIs must be pre-registered with FamilySearch developer support.~~
+- The OAuth `client_id` and redirect URIs are build-time configuration; how they are obtained is out of scope of this SDD.
 - GitHub Pages cannot set HTTP response headers and has no server-side routing.
-- ~~Real family data requires a **production** app key, which needs FamilySearch's compatibility review; the integration (sandbox) environment has test data only. No key exists yet.~~
-- ~~Only documented FamilySearch APIs may be used (undocumented ones can get the key disabled).~~
+- Prefer documented FamilySearch APIs (ADR-10); the internal `tree-data` endpoint may change without notice.
 - Data belongs to FamilySearch users and may include living people: privacy by default.
 
 ## 1.7 Assumptions

@@ -17,7 +17,7 @@
 ## 3. Mocking external systems
 - FamilySearch API: MSW handlers; scripted `429 + Retry-After`, `401`, `5xx`, slow responses.
 - FamilySearch identity: stubbed in unit/integration tests; in E2E the redirect is intercepted and a fake code returned.
-- Real systems are exercised only in a **manual smoke test** against the integration (sandbox) or beta environment (needs credentials; not automated in CI).
+- Real systems are exercised only in a **manual smoke test** against a real FamilySearch account (needs credentials; not automated in CI).
 
 ## 4. Quality gates (CI)
 - `tsc --noEmit`, ESLint, Prettier check.
@@ -27,6 +27,6 @@
 - Dependency audit: no known high/critical vulnerabilities.
 
 ## 5. Manual checks before release
-- Real login on integration/beta with a test FamilySearch account (including the Google option); V1/V2/V3 on a real tree.
+- Real login with a FamilySearch account (including the Google option); V1/V2/V3 on a real tree.
 - Throttling behavior (FamilySearch offers a throttling test resource for this purpose).
 - Keyboard-only walkthrough; screen reader smoke test; mobile viewport.

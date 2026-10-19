@@ -6,10 +6,10 @@
 ## 1. Environments
 | Environment | Host | FamilySearch | Purpose |
 |-------------|------|--------------|---------|
-| Local | `http://localhost:<port>` | Integration (sandbox) key | Development and tests |
-| Production | GitHub Pages (URL: OQ-12) | Production key, available only after the compatibility review (until then integration/beta, test data) | Users |
+| Local | `http://localhost:<port>` | Local redirect URI | Development and tests |
+| Production | GitHub Pages (URL: OQ-12) | Production redirect URI | Users |
 
-Each environment needs its own **registered redirect URI** with FamilySearch (OQ-07). Client ids and base URLs are injected at **build time** through public environment variables (they are not secrets).
+Each environment has its own redirect URI. Client ids and base URLs are injected at **build time** through public environment variables (they are not secrets).
 
 ## 2. Pipeline (GitHub Actions)
 | Trigger | Jobs |
@@ -39,9 +39,8 @@ Workflow rules:
 Re-run the deployment workflow of the last good commit (or revert the commit on `main`). Details in [backup & recovery](3-backup-recovery.md).
 
 ## 6. Pre-go-live checklist
-- [ ] Developer account and sandbox app created; redirect URIs registered
-- [ ] Compatibility review completed and production key enabled (or release explicitly limited to test data)
-- [ ] Only documented endpoints in use (allow-list test passes)
+- [ ] `client_id` and redirect URIs configured for each environment
+- [ ] Endpoint allow-list test passes
 - [ ] CSP finalized with actual hosts
 - [ ] No real personal data in the repository
-- [ ] Beta smoke test passed with a real account
+- [ ] Smoke test passed with a real account

@@ -33,5 +33,5 @@ GitHub Pages cannot send custom response headers, so use `<meta>` where possible
 - Show a short privacy notice on the login page (what is read, that nothing is stored).
 
 ## 5. Compliance
-- Follow FamilySearch developer terms and compatibility rules; read-only, honor throttling.
-- **Documented endpoints only**: an allow-list of URL patterns in the API client enforces this (R-01, ADR-10, OQ-06).
+- Follow FamilySearch's terms of use; read-only, honor throttling.
+- **Endpoint allow-list**: the API client only calls a fixed list of URL patterns (R-01, ADR-10, OQ-06).
