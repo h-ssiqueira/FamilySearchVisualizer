@@ -11,7 +11,7 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 | 4 | Design | [data model](4-design/1-data-model.md), [modules](4-design/2-module-design.md), [interfaces](4-design/3-interfaces.md), [flows](4-design/4-flows.md), [UI spec](4-design/5-ui-spec.md) |
 | 5 | Security | [auth](5-security/1-auth-authorization.md), [controls](5-security/2-security-controls.md) |
 | 6 | Tests | [strategy](6-tests/1-strategy.md), [test cases](6-tests/2-test-cases.md) |
-| 7 | Operations | [deploy](7-operations/1-deploy.md), [monitoring](7-operations/2-monitoring.md), [backup & recovery](7-operations/3-backup-recovery.md) |
+| 7 | Operations | [deploy](7-operations/1-deploy.md), [monitoring](7-operations/2-monitoring.md), [backup & recovery](7-operations/3-backup-recovery.md), [scaffold checklist](7-operations/4-scaffold-checklist.md) |
 | 8 | Attachments | [examples](8-attachments/examples.md), [glossary](8-attachments/glossary.md) |
 
 ## Conventions
@@ -33,6 +33,7 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 | A2 | Run the spike in [arch vision](3-architecture/1-arch-vision.md) (PKCE from a browser, CORS, token lifetime, one ancestry call) | Confirms ADR-01 is viable |
 | A3 | Check `8-attachments/examples.md` for real personal data (`3-interfaces.md` is synthetic) and anonymize it if needed; if real data was ever on a public branch, treat it as exposed and rewrite history or ask GitHub to purge caches | Privacy of (possibly living) people |
 | A6 | Move the diagram from `3-interfaces.md` to a `.drawio` / `.svg` file in `8-attachments/` and link it (the Markdown is 99 % base64) | Readability, repository size |
+| A7 | Execute the [scaffold checklist](7-operations/4-scaffold-checklist.md) (first settle its section 0 decisions) | Working, tested, deployable base for feature work |
 | A4 | ~~Ask FamilySearch developer support~~ **Dropped** (out of scope) | – |
 | A5 | Decide OQ-06 (documented API) before building the tree builder | Avoids rework if the internal endpoint changes |
 
