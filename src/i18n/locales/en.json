@@ -1,0 +1,24 @@
+{
+  "app": { "title": "FamilySearch Visualizer" },
+  "login": {
+    "heading": "FamilySearch Visualizer",
+    "description": "See your family tree in simple, progressively richer views.",
+    "button": "Sign in with Google (FamilySearch)",
+    "privacy": "You sign in with Google through FamilySearch. Your FamilySearch session token and your family data stay in this browser tab; nothing is stored or sent anywhere except to FamilySearch."
+  },
+  "tree": {
+    "heading": "Your family tree",
+    "placeholder": "The tree views are coming soon.",
+    "logout": "Sign out"
+  },
+  "config": {
+    "heading": "Configuration problem",
+    "body": "The app is missing settings or has invalid ones:",
+    "hint": "Copy .env.example to .env, fill in the values and build again."
+  },
+  "error": { "generic": "Something went wrong. Please reload the page." },
+  "card": {
+    "gender": { "male": "Male", "female": "Female", "unknown": "Unknown gender" }
+  },
+  "language": { "label": "Language", "en": "English", "pt-BR": "Português (Brasil)" }
+}
