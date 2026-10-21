@@ -8,8 +8,25 @@
   },
   "tree": {
     "heading": "Sua árvore genealógica",
-    "placeholder": "As visões da árvore chegam em breve.",
-    "logout": "Sair"
+    "logout": "Sair",
+    "loading": "Carregando…",
+    "loadingDetails": "Carregando parentes…",
+    "generations": "Gerações carregadas: {{count}}",
+    "next": "Carregar próxima geração",
+    "all": "Carregar todas as gerações",
+    "stop": "Parar",
+    "retry": "Tentar de novo",
+    "error": "Não foi possível carregar a árvore. Verifique a conexão e tente de novo.",
+    "canvas": "Árvore genealógica. Arraste para mover; use as setas para mover, mais e menos para ampliar, zero para ajustar.",
+    "zoomIn": "Ampliar",
+    "zoomOut": "Reduzir",
+    "fit": "Ajustar à tela",
+    "view": {
+      "label": "Visão",
+      "V1": "Linha direta",
+      "V2": "Casais e filhos",
+      "V3": "Família estendida"
+    }
   },
   "config": {
     "heading": "Problema de configuração",

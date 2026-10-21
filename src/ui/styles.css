@@ -31,8 +31,20 @@ body {
   cursor: pointer;
 }
 
+.button:disabled {
+  background: #767676;
+  cursor: not-allowed;
+}
+
+.button--toggle[aria-pressed='true'] {
+  outline: 2px solid #111;
+  outline-offset: 1px;
+  font-weight: 700;
+}
+
 .button:focus-visible,
-select:focus-visible {
+select:focus-visible,
+.tree-viewport:focus-visible {
   outline: 3px solid #f2a900;
   outline-offset: 2px;
 }
@@ -93,4 +105,104 @@ select:focus-visible {
 .person-card__name {
   font-size: 0.9rem;
   font-weight: 600;
+}
+
+/* Signed-in screen: toolbar on top, the canvas takes the rest of the window. */
+.tree-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 0.75rem 1rem;
+  box-sizing: border-box;
+}
+
+.tree-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tree-header h1 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.tree-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.tree-views {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.tree-status {
+  margin: 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.tree-canvas {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.tree-zoom {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.tree-viewport {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  cursor: grab;
+  touch-action: none;
+}
+
+.tree-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+.tree-links {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.tree-link {
+  fill: none;
+  stroke: #555;
+  stroke-width: 2;
+}
+
+.tree-marriage {
+  stroke: #555;
+  stroke-width: 2;
+}
+
+.tree-label {
+  fill: #222;
+  font-size: 11px;
+  text-anchor: middle;
+}
+
+.tree-card {
+  position: absolute;
 }
