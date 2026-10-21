@@ -3,6 +3,8 @@ import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it } from 'vitest';
 import { tokenStore } from '@/auth';
 import type { ConfigResult } from '@/config';
+import type { CurrentUser } from '@/domain';
+import type { Services } from '@/services';
 import { signOut } from '@/state';
 import { App } from './App';
 
@@ -15,10 +17,19 @@ const valid: ConfigResult = {
   },
 };
 
+// A client that never answers: these tests are about routing, not about loading the tree.
+const idleServices = (): Services => ({
+  client: {
+    getCurrentUser: () => new Promise<CurrentUser>(() => undefined),
+    getPersonDetails: () => Promise.reject(new Error('not used')),
+  },
+  source: { getPerson: async () => null },
+});
+
 function renderApp(configResult: ConfigResult = valid, entries: string[] = ['/']) {
   return render(
     <MemoryRouter initialEntries={entries}>
-      <App configResult={configResult} />
+      <App configResult={configResult} createServices={idleServices} />
     </MemoryRouter>,
   );
 }
@@ -33,7 +44,7 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: /sign in with google/i })).toBeInTheDocument();
   });
 
-  it('shows the tree placeholder with a token and goes back to login on sign-out (TC-06)', async () => {
+  it('shows the tree screen with a token and goes back to login on sign-out (TC-06)', async () => {
     tokenStore.set('synthetic-token');
     renderApp();
     expect(screen.getByRole('heading', { name: 'Your family tree' })).toBeInTheDocument();
