@@ -1,0 +1,54 @@
+# MOVE ME: see .github/workflows-pending/ci.yml (git mv .github/workflows-pending .github/workflows).
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  VITE_BASE_PATH: /FamilySearchVisualizer/
+  VITE_FS_API_BASE: https://www.familysearch.org
+  VITE_FS_LOGIN_URL: https://ident.familysearch.org/oauth2/authorization/google
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # TODO: pin third-party actions by commit SHA (SDD security controls, section 3).
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Install
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test:coverage
+      - run: npm run build
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

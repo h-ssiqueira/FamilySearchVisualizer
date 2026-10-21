@@ -1,0 +1,32 @@
+# MOVE ME: see .github/workflows-pending/ci.yml (git mv .github/workflows-pending .github/workflows).
+name: canary
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Install
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - name: Dependency audit (high and critical)
+        run: npm audit --audit-level=high
+
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      # Fails until the first deployment to GitHub Pages has happened.
+      - name: Check that the deployed site answers and serves the app shell
+        run: |
+          curl -fsSL --retry 3 https://h-ssiqueira.github.io/FamilySearchVisualizer/ | grep -q 'id="root"'
