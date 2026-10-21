@@ -164,6 +164,8 @@ export function TreeCanvas({ layout }: { layout: FamilyLayout }) {
         <div
           className="tree-stage"
           data-scale={transform.scale}
+          data-x={transform.x}
+          data-y={transform.y}
           style={{
             width: layout.width,
             height: layout.height,

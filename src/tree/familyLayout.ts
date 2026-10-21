@@ -271,8 +271,14 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
   if (placements.length === 0) return EMPTY;
 
   const extent = overallExtent(placements);
-  const maxRow = placements.reduce((max, placement) => Math.max(max, placement.row), placements[0]?.row ?? 0);
-  const minRow = placements.reduce((min, placement) => Math.min(min, placement.row), maxRow);
+  const maxRow = placements.reduce(
+    (max, placement) => Math.max(max, placement.row),
+    Number.NEGATIVE_INFINITY,
+  );
+  const minRow = placements.reduce(
+    (min, placement) => Math.min(min, placement.row),
+    Number.POSITIVE_INFINITY,
+  );
   const pitch = CARD.height + SPACING.rowGap;
 
   const positioned = new Map<PersonId, PositionedCard>();
@@ -295,7 +301,8 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
 
     const [one, two] = partners;
     if (one && two) {
-      const [left, right] = one.x <= two.x ? [one, two] : [two, one];
+      const left = one.x <= two.x ? one : two;
+      const right = left === one ? two : one;
       marriages.push({
         coupleId: couple.id,
         x1: left.x + CARD.width,

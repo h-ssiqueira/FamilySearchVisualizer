@@ -26,8 +26,8 @@ const view: FamilyView = {
 };
 const layout = layoutFamily(view);
 
-function scaleOf(container: HTMLElement): string | null {
-  return container.querySelector('.tree-stage')?.getAttribute('data-scale') ?? null;
+function stageAttribute(container: HTMLElement, name: string): string | null {
+  return container.querySelector('.tree-stage')?.getAttribute(name) ?? null;
 }
 
 describe('TreeCanvas', () => {
@@ -45,24 +45,28 @@ describe('TreeCanvas', () => {
     const { container } = render(<TreeCanvas layout={layout} />);
     const region = screen.getByRole('region', { name: /^Family tree/ });
     expect(region).toHaveAttribute('tabindex', '0');
-    expect(scaleOf(container)).toBe('1');
+    expect(stageAttribute(container, 'data-scale')).toBe('1');
     fireEvent.keyDown(region, { key: '+' });
-    expect(scaleOf(container)).toBe('1.2');
+    expect(stageAttribute(container, 'data-scale')).toBe('1.2');
     fireEvent.keyDown(region, { key: '-' });
-    expect(Number(scaleOf(container))).toBeCloseTo(1, 5);
+    expect(Number(stageAttribute(container, 'data-scale'))).toBeCloseTo(1, 5);
   });
 
-  it('zooms with the buttons and pans with the arrow keys', () => {
+  it('zooms with the buttons', () => {
     const { container } = render(<TreeCanvas layout={layout} />);
     fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
-    expect(scaleOf(container)).toBe('1.2');
+    expect(stageAttribute(container, 'data-scale')).toBe('1.2');
     fireEvent.click(screen.getByRole('button', { name: 'Zoom out' }));
-    expect(Number(scaleOf(container))).toBeCloseTo(1, 5);
+    expect(Number(stageAttribute(container, 'data-scale'))).toBeCloseTo(1, 5);
+  });
 
+  it('pans with the arrow keys', () => {
+    const { container } = render(<TreeCanvas layout={layout} />);
     const region = screen.getByRole('region', { name: /^Family tree/ });
-    const stage = container.querySelector('.tree-stage');
     fireEvent.keyDown(region, { key: 'ArrowLeft' });
-    expect(stage?.getAttribute('style')).toContain('translate(60px');
+    expect(stageAttribute(container, 'data-x')).toBe('60');
+    fireEvent.keyDown(region, { key: 'ArrowDown' });
+    expect(stageAttribute(container, 'data-y')).toBe('-60');
   });
 
   it('renders nothing but the controls for an empty layout', () => {
