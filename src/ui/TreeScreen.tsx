@@ -4,6 +4,7 @@ import type { PersonId, ViewLevel } from '@/domain';
 import { applyPreferredLocale, useT } from '@/i18n';
 import type { Services } from '@/services';
 import { layoutFamily } from '@/tree';
+import { ExportButton } from './ExportButton';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { TreeCanvas } from './TreeCanvas';
 import { TreeToolbar } from './TreeToolbar';
@@ -50,7 +51,12 @@ function FamilyTreeView({ services, rootId, onSignOut }: FamilyTreeViewProps) {
         </div>
       ) : null}
       {layout ? (
-        <TreeCanvas layout={layout} />
+        <>
+          <div className="tree-toolbar">
+            <ExportButton layout={layout} />
+          </div>
+          <TreeCanvas layout={layout} />
+        </>
       ) : (
         <p role="status" className="notice">
           {t('tree.loading')}

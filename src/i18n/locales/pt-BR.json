@@ -16,6 +16,7 @@
     "all": "Carregar todas as gerações",
     "stop": "Parar",
     "retry": "Tentar de novo",
+    "export": "Exportar como SVG",
     "error": "Não foi possível carregar a árvore. Verifique a conexão e tente de novo.",
     "canvas": "Árvore genealógica. Arraste para mover; use as setas para mover, mais e menos para ampliar, zero para ajustar.",
     "zoomIn": "Ampliar",

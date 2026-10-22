@@ -16,6 +16,7 @@
     "all": "Load all generations",
     "stop": "Stop",
     "retry": "Try again",
+    "export": "Export as SVG",
     "error": "The family tree could not be loaded. Check your connection and try again.",
     "canvas": "Family tree. Drag to move; use the arrow keys to move, plus and minus to zoom, zero to fit.",
     "zoomIn": "Zoom in",
