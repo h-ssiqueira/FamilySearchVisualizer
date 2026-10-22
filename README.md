@@ -2,7 +2,7 @@
 
 A read-only, client-side web app that shows a FamilySearch family tree in progressively richer views, starting from the signed-in user. Vite + React + TypeScript, hosted on GitHub Pages, with no backend.
 
-> **Status: feature complete for the first version, not yet run.** Login wiring, the API client, the three tree views (direct line, couples and children, extended family) with pan and zoom exist and are covered by tests that have **not been executed yet** (see the open items). The design lives in the [SDD](SDD/README.md).
+> **Status: feature complete for the first version, not yet run.** Login wiring, the API client, the three tree views (direct line, couples and children, extended family), pan and zoom, and SVG export exist and are covered by tests that have **not been executed yet** (see the open items). The design lives in the [SDD](SDD/README.md).
 
 ## What it does
 
@@ -12,6 +12,7 @@ A read-only, client-side web app that shows a FamilySearch family tree in progre
 - **V3 Extended family**: adds the spouses of those children and their children (one request per child, cached).
 - **Cards** are 250 x 90 px with four lines (name, dates and age, places, id); living people show only the birth date. Gender is shown by colour and by a symbol.
 - **Pan and zoom** by dragging, with the wheel, the buttons or the keyboard (arrows, plus, minus, zero). Cards far outside the viewport are not rendered.
+- **Export** the current view as an SVG image.
 - **English and Brazilian Portuguese**, extensible by adding a JSON catalog.
 
 ## Quick start
@@ -43,7 +44,7 @@ src/
   auth/     in-memory token store, login navigation, URL scrubbing
   api/      endpoint allow-list, request queue, whitelisting mappers, FamilySearch client
   domain/   types, date and card rules, couple helpers, family view model (no imports from other layers)
-  tree/     V1 ancestor builder, V2/V3 family views, vertical family layout
+  tree/     V1 ancestor builder, V2/V3 family views, vertical family layout, SVG export
   state/    session cache, cached person source, sign-out
   services.ts  wires client, queue, cache, token and language
   ui/       screens, canvas with pan/zoom, toolbar, person card (never call fetch)
@@ -71,6 +72,7 @@ The app shows a configuration screen that names the invalid settings instead of 
 - The API client refuses any request that is not a `GET` to one of the two known endpoints.
 - Mappers keep only whitelisted fields: tokens, e-mail, phone, PIN and contributor data never reach the app.
 - Fixtures are synthetic. Never commit real FamilySearch data, tokens or cookies.
+- The SVG export is built in the browser and saved locally; it contains the names and dates shown on screen, so treat the file as personal data.
 
 ## Known open items
 
@@ -79,4 +81,4 @@ The app shows a configuration screen that names the invalid settings instead of 
 - **CI workflows** are staged in `.github/workflows-pending/` because the tool that created them could not write to `.github/workflows/`. Move them with `git mv .github/workflows-pending .github/workflows`.
 - **Lock file and formatting**: run `npm install` and `npm run format` once and commit the results, then enable `cache: npm` and remove `continue-on-error` from the format step of the CI workflow.
 - **Actions are pinned by tag, not by SHA** yet (SDD security controls, section 3).
-- **Not built yet**: expanding a light card to its full details on click (FR-18), keyboard navigation between cards, export (FR-22), re-rooting on a person (FR-16), showing several parent sets or spouses of line persons (FR-19), wrapping very large sibling groups (OQ-20).
+- **Not built yet**: expanding a light card to its full details on click (FR-18), keyboard navigation between cards, PNG/PDF export, re-rooting on a person (FR-16), showing several parent sets or spouses of line persons (FR-19), wrapping very large sibling groups (OQ-20).
