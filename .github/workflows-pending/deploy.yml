@@ -1,9 +1,10 @@
 # MOVE ME: see .github/workflows-pending/ci.yml (git mv .github/workflows-pending .github/workflows).
+# The repository's default branch is `master`: that is the branch that deploys.
 name: deploy
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
 
 permissions:
