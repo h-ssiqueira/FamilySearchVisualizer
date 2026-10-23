@@ -34,4 +34,4 @@ One details request returns the person's parents, siblings, spouses and children
 - SC-1: a new user reaches a rendered V1 within a few clicks after signing in.
 - SC-2: V1's first batch of generations renders without any 429 error under normal conditions; deeper loading never freezes the UI and can always be stopped.
 - SC-3: no family data is sent anywhere except FamilySearch.
-- SC-4: deployments are fully automated from `main`.
+- SC-4: deployments are fully automated from `master` (the repository's default branch).

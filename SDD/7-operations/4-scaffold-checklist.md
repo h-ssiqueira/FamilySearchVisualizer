@@ -9,6 +9,7 @@ Goal: an empty but **working, tested and deployable** app (Vite + React + TypeSc
 - [x] **OQ-21**: the token is obtained through the Google login address of FamilySearch's identity service (`https://ident.familysearch.org/oauth2/authorization/google`), as in the first lines of `examples.md`. **Still to verify in the spike:** how the token reaches a page on `github.io` (fallbacks in the auth doc, section 3).
 - [ ] **OQ-11**: error reporting allowed or zero telemetry (default in the scaffold: zero telemetry).
 - [ ] **A3 (urgent, owner: the author, who will remove the file and clean the Git history)**: `8-attachments/examples.md` contains a live token, personal data and real people. Sign out of FamilySearch everywhere first. After the cleanup, keep a **redacted** copy for the SDD. No fixture may be derived from the original.
+- Note: the repository's default branch is **`master`**, not `main`.
 
 ## 1. Repository hygiene
 - [ ] `.gitignore` (node_modules, dist, .env*, coverage, playwright-report) and `.editorconfig`
@@ -68,8 +69,9 @@ Goal: an empty but **working, tested and deployable** app (Vite + React + TypeSc
 - [ ] First passing tests: token never in URL/storage/logs, date formatter (TC-62), card format (TC-61), request queue
 
 ## 9. CI/CD (GitHub Actions)
-- [ ] `ci.yml` on pull requests to `main`: checkout, setup-node with cache, `npm ci`, typecheck, lint, format check, tests with coverage, build, Playwright, dependency audit
-- [ ] `deploy.yml` on push to `main`: same checks, build, `upload-pages-artifact`, `deploy-pages`
+- [ ] Workflows live in `.github/workflows/` (the connector that created them could not write there: they may still be in `.github/workflows-pending/`; move them with `git mv`)
+- [ ] `ci.yml` on pull requests (any base branch, so stacked PRs are checked): checkout, setup-node with cache, `npm ci`, typecheck, lint, format check, tests with coverage, build, Playwright, dependency audit
+- [ ] `deploy.yml` on push to `master` (the default branch): same checks, build, `upload-pages-artifact`, `deploy-pages`
 - [ ] Workflow `permissions:` minimal per job; `pages: write` and `id-token: write` only in the deploy job
 - [ ] `concurrency` group so only one deployment runs at a time
 - [ ] Third-party actions pinned by commit SHA
@@ -79,7 +81,7 @@ Goal: an empty but **working, tested and deployable** app (Vite + React + TypeSc
 ## 10. GitHub settings (manual)
 - [ ] Pages: source = GitHub Actions; `github-pages` environment created
 - [ ] Repository variables set for the `VITE_*` values of production (public values, not secrets)
-- [ ] Branch protection on `main`: pull request required, required checks (`ci`), no force-push (backup and recovery, section 2)
+- [ ] Branch protection on `master`: pull request required, required checks (`ci`), no force-push (backup and recovery, section 2)
 - [ ] Dependabot alerts and security updates on
 
 ## 11. Documentation
@@ -90,7 +92,7 @@ Goal: an empty but **working, tested and deployable** app (Vite + React + TypeSc
 ## 12. Definition of done for the scaffold
 - [ ] Fresh clone: `npm ci && npm run dev` shows the login screen
 - [ ] `npm run typecheck && npm run lint && npm test && npm run build` pass locally
-- [ ] A pull request runs `ci` and is green; merging to `main` deploys to GitHub Pages
+- [ ] A pull request runs `ci` and is green; merging to `master` deploys to GitHub Pages
 - [ ] The deployed page loads over HTTPS with no console errors and no request to hosts other than FamilySearch (TC-54)
 - [ ] No real personal data and no secret in the repository
 

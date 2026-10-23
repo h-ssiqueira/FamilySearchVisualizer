@@ -23,7 +23,7 @@ GitHub Pages cannot send custom response headers, so use `<meta>` where possible
 ## 3. Supply chain and CI
 - Dependabot for npm and GitHub Actions; `npm audit` (or equivalent) in CI.
 - Pin third-party GitHub Actions by commit SHA; least-privilege `permissions:` per job; Pages deployment via the official Pages actions with OIDC (no deploy tokens).
-- Protected `main` branch: required reviews/checks.
+- Protected `master` branch (the default branch): required reviews/checks.
 - Secret scanning and push protection enabled on the repository.
 
 ## 4. Privacy

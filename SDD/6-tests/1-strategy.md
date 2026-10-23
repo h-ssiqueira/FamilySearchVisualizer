@@ -22,7 +22,7 @@
 ## 4. Quality gates (CI)
 - `tsc --noEmit`, ESLint, Prettier check.
 - Unit/component/integration tests must pass; coverage ≥ 80 % on `domain`, `api`, `tree` *(proposed)*.
-- Playwright E2E on pull requests to `main`.
+- Playwright E2E on pull requests (any base branch, so stacked pull requests are checked too).
 - axe accessibility checks on main screens: zero serious/critical violations.
 - Dependency audit: no known high/critical vulnerabilities.
 

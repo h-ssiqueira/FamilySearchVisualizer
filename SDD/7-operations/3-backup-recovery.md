@@ -10,7 +10,7 @@
 
 ## 2. Backup
 - Git history is the backup; keep at least one additional copy (a local clone or a mirror/fork).
-- Enable branch protection on `main`; forbid force-push.
+- Enable branch protection on `master` (the default branch); forbid force-push.
 - Keep a runbook (this file) with the configuration values (`VITE_*`), stored in the repository without secrets.
 - Secrets: none required by the application. CI has no long-lived deploy secrets (Pages OIDC).
 
