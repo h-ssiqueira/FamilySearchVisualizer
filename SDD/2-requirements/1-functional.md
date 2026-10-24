@@ -20,16 +20,17 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-09 | On HTTP 429/503 the app waits for `Retry-After` and retries; the user sees a "waiting" indicator. | M |
 | FR-10 | Responses are cached in memory for the session; the same person is never requested twice in one session unless refreshed. | S |
 | FR-23 | Concurrency of outgoing requests is bounded (configurable, default proposed: 4). | M |
+| FR-31 | "load next generation" and "load all remaining" must consider each branch; never stop on a specific generation branch where other branch still have data to load | M |
 
 ## Views
 | ID | Requirement | Pri |
 |----|-------------|-----|
 | FR-11 | **V1** shows the root and direct ancestors as a binary tree; missing parents render as placeholders. | M |
-| FR-12 | Ancestor depth is **unlimited**. The app auto-loads a first batch of generations (proposed: 4), then offers "load next generation" and "load all remaining"; loading shows progress and can be paused/cancelled at any time; it stops by itself when no further parents are known. | M |
+| FR-12 | Ancestor depth is **unlimited**. The app auto-loads a first batch of generations (proposed: 4), then offers "load next generation" and "load all remaining"; loading shows progress and can be paused/cancelled at any time; it stops by itself when no further parents are known in current branch. | M |
 | FR-13 | **V2** adds, for every couple shown, all their children (including the root's own spouse and children). | M |
 | FR-14 | **V3** adds the spouses of the children shown in V2 and the children of those unions. | M |
 | FR-15 | The user can switch V1/V2/V3 without reloading data already cached. | M |
-| FR-16 | Selecting a person re-roots the tree on that person. | C |
+| FR-16 | Selecting a person displays the link to original family tree page of that person. | C |
 | FR-17 | A person card shows four lines: name; birth date – death date (age); birth place – death place; person id (see [UI spec](../4-design/5-ui-spec.md)). | M |
 | FR-18 | A card can be expanded to show death place, marriages and the FamilySearch id with a link to the person on familysearch.org. | S |
 | FR-19 | When a person has several parent sets or spouses, the app shows the first set/spouse and indicates others exist (OQ-04). | S |
@@ -43,3 +44,4 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-28 | Layout as sketched: vertical, ancestors above and descendants below (root at the bottom); man left and woman right in a parent couple; a person's spouse to the right. | M |
 | FR-29 | Several children of a couple are drawn side by side in one row below the couple; each child's slot reserves room for spouses only if they exist. | M |
 | FR-30 | Several spouses of one person are drawn to the right at the same level, each with its own marriage link; a person without a known spouse gets no spouse card and no placeholder. | M |
+| FR-32 | Menu icons, buttons and the interface must have priority in view; the tree must not override the UI. | M |

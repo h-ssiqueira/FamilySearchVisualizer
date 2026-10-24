@@ -81,4 +81,4 @@ The app shows a configuration screen that names the invalid settings instead of 
 - **CI workflows** are staged in `.github/workflows-pending/` because the tool that created them could not write to `.github/workflows/`. Move them with `git mv .github/workflows-pending .github/workflows`.
 - **Lock file and formatting**: run `npm install` and `npm run format` once and commit the results, then enable `cache: npm` and remove `continue-on-error` from the format step of the CI workflow.
 - **Actions are pinned by tag, not by SHA** yet (SDD security controls, section 3).
-- **Not built yet**: expanding a light card to its full details on click (FR-18), keyboard navigation between cards, PNG/PDF export, re-rooting on a person (FR-16), showing several parent sets or spouses of line persons (FR-19), wrapping very large sibling groups (OQ-20).
+- **Not built yet**: expanding a light card to its full details on click (FR-18), keyboard navigation between cards, PNG/PDF export, profile of a person (FR-16), showing several parent sets or spouses of line persons (FR-19), wrapping very large sibling groups (OQ-20).
