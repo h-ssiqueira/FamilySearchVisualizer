@@ -6,6 +6,7 @@ import type { Services } from '@/services';
 import { layoutFamily } from '@/tree';
 import { ExportButton } from './ExportButton';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { PersonPanel } from './PersonPanel';
 import { TreeCanvas } from './TreeCanvas';
 import { TreeToolbar } from './TreeToolbar';
 import { useCurrentUser } from './useCurrentUser';
@@ -20,6 +21,7 @@ interface FamilyTreeViewProps {
 function FamilyTreeView({ services, rootId, onSignOut }: FamilyTreeViewProps) {
   const t = useT();
   const [level, setLevel] = useState<ViewLevel>('V1');
+  const [selectedId, setSelectedId] = useState<PersonId | undefined>(undefined);
   const tree = useFamilyTree({
     source: services.source,
     rootId,
@@ -27,6 +29,7 @@ function FamilyTreeView({ services, rootId, onSignOut }: FamilyTreeViewProps) {
     onUnauthorized: onSignOut,
   });
   const layout = useMemo(() => (tree.family ? layoutFamily(tree.family) : undefined), [tree.family]);
+  const selected = layout?.cards.find((entry) => entry.card.id === selectedId)?.card;
 
   return (
     <>
@@ -55,7 +58,21 @@ function FamilyTreeView({ services, rootId, onSignOut }: FamilyTreeViewProps) {
           <div className="tree-toolbar">
             <ExportButton layout={layout} />
           </div>
-          <TreeCanvas layout={layout} />
+          <div className="tree-body">
+            <TreeCanvas
+              layout={layout}
+              selectedId={selectedId}
+              onSelect={(id) => setSelectedId((current) => (current === id ? undefined : id))}
+            />
+            {selected ? (
+              <PersonPanel
+                key={selected.id}
+                person={selected.person}
+                source={services.source}
+                onClose={() => setSelectedId(undefined)}
+              />
+            ) : null}
+          </div>
         </>
       ) : (
         <p role="status" className="notice">
@@ -66,7 +83,7 @@ function FamilyTreeView({ services, rootId, onSignOut }: FamilyTreeViewProps) {
   );
 }
 
-/** The signed-in screen: the current user is the root of the tree (SDD FR-05, FR-11..FR-15). */
+/** The signed-in screen: the current user is the root of the tree (SDD FR-05, FR-11..FR-16). */
 export function TreeScreen({ services, onSignOut }: { services: Services; onSignOut: () => void }) {
   const t = useT();
   const user = useCurrentUser(services.client);

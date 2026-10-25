@@ -5,3 +5,4 @@ export * from './dates';
 export * from './cardText';
 export * from './couples';
 export * from './family';
+export * from './links';

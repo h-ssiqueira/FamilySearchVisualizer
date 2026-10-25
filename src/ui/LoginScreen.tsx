@@ -1,24 +1,23 @@
-
 import { useState, type FormEvent } from 'react';
+import { tokenStore } from '@/auth';
 import { useT } from '@/i18n';
-import { tokenStore } from '@/auth/tokenStore';
 import { LanguageSwitcher } from './LanguageSwitcher';
 
 export function LoginScreen({ onSignIn }: { onSignIn: () => void }) {
   const t = useT();
   const [accessToken, setAccessToken] = useState('');
-  const [error, setError] = useState('');
+  const [empty, setEmpty] = useState(false);
 
-  function handleTokenSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleTokenSubmit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
-
-    if (!tokenStore.set(accessToken)) {
-      setError('Please enter an access token.');
+    // People often copy the whole header value: accept it with or without the Bearer prefix.
+    const cleaned = accessToken.replace(/^\s*bearer\s+/i, '');
+    if (!tokenStore.set(cleaned)) {
+      setEmpty(true);
       return;
     }
-
     setAccessToken('');
-    setError('');
+    setEmpty(false);
   }
 
   return (
@@ -35,11 +34,15 @@ export function LoginScreen({ onSignIn }: { onSignIn: () => void }) {
       <p className="notice">{t('login.privacy')}</p>
 
       <section className="manual-login">
-        <h2>Use an existing access token</h2>
-        <p>Enter a valid FamilySearch access token to continue.</p>
+        <h2>{t('login.manual.heading')}</h2>
+        <p>{t('login.manual.description')}</p>
+        <details>
+          <summary>{t('login.manual.helpSummary')}</summary>
+          <p className="notice">{t('login.manual.help')}</p>
+        </details>
 
         <form onSubmit={handleTokenSubmit}>
-          <label htmlFor="access-token">Access token</label>
+          <label htmlFor="access-token">{t('login.manual.label')}</label>
           <input
             id="access-token"
             name="accessToken"
@@ -49,21 +52,21 @@ export function LoginScreen({ onSignIn }: { onSignIn: () => void }) {
             value={accessToken}
             onChange={(event) => {
               setAccessToken(event.target.value);
-              setError('');
+              setEmpty(false);
             }}
-            placeholder="Paste your access token"
+            placeholder={t('login.manual.placeholder')}
             required
           />
 
           <button type="submit" className="button">
-            Continue with token
+            {t('login.manual.submit')}
           </button>
 
-          {error && (
+          {empty ? (
             <p className="notice" role="alert">
-              {error}
+              {t('login.manual.empty')}
             </p>
-          )}
+          ) : null}
         </form>
       </section>
     </main>

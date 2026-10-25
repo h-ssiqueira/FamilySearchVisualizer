@@ -153,12 +153,10 @@ export async function extendToV3(
   };
 }
 
-/** True when the deepest generation loaded still has known parents to load. */
+/**
+ * True while any branch still has known parents that were not loaded (SDD FR-31). It reads
+ * the tree's `pending` list, so a branch that ended early never hides one that goes on.
+ */
 export function hasMoreAncestors(tree: ViewTree): boolean {
-  const deepest = tree.nodes.reduce((max, node) => Math.max(max, node.generation), 0);
-  return tree.nodes.some((node) => {
-    if (node.generation !== deepest || !('parentSets' in node.person)) return false;
-    const couple = preferredCouple(node.person.parentSets);
-    return couple !== undefined && (couple.partner1 !== undefined || couple.partner2 !== undefined);
-  });
+  return tree.pending.length > 0;
 }

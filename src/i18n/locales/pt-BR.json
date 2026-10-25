@@ -4,7 +4,17 @@
     "heading": "FamilySearch Visualizer",
     "description": "Veja a sua árvore genealógica em visões simples e cada vez mais detalhadas.",
     "button": "Entrar com Google (FamilySearch)",
-    "privacy": "Você entra com o Google por meio do FamilySearch. O token da sua sessão no FamilySearch e os dados da sua família ficam apenas nesta aba do navegador; nada é guardado nem enviado a lugar nenhum além do FamilySearch."
+    "privacy": "Você entra com o Google por meio do FamilySearch. O token da sua sessão no FamilySearch e os dados da sua família ficam apenas nesta aba do navegador; nada é guardado nem enviado a lugar nenhum além do FamilySearch.",
+    "manual": {
+      "heading": "Usar um token de acesso existente",
+      "description": "Informe um token de acesso válido do FamilySearch para continuar.",
+      "helpSummary": "Onde encontro o token?",
+      "help": "Entre no FamilySearch, abra as ferramentas do desenvolvedor do navegador (F12), vá à aba Rede (Network), clique em qualquer requisição para familysearch.org e copie o valor que vem depois de Bearer no cabeçalho Authorization.",
+      "label": "Token de acesso",
+      "placeholder": "Cole o seu token de acesso",
+      "submit": "Continuar com o token",
+      "empty": "Informe um token de acesso."
+    }
   },
   "tree": {
     "heading": "Sua árvore genealógica",
@@ -22,6 +32,15 @@
     "zoomIn": "Ampliar",
     "zoomOut": "Reduzir",
     "fit": "Ajustar à tela",
+    "select": "Mostrar {{name}}",
+    "close": "Fechar",
+    "openOnFamilySearch": "Abrir no FamilySearch",
+    "panel": {
+      "label": "Detalhes de {{name}}",
+      "loading": "Carregando detalhes…",
+      "unavailable": "Os detalhes desta pessoa não estão disponíveis.",
+      "marriages": "Casamentos"
+    },
     "view": {
       "label": "Visão",
       "V1": "Linha direta",

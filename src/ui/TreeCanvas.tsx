@@ -8,7 +8,7 @@ import {
   type PointerEvent,
   type RefObject,
 } from 'react';
-import { formatDate } from '@/domain';
+import { cardLines, formatDate, type PersonId } from '@/domain';
 import { useT } from '@/i18n';
 import { CARD, type FamilyLayout, type MarriageLink } from '@/tree';
 import { PersonCard } from './PersonCard';
@@ -18,6 +18,8 @@ const KEY_STEP = 60;
 /** Cards this far outside the viewport are still rendered (SDD NFR-02: culling). */
 const CULL_MARGIN = 300;
 const LABEL_MAX = 24;
+/** A pointer that moves less than this is a click on a card, not a drag of the canvas. */
+const DRAG_THRESHOLD = 4;
 
 function useElementSize(ref: RefObject<HTMLElement | null>): Size {
   const [size, setSize] = useState<Size>({ width: 0, height: 0 });
@@ -43,12 +45,22 @@ function marriageLines(link: MarriageLink): string[] {
     .map(clip);
 }
 
-export function TreeCanvas({ layout }: { layout: FamilyLayout }) {
+interface TreeCanvasProps {
+  layout: FamilyLayout;
+  /** The card whose panel is open. */
+  selectedId?: PersonId;
+  /** When given, every card gets a button that selects it (SDD FR-16). */
+  onSelect?: (id: PersonId) => void;
+}
+
+export function TreeCanvas({ layout, selectedId, onSelect }: TreeCanvasProps) {
   const t = useT();
   const viewportRef = useRef<HTMLDivElement>(null);
   const size = useElementSize(viewportRef);
   const { transform, zoomBy, panBy, fit } = usePanZoom();
-  const drag = useRef<{ x: number; y: number } | null>(null);
+  const drag = useRef<{ x: number; y: number; startX: number; startY: number; panning: boolean } | null>(
+    null,
+  );
   const fitted = useRef(false);
   const center = { x: size.width / 2, y: size.height / 2 };
 
@@ -75,6 +87,8 @@ export function TreeCanvas({ layout }: { layout: FamilyLayout }) {
   }, [zoomBy]);
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
+    // Keys pressed on a card button belong to the button, not to the canvas.
+    if (event.target !== event.currentTarget) return;
     switch (event.key) {
       case 'ArrowLeft':
         panBy(KEY_STEP, 0);
@@ -104,16 +118,29 @@ export function TreeCanvas({ layout }: { layout: FamilyLayout }) {
     event.preventDefault();
   };
 
+  // The pointer is captured only once it really drags, so a plain click still reaches the card.
   const onPointerDown = (event: PointerEvent<HTMLDivElement>): void => {
     if (event.button !== 0) return;
-    drag.current = { x: event.clientX, y: event.clientY };
-    event.currentTarget.setPointerCapture?.(event.pointerId);
+    drag.current = {
+      x: event.clientX,
+      y: event.clientY,
+      startX: event.clientX,
+      startY: event.clientY,
+      panning: false,
+    };
   };
   const onPointerMove = (event: PointerEvent<HTMLDivElement>): void => {
-    const last = drag.current;
-    if (!last) return;
-    panBy(event.clientX - last.x, event.clientY - last.y);
-    drag.current = { x: event.clientX, y: event.clientY };
+    const state = drag.current;
+    if (!state) return;
+    if (!state.panning) {
+      const moved = Math.abs(event.clientX - state.startX) + Math.abs(event.clientY - state.startY);
+      if (moved <= DRAG_THRESHOLD) return;
+      state.panning = true;
+      event.currentTarget.setPointerCapture?.(event.pointerId);
+    }
+    panBy(event.clientX - state.x, event.clientY - state.y);
+    state.x = event.clientX;
+    state.y = event.clientY;
   };
   const endDrag = (): void => {
     drag.current = null;
@@ -208,6 +235,15 @@ export function TreeCanvas({ layout }: { layout: FamilyLayout }) {
           {visible.map((entry) => (
             <div key={entry.card.id} className="tree-card" style={{ left: entry.x, top: entry.y }}>
               <PersonCard person={entry.card.person} />
+              {onSelect ? (
+                <button
+                  type="button"
+                  className="tree-card-button"
+                  aria-label={t('tree.select', { name: cardLines(entry.card.person).name })}
+                  aria-pressed={selectedId === entry.card.id}
+                  onClick={() => onSelect(entry.card.id)}
+                />
+              ) : null}
             </div>
           ))}
         </div>

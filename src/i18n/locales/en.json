@@ -4,7 +4,17 @@
     "heading": "FamilySearch Visualizer",
     "description": "See your family tree in simple, progressively richer views.",
     "button": "Sign in with Google (FamilySearch)",
-    "privacy": "You sign in with Google through FamilySearch. Your FamilySearch session token and your family data stay in this browser tab; nothing is stored or sent anywhere except to FamilySearch."
+    "privacy": "You sign in with Google through FamilySearch. Your FamilySearch session token and your family data stay in this browser tab; nothing is stored or sent anywhere except to FamilySearch.",
+    "manual": {
+      "heading": "Use an existing access token",
+      "description": "Enter a valid FamilySearch access token to continue.",
+      "helpSummary": "Where do I find the token?",
+      "help": "Sign in on FamilySearch, open the browser developer tools (F12), go to the Network tab, click any request to familysearch.org and copy the value that follows Bearer in the Authorization header.",
+      "label": "Access token",
+      "placeholder": "Paste your access token",
+      "submit": "Continue with token",
+      "empty": "Please enter an access token."
+    }
   },
   "tree": {
     "heading": "Your family tree",
@@ -22,6 +32,15 @@
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "fit": "Fit to screen",
+    "select": "Show {{name}}",
+    "close": "Close",
+    "openOnFamilySearch": "Open on FamilySearch",
+    "panel": {
+      "label": "Details of {{name}}",
+      "loading": "Loading details…",
+      "unavailable": "The details of this person are not available.",
+      "marriages": "Marriages"
+    },
     "view": {
       "label": "View",
       "V1": "Direct line",

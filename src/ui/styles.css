@@ -44,7 +44,11 @@ body {
 
 .button:focus-visible,
 select:focus-visible,
-.tree-viewport:focus-visible {
+input:focus-visible,
+summary:focus-visible,
+a:focus-visible,
+.tree-viewport:focus-visible,
+.tree-card-button:focus-visible {
   outline: 3px solid #f2a900;
   outline-offset: 2px;
 }
@@ -60,6 +64,26 @@ select:focus-visible,
   align-items: center;
   justify-content: flex-end;
   margin-bottom: 1rem;
+}
+
+.manual-login {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ccc;
+}
+
+.manual-login form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 28rem;
+}
+
+.manual-login input {
+  padding: 0.5rem;
+  border: 1px solid #767676;
+  border-radius: 4px;
+  font: inherit;
 }
 
 /* Person card (SDD UI spec): fixed 250 x 90 px, gender by colour AND by a symbol. */
@@ -107,13 +131,24 @@ select:focus-visible,
   font-weight: 600;
 }
 
-/* Signed-in screen: toolbar on top, the canvas takes the rest of the window. */
+/*
+ * Signed-in screen. The interface always wins over the tree (SDD FR-32): header, toolbar,
+ * zoom buttons and the details panel sit above the canvas, and the canvas is clipped and
+ * isolated so that cards and links can never paint over them.
+ */
 .tree-screen {
   display: flex;
   flex-direction: column;
   height: 100vh;
   padding: 0.75rem 1rem;
   box-sizing: border-box;
+}
+
+.tree-header,
+.tree-toolbar {
+  position: relative;
+  z-index: 3;
+  background: var(--background);
 }
 
 .tree-header {
@@ -146,17 +181,29 @@ select:focus-visible,
   font-size: 0.9rem;
 }
 
+.tree-body {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  flex: 1;
+  gap: 0.5rem;
+  min-height: 0;
+}
+
 .tree-canvas {
   position: relative;
   flex: 1;
+  min-width: 0;
   min-height: 0;
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .tree-zoom {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  z-index: 2;
+  z-index: 4;
   display: flex;
   gap: 0.25rem;
 }
@@ -168,6 +215,7 @@ select:focus-visible,
   border: 1px solid #ccc;
   background: #fafafa;
   cursor: grab;
+  contain: paint;
   touch-action: none;
 }
 
@@ -205,4 +253,45 @@ select:focus-visible,
 
 .tree-card {
   position: absolute;
+}
+
+/* A transparent button over the whole card: keyboard and screen-reader access to selection. */
+.tree-card-button {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tree-card-button[aria-pressed='true'] {
+  outline: 3px solid #111;
+  outline-offset: 1px;
+}
+
+.person-panel {
+  position: relative;
+  z-index: 4;
+  flex: 0 0 18rem;
+  max-width: 40%;
+  padding: 0.75rem;
+  overflow: auto;
+  border: 1px solid #ccc;
+  background: var(--background);
+}
+
+.person-panel h2 {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.person-panel h3 {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 0.95rem;
+}
+
+.person-panel p {
+  margin: 0.25rem 0;
+  overflow-wrap: anywhere;
 }
