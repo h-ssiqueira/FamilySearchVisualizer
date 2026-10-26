@@ -45,6 +45,9 @@ export interface FamilyLayout {
 
 const HALF = CARD.width / 2;
 
+/** Which partner of a couple on the line a block belongs to: left or right of the marriage. */
+type Side = 'left' | 'right';
+
 interface Placement {
   id: PersonId;
   row: number;
@@ -100,6 +103,9 @@ const EMPTY: FamilyLayout = { cards: [], marriages: [], descents: [], width: 0, 
  * The line is laid out as a binary tree from the root upwards. Each block is the group of
  * children of a couple plus, above it, the blocks of the two parents; blocks are joined with a
  * contour check per row, so cards never overlap (including cousins and nephews of V3).
+ *
+ * The siblings of each partner of a couple go on the outer side of that partner, so the space
+ * between the two partners (where the marriage line is drawn) stays free of cards (FR-26).
  */
 export function layoutFamily(view: FamilyView): FamilyLayout {
   const cards = new Map(view.cards.map((card) => [card.id, card] as const));
@@ -217,13 +223,27 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
     return offset;
   }
 
+  /**
+   * The children of a couple in the order they are drawn. A partner on the left has its
+   * siblings to its left (its own card last); a partner on the right has them to its right.
+   */
+  function orderedChildren(childIds: readonly PersonId[], selfId: PersonId, side?: Side): PersonId[] {
+    const others = childIds.filter((childId) => childId !== selfId);
+    if (side === 'left') return [...others, selfId];
+    if (side === 'right') return [selfId, ...others];
+    return [...childIds];
+  }
+
   const placedLine = new Set<PersonId>();
 
   /** Block of a person on the line, with the person's card centre at 0. */
-  function buildBlock(id: PersonId): Placement[] {
+  function buildBlock(id: PersonId, side?: Side): Placement[] {
     placedLine.add(id);
     const couple = parentCoupleOf.get(id);
-    const group = layoutChildren(couple ? couple.childIds : [id], id);
+    const group = layoutChildren(
+      couple ? orderedChildren(couple.childIds, id, side) : [id],
+      id,
+    );
     if (group.placements.length === 0) return [];
 
     const row = cards.get(id)?.row ?? 0;
@@ -234,10 +254,11 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
     const selfRel = (self ? self.cx : groupCenter) - groupCenter;
 
     const blocks: Placement[][] = [];
-    for (const partnerId of couple && couple.kind === 'parents' ? couple.partnerIds : []) {
-      if (!isLine(partnerId) || placedLine.has(partnerId)) continue;
-      blocks.push(buildBlock(partnerId));
-    }
+    const partnerIds = couple && couple.kind === 'parents' ? couple.partnerIds : [];
+    partnerIds.forEach((partnerId, index) => {
+      if (!isLine(partnerId) || placedLine.has(partnerId)) return;
+      blocks.push(buildBlock(partnerId, index === 0 ? 'left' : 'right'));
+    });
     const [first, second] = blocks;
 
     if (first && second) {
