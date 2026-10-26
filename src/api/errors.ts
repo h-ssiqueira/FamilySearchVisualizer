@@ -1,4 +1,6 @@
-export class UnauthorizedError extends Error {
+import { SessionExpiredError } from '@/domain';
+
+export class UnauthorizedError extends SessionExpiredError {
   constructor() {
     super('Unauthorized');
     this.name = 'UnauthorizedError';

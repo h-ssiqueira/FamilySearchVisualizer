@@ -1,10 +1,12 @@
-import { UnavailableError, type FamilySearchClient } from '@/api';
-import type { Person, PersonId, PersonSource } from '@/domain';
+import type { PersonId, PersonSource } from '@/domain';
+import { SessionExpiredError, type Person } from '@/domain';
+import { HttpError, UnavailableError, type FamilySearchClient } from '@/api';
 import type { PersonCache } from './cache';
 
 /**
- * Person source for the tree builder: cache first, one request per person even when asked twice
- * at the same time, and restricted/missing people reported as `null` instead of an error.
+ * Person source for the tree builders: cache first, one request per person even when asked twice
+ * at the same time. No data (restricted, missing) becomes `null`; a session that has expired is
+ * rethrown; any other failure is rethrown so that the builder can report that one person.
  */
 export function createPersonSource(client: FamilySearchClient, cache: PersonCache): PersonSource {
   const inFlight = new Map<PersonId, Promise<Person | null>>();
@@ -24,6 +26,13 @@ export function createPersonSource(client: FamilySearchClient, cache: PersonCach
         })
         .catch((error: unknown): Person | null => {
           if (error instanceof UnavailableError) return null;
+          if (error instanceof SessionExpiredError) throw error;
+          // Logged by class and status only: never the payload (SDD NFR-05).
+          console.warn(
+            'FamilySearch request failed:',
+            error instanceof Error ? error.name : 'unknown',
+            error instanceof HttpError ? error.status : '',
+          );
           throw error;
         })
         .finally(() => {

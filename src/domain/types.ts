@@ -75,5 +75,8 @@ export interface ViewTree {
   root: PersonId;
   nodes: TreeNode[];
   edges: TreeEdge[];
+  /** Known ancestors not loaded yet, plus the failed ones: loading more can reach them. */
   pending: PersonId[];
+  /** People whose details could not be loaded because of a transient error (FR-33). */
+  failed: PersonId[];
 }

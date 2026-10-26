@@ -23,7 +23,13 @@ export interface ClientOptions {
   /** Value for the `Accept-Language` header (the response text is localized to it). */
   getAcceptLanguage: () => string;
   queue: RequestQueue;
+  /** How requests leave the browser. The relay supplies its own (see src/relay). */
   fetchImpl?: typeof fetch;
+  /**
+   * With a token (fallback mode) the client must have one. Through the relay the user's own
+   * session authorises the calls, so no token is needed.
+   */
+  requireToken?: boolean;
 }
 
 const DEFAULT_RETRY_MS = 5_000;
@@ -42,23 +48,26 @@ export function parseRetryAfter(value: string | null, now: number = Date.now()):
 
 export function createFamilySearchClient(options: ClientOptions): FamilySearchClient {
   const doFetch: typeof fetch = options.fetchImpl ?? ((input, init) => fetch(input, init));
+  const requireToken = options.requireToken ?? true;
 
   function requestJson(path: string, signal?: AbortSignal): Promise<unknown> {
     return options.queue.enqueue(async (taskSignal) => {
       const url = new URL(path, options.apiBase).toString();
       if (!isAllowedRequest(url, 'GET', options.apiBase)) throw new NotAllowedError();
       const token = options.getToken();
-      if (!token) throw new MissingTokenError();
+      if (!token && requireToken) throw new MissingTokenError();
+
+      const headers: Record<string, string> = {
+        Accept: 'application/json',
+        'Accept-Language': options.getAcceptLanguage(),
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36',
+      };
+      if (token) headers.Authorization = `Bearer ${token}`;
 
       const response = await doFetch(url, {
         method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          'Accept-Language': options.getAcceptLanguage(),
-          Authorization: `Bearer ${token}`,
-          'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36',
-        },
+        headers,
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
         signal: taskSignal,

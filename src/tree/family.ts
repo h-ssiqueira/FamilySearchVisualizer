@@ -1,6 +1,7 @@
 import {
   partnerOf,
   preferredCouple,
+  SessionExpiredError,
   type Couple,
   type FamilyCard,
   type FamilyCouple,
@@ -123,6 +124,7 @@ export function buildFamilyView(tree: ViewTree, level: 'V1' | 'V2'): FamilyView 
 /**
  * V3: plus the spouse(s) of the children shown in V2 and their children, one level only.
  * It needs the details of each such child (one request each, through the cached source).
+ * A relative that cannot be loaded keeps its card without the extra relatives (FR-33).
  */
 export async function extendToV3(
   view: FamilyView,
@@ -133,7 +135,14 @@ export async function extendToV3(
     (card) => card.role === 'sibling' || (card.role === 'child' && card.row === -1),
   );
   const loaded = await Promise.all(
-    targets.map(async (card) => [card, await source.getPerson(card.id, signal)] as const),
+    targets.map(async (card): Promise<readonly [FamilyCard, Person | null]> => {
+      try {
+        return [card, await source.getPerson(card.id, signal)];
+      } catch (error) {
+        if (error instanceof SessionExpiredError) throw error;
+        return [card, null];
+      }
+    }),
   );
   if (signal?.aborted) return view;
 
@@ -154,8 +163,9 @@ export async function extendToV3(
 }
 
 /**
- * True while any branch still has known parents that were not loaded (SDD FR-31). It reads
- * the tree's `pending` list, so a branch that ended early never hides one that goes on.
+ * True while any branch still has known parents that were not loaded, or failed to load
+ * (SDD FR-31, FR-33). It reads the tree's `pending` list, so a branch that ended early never
+ * hides one that goes on.
  */
 export function hasMoreAncestors(tree: ViewTree): boolean {
   return tree.pending.length > 0;
