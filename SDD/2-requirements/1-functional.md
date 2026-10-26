@@ -7,8 +7,8 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 |----|-------------|-----|
 | FR-01 | The user signs in with Google through FamilySearch's identity service (login address from `examples.md`). The app has no Google client or SDK. | M |
 | FR-02 | The app obtains the FamilySearch session through the relay (FR-34) or, as a fallback, through a bearer token the user pastes; it keeps the token in memory only and sends it as `Authorization: Bearer` to FamilySearch endpoints only. | M |
-| FR-03 | The user can sign out; tokens and cached family data are wiped from memory and browser storage, and the relay connection is closed. | M |
-| FR-04 | When the FamilySearch token expires or is rejected (401), the user is asked to re-authenticate, keeping the selected view. | S |
+| FR-03 | The user can sign out; tokens and cached family data are wiped from memory and browser storage, the relay connection is closed and the open view is forgotten. | M |
+| FR-04 | When the FamilySearch session ends (401), the user is asked to sign in again. The tree already loaded and the open view are kept in memory, so after signing in the app shows the same view without loading everything again. | M |
 
 ## Data loading
 | ID | Requirement | Pri |
@@ -17,11 +17,11 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-06 | Load person details by id and map them to the domain model (see data model). | M |
 | FR-07 | Dates use `formalText`, falling back to `normalizedText`; missing values render as "unknown". | M |
 | FR-08 | Data is loaded lazily, generation by generation, and rendered progressively. | M |
-| FR-09 | On HTTP 429/503 the app waits for `Retry-After` and retries; the user sees a "waiting" indicator. | M |
+| FR-09 | On HTTP 429/503 the queue pauses for `Retry-After`; the toolbar shows how many seconds are left ("FamilySearch asked us to wait N s") and the requests resume by themselves. | M |
 | FR-10 | Responses are cached in memory for the session; the same person is never requested twice in one session unless refreshed. | S |
 | FR-23 | Concurrency of outgoing requests is bounded (configurable, default proposed: 4). | M |
 | FR-31 | "Load next generation" and "load all remaining" must consider each branch: loading never stops at one branch while another branch still has parents to load. | M |
-| FR-33 | A person whose details fail with a transient error (throttling, server error, unexpected data) does not stop the rest of the tree. The person is shown as not loaded, the count is visible, and "retry" requests them again. Only a person with no data (not found, restricted) ends a branch, and only an expired session stops the load. | M |
+| FR-33 | A person whose details fail with a transient error (throttling that does not end, network failure, server error, unexpected data) does not stop the rest of the tree. The person is shown as not loaded, the count is visible, and "retry" requests them again. Only a person with no data (not found, restricted) ends a branch, and only an expired session stops the load. | M |
 
 ## Views
 | ID | Requirement | Pri |
@@ -40,7 +40,7 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-22 | Export current view as image/PDF. | C |
 | FR-24 | Cards have a fixed size (250 × 90 px); long text is truncated with an ellipsis and the full text is available in a tooltip. | M |
 | FR-25 | Dates are shown as `yyyy-MM-dd` when complete; partial, approximate or range dates show only what is known or the raw text; no invented day/month. Age is shown only for deceased people; living people show only the birth date. | M |
-| FR-26 | Partners are joined by a horizontal line labelled with the marriage date and location; children hang from both parents with orthogonal lines; no arrowheads. | M |
+| FR-26 | Partners are joined by a horizontal line labelled with the marriage date and location; no card lies on that line: the siblings of each partner are placed on its outer side; children hang from both parents with orthogonal lines; no arrowheads. | M |
 | FR-27 | Gender is shown by card colour (blue = male, pink = female, neutral grey = unknown) **and** by a non-colour cue (NFR-06). | M |
 | FR-28 | Layout as sketched: vertical, ancestors above and descendants below (root at the bottom); man left and woman right in a parent couple; a person's spouse to the right. | M |
 | FR-29 | Several children of a couple are drawn side by side in one row below the couple; each child's slot reserves room for spouses only if they exist. | M |
