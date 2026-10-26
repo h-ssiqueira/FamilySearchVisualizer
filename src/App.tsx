@@ -2,9 +2,10 @@ import { useMemo } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { startLogin, useToken } from '@/auth';
 import type { AppConfig, ConfigResult } from '@/config';
+import { useT } from '@/i18n';
 import { useRelayState } from '@/relay/relayStore';
 import { createServices, type ServiceOptions, type Services } from '@/services';
-import { signOut } from '@/state';
+import { expireSession, isSessionExpired, signOut } from '@/state';
 import { ConfigError } from '@/ui/ConfigError';
 import { LoginScreen } from '@/ui/LoginScreen';
 import { TreeScreen } from '@/ui/TreeScreen';
@@ -27,7 +28,7 @@ function Authenticated({ config, factory, transport, requireToken }: Authenticat
     () => factory(config, { transport, requireToken }),
     [config, factory, transport, requireToken],
   );
-  return <TreeScreen services={services} onSignOut={signOut} />;
+  return <TreeScreen services={services} onSignOut={signOut} onExpired={expireSession} />;
 }
 
 /**
@@ -35,6 +36,7 @@ function Authenticated({ config, factory, transport, requireToken }: Authenticat
  * the user's session, so no token is needed (SDD FR-02, FR-34).
  */
 export function App({ configResult, createServices: factory = createServices }: AppProps) {
+  const t = useT();
   const token = useToken();
   const relay = useRelayState();
 
@@ -43,6 +45,7 @@ export function App({ configResult, createServices: factory = createServices }: 
 
   const connection = token === null && relay.status === 'connected' ? relay.connection : undefined;
   const signedIn = token !== null || connection !== undefined;
+  const expired = !signedIn && isSessionExpired();
 
   return (
     <Routes>
@@ -57,7 +60,14 @@ export function App({ configResult, createServices: factory = createServices }: 
               requireToken={connection === undefined}
             />
           ) : (
-            <LoginScreen onSignIn={() => startLogin(config.loginUrl)} />
+            <>
+              {expired ? (
+                <p role="alert" className="screen notice">
+                  {t('login.expired')}
+                </p>
+              ) : null}
+              <LoginScreen onSignIn={() => startLogin(config.loginUrl)} />
+            </>
           )
         }
       />

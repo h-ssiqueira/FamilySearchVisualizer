@@ -5,6 +5,7 @@
     "description": "Veja a sua árvore genealógica em visões simples e cada vez mais detalhadas.",
     "button": "Entrar com Google (FamilySearch)",
     "privacy": "Você entra com o Google por meio do FamilySearch. O token da sua sessão no FamilySearch e os dados da sua família ficam apenas nesta aba do navegador; nada é guardado nem enviado a lugar nenhum além do FamilySearch.",
+    "expired": "Sua sessão no FamilySearch terminou. Entre de novo: a visão que você tinha aberta será mantida.",
     "relay": {
       "heading": "Conectar por uma aba do FamilySearch",
       "description": "Abra o FamilySearch e entre na sua conta. Depois clique no favorito abaixo nessa aba. Os dados passam por essa aba, então você não precisa copiar um token.",
@@ -38,6 +39,7 @@
     "loading": "Carregando…",
     "loadingDetails": "Carregando parentes…",
     "generations": "Gerações carregadas: {{count}}",
+    "waiting": "O FamilySearch pediu para aguardar {{seconds}} s",
     "failed": "{{count}} pessoas não puderam ser carregadas",
     "retryFailed": "Tentar as que falharam",
     "next": "Carregar próxima geração",

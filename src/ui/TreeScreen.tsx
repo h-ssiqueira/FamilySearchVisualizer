@@ -3,6 +3,7 @@ import { UnauthorizedError } from '@/api';
 import type { PersonId, ViewLevel } from '@/domain';
 import { applyPreferredLocale, useT } from '@/i18n';
 import type { Services } from '@/services';
+import { viewStore } from '@/state/viewStore';
 import { layoutFamily } from '@/tree';
 import { ExportButton } from './ExportButton';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -11,23 +12,31 @@ import { TreeCanvas } from './TreeCanvas';
 import { TreeToolbar } from './TreeToolbar';
 import { useCurrentUser } from './useCurrentUser';
 import { useFamilyTree } from './useFamilyTree';
+import { useQueueWait } from './useQueueWait';
 
 interface FamilyTreeViewProps {
   services: Services;
   rootId: PersonId;
   onSignOut: () => void;
+  onExpired: () => void;
 }
 
-function FamilyTreeView({ services, rootId, onSignOut }: FamilyTreeViewProps) {
+function FamilyTreeView({ services, rootId, onSignOut, onExpired }: FamilyTreeViewProps) {
   const t = useT();
-  const [level, setLevel] = useState<ViewLevel>('V1');
+  // The view survives an expiry: signing in again returns to it (FR-04).
+  const [level, setLevelState] = useState<ViewLevel>(() => viewStore.get());
+  const setLevel = (next: ViewLevel): void => {
+    viewStore.set(next);
+    setLevelState(next);
+  };
   const [selectedId, setSelectedId] = useState<PersonId | undefined>(undefined);
   const tree = useFamilyTree({
     source: services.source,
     rootId,
     level,
-    onUnauthorized: onSignOut,
+    onUnauthorized: onExpired,
   });
+  const waitSeconds = useQueueWait(services.queue);
   const layout = useMemo(() => (tree.family ? layoutFamily(tree.family) : undefined), [tree.family]);
   const selected = layout?.cards.find((entry) => entry.card.id === selectedId)?.card;
 
@@ -42,6 +51,7 @@ function FamilyTreeView({ services, rootId, onSignOut }: FamilyTreeViewProps) {
         canLoadMore={tree.canLoadMore}
         failedCount={tree.failed}
         onRetry={tree.retry}
+        waitSeconds={waitSeconds}
         onNext={tree.loadNext}
         onAll={tree.loadAll}
         onStop={tree.stop}
@@ -85,8 +95,19 @@ function FamilyTreeView({ services, rootId, onSignOut }: FamilyTreeViewProps) {
   );
 }
 
-/** The signed-in screen: the current user is the root of the tree (SDD FR-05, FR-11..FR-16). */
-export function TreeScreen({ services, onSignOut }: { services: Services; onSignOut: () => void }) {
+/**
+ * The signed-in screen: the current user is the root of the tree (SDD FR-05, FR-11..FR-16).
+ * A rejected session goes to `onExpired` (FR-04); the explicit sign-out button goes to `onSignOut`.
+ */
+export function TreeScreen({
+  services,
+  onSignOut,
+  onExpired,
+}: {
+  services: Services;
+  onSignOut: () => void;
+  onExpired: () => void;
+}) {
   const t = useT();
   const user = useCurrentUser(services.client);
 
@@ -95,8 +116,8 @@ export function TreeScreen({ services, onSignOut }: { services: Services; onSign
   }, [user]);
 
   useEffect(() => {
-    if (user.status === 'error' && user.error instanceof UnauthorizedError) onSignOut();
-  }, [user, onSignOut]);
+    if (user.status === 'error' && user.error instanceof UnauthorizedError) onExpired();
+  }, [user, onExpired]);
 
   return (
     <main className="tree-screen">
@@ -105,7 +126,12 @@ export function TreeScreen({ services, onSignOut }: { services: Services; onSign
         <LanguageSwitcher />
       </header>
       {user.status === 'ready' ? (
-        <FamilyTreeView services={services} rootId={user.user.personId} onSignOut={onSignOut} />
+        <FamilyTreeView
+          services={services}
+          rootId={user.user.personId}
+          onSignOut={onSignOut}
+          onExpired={onExpired}
+        />
       ) : (
         <>
           <p role={user.status === 'error' ? 'alert' : 'status'} className="notice">

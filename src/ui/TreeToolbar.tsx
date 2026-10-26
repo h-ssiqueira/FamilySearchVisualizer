@@ -1,5 +1,5 @@
-import { useT } from '@/i18n';
 import type { ViewLevel } from '@/domain';
+import { useT } from '@/i18n';
 
 const VIEWS: readonly ViewLevel[] = ['V1', 'V2', 'V3'];
 
@@ -13,6 +13,8 @@ export interface TreeToolbarProps {
   /** People that could not be loaded yet (FR-33). */
   failedCount?: number;
   onRetry?: () => void;
+  /** Seconds FamilySearch asked us to wait; shown while the queue is paused (FR-09). */
+  waitSeconds?: number;
   onNext: () => void;
   onAll: () => void;
   onStop: () => void;
@@ -21,12 +23,15 @@ export interface TreeToolbarProps {
 
 export function TreeToolbar(props: TreeToolbarProps) {
   const t = useT();
-  const { level, busy, detailsBusy, canLoadMore, failedCount = 0 } = props;
-  const status = busy
-    ? t('tree.loading')
-    : detailsBusy
-      ? t('tree.loadingDetails')
-      : t('tree.generations', { count: props.generations });
+  const { level, busy, detailsBusy, canLoadMore, failedCount = 0, waitSeconds = 0 } = props;
+  const status =
+    waitSeconds > 0
+      ? t('tree.waiting', { seconds: waitSeconds })
+      : busy
+        ? t('tree.loading')
+        : detailsBusy
+          ? t('tree.loadingDetails')
+          : t('tree.generations', { count: props.generations });
 
   return (
     <div className="tree-toolbar">

@@ -8,6 +8,8 @@ import { createPersonSource, personCache } from '@/state';
 export interface Services {
   client: FamilySearchClient;
   source: PersonSource;
+  /** Exposed so that the screen can show FamilySearch's `Retry-After` wait (FR-09). */
+  queue?: RequestQueue;
 }
 
 export interface ServiceOptions {
@@ -30,5 +32,5 @@ export function createServices(config: AppConfig, options: ServiceOptions = {}):
     fetchImpl: options.transport,
     requireToken: options.requireToken ?? true,
   });
-  return { client, source: createPersonSource(client, personCache) };
+  return { client, source: createPersonSource(client, personCache), queue };
 }

@@ -5,6 +5,7 @@
     "description": "See your family tree in simple, progressively richer views.",
     "button": "Sign in with Google (FamilySearch)",
     "privacy": "You sign in with Google through FamilySearch. Your FamilySearch session token and your family data stay in this browser tab; nothing is stored or sent anywhere except to FamilySearch.",
+    "expired": "Your FamilySearch session ended. Sign in again: the view you had open is kept.",
     "relay": {
       "heading": "Connect through a FamilySearch tab",
       "description": "Open FamilySearch and sign in there. Then click the bookmarklet below on that tab. The data travels through that tab, so you do not need to copy a token.",
@@ -38,6 +39,7 @@
     "loading": "Loading…",
     "loadingDetails": "Loading relatives…",
     "generations": "Generations loaded: {{count}}",
+    "waiting": "FamilySearch asked us to wait {{seconds}} s",
     "failed": "{{count}} people could not be loaded",
     "retryFailed": "Retry failed",
     "next": "Load next generation",

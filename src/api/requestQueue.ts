@@ -25,12 +25,14 @@ function abortError(): DOMException {
 
 /**
  * Bounded concurrency, cancellation and `Retry-After` handling. Throttling is per user, so a
- * RetryAfterError pauses the whole queue, not only the task that hit it (SDD flow F5).
+ * RetryAfterError pauses the whole queue, not only the task that hit it (SDD flow F5). The pause
+ * is observable, so the screen can tell the user how long to wait (SDD FR-09).
  */
 export class RequestQueue {
   private readonly concurrency: number;
   private readonly maxRetries: number;
   private readonly pending: Job[] = [];
+  private readonly listeners = new Set<() => void>();
   private running = 0;
   private pausedUntil = 0;
   private timer: ReturnType<typeof setTimeout> | undefined;
@@ -42,6 +44,19 @@ export class RequestQueue {
 
   get inFlight(): number {
     return this.running;
+  }
+
+  /** Epoch milliseconds until which the queue is paused, or 0 when it is running. */
+  get waitingUntil(): number {
+    return this.pausedUntil > Date.now() ? this.pausedUntil : 0;
+  }
+
+  /** Called when a pause starts and when it ends. Returns the function that unsubscribes. */
+  subscribe(listener: () => void): () => void {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   enqueue<T>(task: QueueTask<T>, signal?: AbortSignal): Promise<T> {
@@ -59,6 +74,10 @@ export class RequestQueue {
       });
       this.pump();
     });
+  }
+
+  private notify(): void {
+    for (const listener of [...this.listeners]) listener();
   }
 
   private pump(): void {
@@ -83,6 +102,7 @@ export class RequestQueue {
     if (this.timer !== undefined) clearTimeout(this.timer);
     this.timer = setTimeout(() => {
       this.timer = undefined;
+      this.notify();
       this.pump();
     }, ms);
   }
@@ -95,6 +115,7 @@ export class RequestQueue {
         job.attempts += 1;
         this.pausedUntil = Math.max(this.pausedUntil, Date.now() + error.retryAfterMs);
         this.pending.unshift(job);
+        this.notify();
       } else {
         job.reject(error);
       }
