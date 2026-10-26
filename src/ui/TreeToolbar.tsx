@@ -1,5 +1,6 @@
 import type { ViewLevel } from '@/domain';
 import { useT } from '@/i18n';
+import { formatNumber } from '@/i18n/format';
 
 const VIEWS: readonly ViewLevel[] = ['V1', 'V2', 'V3'];
 
@@ -26,12 +27,12 @@ export function TreeToolbar(props: TreeToolbarProps) {
   const { level, busy, detailsBusy, canLoadMore, failedCount = 0, waitSeconds = 0 } = props;
   const status =
     waitSeconds > 0
-      ? t('tree.waiting', { seconds: waitSeconds })
+      ? t('tree.waiting', { seconds: formatNumber(waitSeconds) })
       : busy
         ? t('tree.loading')
         : detailsBusy
           ? t('tree.loadingDetails')
-          : t('tree.generations', { count: props.generations });
+          : t('tree.generations', { count: formatNumber(props.generations) });
 
   return (
     <div className="tree-toolbar">
@@ -59,7 +60,9 @@ export function TreeToolbar(props: TreeToolbarProps) {
       </button>
       <p role="status" className="tree-status">
         {status}
-        {failedCount > 0 ? ` · ${t('tree.failed', { count: failedCount })}` : ''}
+        {failedCount > 0
+          ? ` · ${t('tree.failed', { count: formatNumber(failedCount) })}`
+          : ''}
       </p>
       {failedCount > 0 && props.onRetry ? (
         <button type="button" className="button" disabled={busy} onClick={props.onRetry}>
