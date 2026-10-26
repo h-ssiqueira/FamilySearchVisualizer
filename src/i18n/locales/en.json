@@ -5,6 +5,22 @@
     "description": "See your family tree in simple, progressively richer views.",
     "button": "Sign in with Google (FamilySearch)",
     "privacy": "You sign in with Google through FamilySearch. Your FamilySearch session token and your family data stay in this browser tab; nothing is stored or sent anywhere except to FamilySearch.",
+    "relay": {
+      "heading": "Connect through a FamilySearch tab",
+      "description": "Open FamilySearch and sign in there. Then click the bookmarklet below on that tab. The data travels through that tab, so you do not need to copy a token.",
+      "open": "Open FamilySearch and connect",
+      "waiting": "Waiting for the bookmarklet on the FamilySearch tab…",
+      "cancel": "Cancel",
+      "failed": {
+        "popup": "The browser blocked the FamilySearch window. Allow pop-ups for this site and try again.",
+        "timeout": "The FamilySearch tab did not answer. Make sure you clicked the bookmarklet on that tab.",
+        "closed": "The FamilySearch tab was closed. Connect again.",
+        "unknown": "The connection could not be made. Try again."
+      },
+      "bookmarkletSummary": "How do I install the bookmarklet?",
+      "bookmarkletHelp": "Drag the link below to your bookmarks bar. On the FamilySearch tab, click it once. If the page reloads, click it again.",
+      "bookmarkletLabel": "FSV relay"
+    },
     "manual": {
       "heading": "Use an existing access token",
       "description": "Enter a valid FamilySearch access token to continue.",
@@ -22,6 +38,8 @@
     "loading": "Loading…",
     "loadingDetails": "Loading relatives…",
     "generations": "Generations loaded: {{count}}",
+    "failed": "{{count}} people could not be loaded",
+    "retryFailed": "Retry failed",
     "next": "Load next generation",
     "all": "Load all generations",
     "stop": "Stop",

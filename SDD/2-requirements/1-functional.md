@@ -6,8 +6,8 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | ID | Requirement | Pri |
 |----|-------------|-----|
 | FR-01 | The user signs in with Google through FamilySearch's identity service (login address from `examples.md`). The app has no Google client or SDK. | M |
-| FR-02 | The app obtains the FamilySearch token produced by that login (mechanism to verify, OQ-21), keeps it in memory only and sends it as `Authorization: Bearer` to FamilySearch endpoints only. | M |
-| FR-03 | The user can sign out; tokens and cached family data are wiped from memory and browser storage. | M |
+| FR-02 | The app obtains the FamilySearch session through the relay (FR-34) or, as a fallback, through a bearer token the user pastes; it keeps the token in memory only and sends it as `Authorization: Bearer` to FamilySearch endpoints only. | M |
+| FR-03 | The user can sign out; tokens and cached family data are wiped from memory and browser storage, and the relay connection is closed. | M |
 | FR-04 | When the FamilySearch token expires or is rejected (401), the user is asked to re-authenticate, keeping the selected view. | S |
 
 ## Data loading
@@ -21,6 +21,7 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-10 | Responses are cached in memory for the session; the same person is never requested twice in one session unless refreshed. | S |
 | FR-23 | Concurrency of outgoing requests is bounded (configurable, default proposed: 4). | M |
 | FR-31 | "Load next generation" and "load all remaining" must consider each branch: loading never stops at one branch while another branch still has parents to load. | M |
+| FR-33 | A person whose details fail with a transient error (throttling, server error, unexpected data) does not stop the rest of the tree. The person is shown as not loaded, the count is visible, and "retry" requests them again. Only a person with no data (not found, restricted) ends a branch, and only an expired session stops the load. | M |
 
 ## Views
 | ID | Requirement | Pri |
@@ -34,7 +35,7 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-17 | A person card shows four lines: name; birth date – death date (age); birth place – death place; person id (see [UI spec](../4-design/5-ui-spec.md)). | M |
 | FR-18 | A card can be expanded to show death place, marriages and the FamilySearch id with a link to the person on familysearch.org. | S |
 | FR-19 | When a person has several parent sets or spouses, the app shows the first set/spouse and indicates others exist (OQ-04). | S |
-| FR-20 | Loading, empty, partial-failure and error states are visible and recoverable (retry per node). | M |
+| FR-20 | Loading, empty, partial-failure and error states are visible and recoverable (retry per node, FR-33). | M |
 | FR-21 | Pan and zoom of the tree canvas. | S |
 | FR-22 | Export current view as image/PDF. | C |
 | FR-24 | Cards have a fixed size (250 × 90 px); long text is truncated with an ellipsis and the full text is available in a tooltip. | M |
@@ -45,3 +46,4 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-29 | Several children of a couple are drawn side by side in one row below the couple; each child's slot reserves room for spouses only if they exist. | M |
 | FR-30 | Several spouses of one person are drawn to the right at the same level, each with its own marriage link; a person without a known spouse gets no spouse card and no placeholder. | M |
 | FR-32 | Menu icons, buttons and the interface have priority over the tree: the tree must never cover or override them. | M |
+| FR-34 | The app reads the tree through a FamilySearch tab that the user opens from the app and marks with a bookmarklet (relay). The relay answers only the two allowed GET endpoints, only to the app's origin, and only while the user's FamilySearch session is active. | M |

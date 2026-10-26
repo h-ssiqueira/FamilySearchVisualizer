@@ -23,6 +23,8 @@ export interface FamilyTreeState {
   /** V3 relatives are still being fetched. */
   detailsBusy: boolean;
   canLoadMore: boolean;
+  /** People whose details could not be loaded yet (FR-33). */
+  failed: number;
   loadNext: () => void;
   loadAll: () => void;
   stop: () => void;
@@ -121,6 +123,7 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
     busy: ancestorsBusy,
     detailsBusy,
     canLoadMore,
+    failed: tree ? tree.failed.length : 0,
     loadNext,
     loadAll,
     stop,

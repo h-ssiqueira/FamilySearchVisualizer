@@ -40,6 +40,8 @@ function FamilyTreeView({ services, rootId, onSignOut }: FamilyTreeViewProps) {
         busy={tree.busy}
         detailsBusy={tree.detailsBusy}
         canLoadMore={tree.canLoadMore}
+        failedCount={tree.failed}
+        onRetry={tree.retry}
         onNext={tree.loadNext}
         onAll={tree.loadAll}
         onStop={tree.stop}
