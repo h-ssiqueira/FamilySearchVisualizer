@@ -47,3 +47,4 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-30 | Several spouses of one person are drawn to the right at the same level, each with its own marriage link; a person without a known spouse gets no spouse card and no placeholder. | M |
 | FR-32 | Menu icons, buttons and the interface have priority over the tree: the tree must never cover or override them. | M |
 | FR-34 | The app reads the tree through a FamilySearch tab that the user opens from the app and marks with a bookmarklet (relay). The relay answers only the two allowed GET endpoints, only to the app's origin, and only while the user's FamilySearch session is active. | M |
+| FR-35 | The interface has a dark theme. It follows the system setting by default; a control on every screen switches between light and dark, and the choice is remembered in this browser. Cards keep light colours so that their text stays readable. The exported SVG keeps a white background. | S |
