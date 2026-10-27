@@ -4,6 +4,7 @@ import { HashRouter } from 'react-router-dom';
 import { scrubUrl, tokenStore } from '@/auth';
 import { loadConfig } from '@/config';
 import { ErrorBoundary } from '@/ui/ErrorBoundary';
+import './ui/theme';
 import { App } from './App';
 import './ui/styles.css';
 

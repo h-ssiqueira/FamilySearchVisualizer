@@ -1,5 +1,6 @@
 {
   "app": { "title": "FamilySearch Visualizer" },
+  "theme": { "dark": "Modo escuro" },
   "login": {
     "heading": "FamilySearch Visualizer",
     "description": "Veja a sua árvore genealógica em visões simples e cada vez mais detalhadas.",

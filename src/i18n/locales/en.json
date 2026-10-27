@@ -1,5 +1,6 @@
 {
   "app": { "title": "FamilySearch Visualizer" },
+  "theme": { "dark": "Dark mode" },
   "login": {
     "heading": "FamilySearch Visualizer",
     "description": "See your family tree in simple, progressively richer views.",
