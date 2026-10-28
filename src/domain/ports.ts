@@ -12,6 +12,17 @@ export class SessionExpiredError extends Error {
 }
 
 /**
+ * The data of one person came back in an unexpected shape (SDD TC-15). The person keeps its
+ * place on the tree, marked as unexpected; the rest of the tree goes on.
+ */
+export class InvalidDataError extends Error {
+  constructor(message = 'Unexpected response shape') {
+    super(message);
+    this.name = 'InvalidDataError';
+  }
+}
+
+/**
  * Where the tree builders get people from. `null` means there is no data for this person
  * (missing or restricted): a branch ends there. Transient errors are thrown.
  */

@@ -1,4 +1,5 @@
 import {
+  InvalidDataError,
   preferredCouple,
   SessionExpiredError,
   type Couple,
@@ -20,6 +21,8 @@ interface Frontier {
   id: PersonId;
   slot: number;
   childId?: PersonId;
+  /** What the parent entry says about this person: the name we show if the person's data is unexpected. */
+  ref?: PersonRef;
 }
 
 /** Man left (even slot), woman right (odd slot); otherwise `partner1` left (SDD UI spec). */
@@ -49,9 +52,10 @@ export function assignParentSlots(
  * generation so the UI can render progressively; stops when no parents are known, when the
  * requested generation is reached, or when the signal is aborted.
  *
- * A person whose details fail with a transient error (throttling, server error, unexpected
- * data) does not stop the rest of the tree: the person is listed in `failed` and in `pending`,
- * so that loading again retries it (SDD FR-33). A person with no data (`null`) simply ends
+ * A person whose details fail with a transient error (throttling, server error) does not stop the
+ * rest of the tree: the person is listed in `failed` and in `pending`, so loading again retries it
+ * (SDD FR-33). A person whose data came back in an unexpected shape keeps its place, marked as
+ * unexpected, and its parents are not requested (TC-15). A person with no data (`null`) simply ends
  * that branch (FR-31). Only an expired session stops the whole load.
  */
 export async function* buildAncestorTree(
@@ -73,6 +77,7 @@ export async function* buildAncestorTree(
 
     const ids = [...new Set(frontier.map((item) => item.id))].filter((id) => !placed.has(id));
     const loaded = new Map<PersonId, Person | null>();
+    const malformed = new Set<PersonId>();
     await Promise.all(
       ids.map(async (id) => {
         try {
@@ -80,7 +85,8 @@ export async function* buildAncestorTree(
         } catch (error) {
           if (error instanceof SessionExpiredError) throw error;
           if (signal?.aborted) return;
-          failed.add(id);
+          if (error instanceof InvalidDataError) malformed.add(id);
+          else failed.add(id);
         }
       }),
     );
@@ -94,7 +100,25 @@ export async function* buildAncestorTree(
         continue;
       }
       const person = loaded.get(item.id);
-      if (!person) continue;
+      if (!person) {
+        if (malformed.has(item.id)) {
+          if (item.ref) {
+            placed.add(item.id);
+            nodes.push({
+              id: item.id,
+              person: { ...item.ref, invalid: true },
+              generation,
+              slot: item.slot,
+              role: 'ancestor',
+            });
+            if (item.childId) edges.push({ from: item.childId, to: item.id, kind: 'parent' });
+          } else {
+            // Without a parent entry there is no name to show: it counts as a failure.
+            failed.add(item.id);
+          }
+        }
+        continue;
+      }
 
       placed.add(item.id);
       failed.delete(item.id);
@@ -110,7 +134,7 @@ export async function* buildAncestorTree(
       const couple = preferredCouple(person.parentSets);
       if (couple) {
         for (const parent of assignParentSlots(couple, item.slot)) {
-          next.push({ id: parent.ref.id, slot: parent.slot, childId: person.id });
+          next.push({ id: parent.ref.id, slot: parent.slot, childId: person.id, ref: parent.ref });
         }
       }
     }

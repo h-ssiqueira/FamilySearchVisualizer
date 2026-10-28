@@ -1,4 +1,4 @@
-import type { LifeEvent, Person, PersonId, PersonRef, ViewLevel } from './types';
+import type { Couple, LifeEvent, Person, PersonId, PersonRef, ViewLevel } from './types';
 
 /**
  * `line`: the root and its direct ancestors. `sibling`: other children of a couple on the line.

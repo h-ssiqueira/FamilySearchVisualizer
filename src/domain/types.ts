@@ -18,12 +18,16 @@ export interface LifeEvent {
   place?: Place;
 }
 
-/** "Light" person: what another person's response says about a relative. */
+/**
+ * "Light" person: what another person's response says about a relative. `invalid` is set when
+ * the person's own data came back unexpected (SDD TC-15): the card then says so.
+ */
 export interface PersonRef {
   id: PersonId;
   name: string;
   gender: Gender;
   living: boolean;
+  invalid?: boolean;
 }
 
 export interface Couple {

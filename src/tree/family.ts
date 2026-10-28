@@ -29,14 +29,20 @@ function orderedPartnerIds(couple: Couple, has: (id: PersonId) => boolean): Pers
   return refs.map((ref) => ref.id);
 }
 
-/** Adds the spouses and children of a person's unions (SDD V2 for the root, V3 for others). */
+/**
+ * Adds the spouses and children of a person's unions (SDD V2 for the root, V3 for others).
+ * When the user's family is flagged as preferred, only the flagged unions are shown (OQ-04);
+ * when none is flagged, every union is shown (FR-30).
+ */
 function addUnions(
   person: Person,
   row: number,
   cards: Map<PersonId, FamilyCard>,
   couples: Map<string, FamilyCouple>,
 ): void {
-  for (const union of person.unions) {
+  const flagged = person.unions.filter((union) => union.preferred);
+  const unions = flagged.length > 0 ? flagged : person.unions;
+  for (const union of unions) {
     const spouse = partnerOf(person.id, union);
     // No spouse and no children: nothing to draw ("no spouse, no card").
     if (!spouse && union.children.length === 0) continue;

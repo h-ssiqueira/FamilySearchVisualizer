@@ -1,4 +1,4 @@
-import { SessionExpiredError } from '@/domain';
+import { InvalidDataError, SessionExpiredError } from '@/domain';
 
 export class UnauthorizedError extends SessionExpiredError {
   constructor() {
@@ -40,8 +40,11 @@ export class HttpError extends Error {
   }
 }
 
-/** Names the invalid fields only: never the values, which may be personal data. */
-export class SchemaError extends Error {
+/**
+ * The response does not have the expected shape. Names the invalid fields only: never the values,
+ * which may be personal data. It is an InvalidDataError, so the tree keeps the person (TC-15).
+ */
+export class SchemaError extends InvalidDataError {
   readonly paths: string[];
   constructor(paths: string[]) {
     super(`Unexpected response shape at: ${paths.join(', ') || '(root)'}`);
