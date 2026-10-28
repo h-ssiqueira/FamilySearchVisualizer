@@ -100,3 +100,9 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 |----|-----|-------|------|
 | TC-72 | FR-09 | U | The queue exposes the pause while it lasts and notifies when it starts and when it ends (`requestQueue.wait.test.ts`) |
 | TC-73 | FR-09 | C | The toolbar says "FamilySearch asked us to wait N s" before the loading message, and shows the normal status when nothing is waiting (`TreeToolbar.wait.test.tsx`) |
+
+## Dark theme (FR-35)
+| ID | Req | Level | Case |
+|----|-----|-------|------|
+| TC-76 | FR-35 | C | The theme button switches to dark, marks the page, remembers the choice, and switches back to light (`theme.test.tsx`) |
+| TC-77 | FR-35 | C | With the choice "system" the page follows the operating system (no explicit marker); the button is labelled in pt-BR (`theme.test.tsx`). Visual contrast in dark mode: open |
