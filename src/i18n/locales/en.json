@@ -76,7 +76,8 @@
   },
   "error": { "generic": "Something went wrong. Please reload the page." },
   "card": {
-    "gender": { "male": "Male", "female": "Female", "unknown": "Unknown gender" }
+    "gender": { "male": "Male", "female": "Female", "unknown": "Unknown gender" },
+    "unexpected": "Unexpected response"
   },
   "language": { "label": "Language", "en": "English", "pt-BR": "Português (Brasil)" }
 }
