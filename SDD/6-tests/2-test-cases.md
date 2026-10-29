@@ -2,7 +2,7 @@
 
 Format: Given / When / Then. Level: U unit, C component, I integration, E end-to-end, M manual.
 
-Status notes: "(`file`)" points to the test that covers the case. "open" means the behaviour is not implemented or not tested yet.
+Status notes: "(`file`)" points to the test that covers the case. "open" means the behaviour is not implemented or not tested yet. "Decided" means the expected behaviour is fixed, but the code may not follow it yet.
 
 ## Authentication
 | ID | Req | Level | Case |
@@ -22,7 +22,7 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 | TC-10 | FR-05 | U | `users/current` mapped to `CurrentUser` (id, name, gender, birthDate) |
 | TC-11 | FR-07 | U | `formalText` present → used; absent → `normalizedText`; both absent → unknown |
 | TC-12 | FR-06 | U | Person with no death → no `ageAtDeath` shown |
-| TC-13 | FR-19 | U | Two parent sets and two spouses → both kept in the model, with the preferred flag (`mappers.parentSets.test.ts`). The views show the preferred family only when one is flagged (`family.preferred.test.ts`; see TC-78). The indicator of the other families: open |
+| TC-13 | FR-19 | U | Two parent sets and two spouses → both kept in the model, with the preferred flag (`mappers.parentSets.test.ts`). The views show the preferred family only when one is flagged (`family.preferred.test.ts`; see TC-78). The indicator of the other families: open (decided yes, form open: OQ-23) |
 | TC-14 | data model | U | Parent with only `parent1` → placeholder for the missing parent. Open: placeholders are not drawn (FR-11) |
 | TC-15 | FR-36, NFR-12 | C/U | Response in an unexpected shape → the person keeps its place, marked; the card says "Unexpected response" where the dates go; the rest of the tree goes on; its parents are not requested; a root in that state counts as a failure (`ancestors.invalid.test.ts`, `PersonCard.invalid.test.tsx`, `schemaError.test.ts`) |
 | TC-16 | FR-10 | U | Same person requested twice → one network call (`personSource.test.ts`) |
@@ -32,7 +32,7 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 |----|-----|-------|------|
 | TC-20 | FR-11 | U | V1 depth 3 for a complete tree → 1+2+4+8 nodes, binary structure (`ancestors.test.ts`) |
 | TC-21 | FR-11 | U | Unknown ancestors → placeholders; recursion stops. Open: placeholders are not drawn |
-| TC-22 | FR-11, R-06 | U | Pedigree collapse: same ancestor on two branches → one node, second reference marked. Open: the marker is missing |
+| TC-22 | FR-11, R-06 | U | Pedigree collapse: same ancestor on two branches → one node, second reference marked. Open: the marker is missing; its form is open (OQ-24) |
 | TC-23 | FR-13 | U | V2: for each couple shown, all its children appear; siblings of root appear under root's parents (`family.test.ts`) |
 | TC-24 | FR-13, FR-37 | I | V2: every relative shown gets its details, one request each; relatives already known come from the cache; the people on the line are not requested again (`family.details.test.ts`, `TreeScreen.test.tsx`) |
 | TC-25 | FR-14 | U | V3: each child's spouse(s) and their children appear (`family.test.ts`) |
@@ -48,7 +48,7 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 | TC-40 | FR-09, NFR-03 | I | 429 with `Retry-After: 5` → all queued requests pause ~5 s, the toolbar shows the seconds left, then they resume (`requestQueue.wait.test.ts`, `TreeToolbar.wait.test.tsx`) |
 | TC-41 | FR-23 | I | Never more than N requests in flight (`requestQueue.test.ts`) |
 | TC-42 | NFR-03, FR-33 | I | Network failure (no answer) → retried with back-off (1 s, 2 s, 4 s); after the last retry the person is shown as not loaded and "retry" requests them again; an HTTP error answer is not retried by the client (`familySearchClient.backoff.test.ts`; the UI part is TC-46) |
-| TC-43 | design | I | 403/404 for one person → node "unavailable", tree still renders. Open: the branch ends silently, no card |
+| TC-43 | FR-38 | I | **Decided:** a restricted or missing person (403/404) shows an "unavailable" card in its place, and its branch ends there. Open: the card is not built yet |
 | TC-44 | F7 | I | Change view/root during loading → in-flight requests aborted, stale results ignored (builder abort in `ancestors.test.ts`; the UI flow is open) |
 | TC-45 | FR-33 | U | One person fails with a transient error → the other branches keep loading; the person is listed as failed and as pending (`ancestors.failure.test.ts`) |
 | TC-46 | FR-33 | C | Toolbar shows the count of people not loaded; "retry" rebuilds the tree and requests only the failed people again (`TreeScreen.retry.test.tsx`) |
@@ -83,9 +83,9 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 ## UI cards and layout
 | ID | Req | Level | Case |
 |----|-----|-------|------|
-| TC-61 | FR-17 | C | The sketch's example renders exactly four lines: `John Example` / `1800-12-31 - 1900-01-01 (99)` / `São Paulo, São Paulo, Brazil - São Paulo, São Paulo, Brazil` (truncated with ellipsis at 250 px, full text in tooltip) / `XXXX-XXX` |
+| TC-61 | FR-17, FR-24 | C | The sketch's example renders exactly four lines: `John Example` / `1800-12-31 - 1900-01-01 (99)` / `São Paulo, São Paulo, Brazil - São Paulo, São Paulo, Brazil` / `XXXX-XXX`. Today the card is 250 px and the places are truncated with a tooltip; under the flexible width decided in OQ-22 this changes |
 | TC-62 | FR-25 | U | Complete date → `yyyy-MM-dd`; year only → `1800`; approximate/range text → raw text; none → empty (`dates.test.ts`) |
-| TC-63 | FR-24 | C | Very long place names are truncated with an ellipsis; tooltip shows the full text; card height stays 90 px (`PersonCard.test.tsx`) |
+| TC-63 | FR-24 | C | Very long place names are truncated with an ellipsis; tooltip shows the full text; card height stays 90 px (`PersonCard.test.tsx`). Under the flexible width (OQ-22): the width grows up to its limit, then truncates |
 | TC-64 | FR-27, NFR-06 | C | Male, female and unknown cards differ by colour **and** by a non-colour cue; text contrast ≥ 4.5:1. Open: contrast is not checked |
 | TC-65 | FR-26 | C | A couple shows a horizontal link with marriage date and place; missing marriage data hides only the missing parts (`familyLayout.test.ts`) |
 | TC-66 | FR-28 | U | Parent couple: male card left of female card; child placed under the couple; spouse right of the person (`familyLayout.test.ts`) |
