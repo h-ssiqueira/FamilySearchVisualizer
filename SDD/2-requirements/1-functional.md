@@ -23,6 +23,7 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-31 | "Load next generation" and "load all remaining" must consider each branch: loading never stops at one branch while another branch still has parents to load. | M |
 | FR-33 | A person whose details fail with a transient error (throttling that does not end, network failure, server error) does not stop the rest of the tree. The person is shown as not loaded, the count is visible, and "retry" requests them again. Only a person with no data (not found, restricted) ends a branch, and only an expired session stops the load. | M |
 | FR-36 | A person whose data comes back in an unexpected shape keeps its place on the tree, marked as "Unexpected response" where the dates go, with the name known from the parent entry; the rest of the tree goes on and that person's parents are not requested (TC-15). | M |
+| FR-37 | In V2 and V3, every relative shown has its details loaded (one request each, cached), so that its card shows dates and places as well (OQ-05). A relative that cannot be loaded keeps a light card (FR-33). | M |
 
 ## Views
 | ID | Requirement | Pri |
@@ -33,7 +34,7 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-14 | **V3** adds the spouses of the children shown in V2 and the children of those unions. | M |
 | FR-15 | The user can switch V1/V2/V3 without reloading data already cached. | M |
 | FR-16 | Selecting a person opens a panel with the person's details and a link to the person's page on familysearch.org. | C |
-| FR-17 | A person card shows four lines: name; birth date – death date (age); birth place – death place; person id (see [UI spec](../4-design/5-ui-spec.md)). | M |
+| FR-17 | A person card shows four lines: name; birth date – death date (age); birth place – death place; person id (see [UI spec](../4-design/5-ui-spec.md)). This holds for every person drawn, in V1, V2 and V3; relatives in V2 and V3 get their details first (FR-37). | M |
 | FR-18 | A card can be expanded to show death place, marriages and the FamilySearch id with a link to the person on familysearch.org. | S |
 | FR-19 | Preferred family only (OQ-04): parent families show the preferred one (the first when none is flagged); spouse families show only the flagged ones when one is flagged, and every spouse when none is flagged (FR-30). The other families are not drawn; an indicator that they exist is not built yet. | S |
 | FR-20 | Loading, empty, partial-failure and error states are visible and recoverable (retry per node, FR-33). | M |
@@ -44,7 +45,7 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-26 | Partners are joined by a horizontal line labelled with the marriage date and location; no card lies on that line: the siblings of each partner are placed on its outer side; children hang from both parents with orthogonal lines; no arrowheads. | M |
 | FR-27 | Gender is shown by card colour (blue = male, pink = female, neutral grey = unknown) **and** by a non-colour cue (NFR-06). | M |
 | FR-28 | Layout as sketched: vertical, ancestors above and descendants below (root at the bottom); man left and woman right in a parent couple; a person's spouse to the right. | M |
-| FR-29 | Several children of a couple are drawn side by side in one row below the couple; each child's slot reserves room for spouses only if they exist. | M |
+| FR-29 | Several children of a couple are drawn side by side in one row below the couple; each child's slot reserves room for spouses only if they exist. Large groups stay in one row, with pan and zoom (OQ-20). | M |
 | FR-30 | Several spouses of one person are drawn to the right at the same level, each with its own marriage link; a person without a known spouse gets no spouse card and no placeholder. | M |
 | FR-32 | Menu icons, buttons and the interface have priority over the tree: the tree must never cover or override them. | M |
 | FR-34 | The app reads the tree through a FamilySearch tab that the user opens from the app and marks with a bookmarklet (relay). The relay answers only the two allowed GET endpoints, only to the app's origin, and only while the user's FamilySearch session is active. | M |

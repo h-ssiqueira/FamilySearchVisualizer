@@ -34,7 +34,7 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 | TC-21 | FR-11 | U | Unknown ancestors → placeholders; recursion stops. Open: placeholders are not drawn |
 | TC-22 | FR-11, R-06 | U | Pedigree collapse: same ancestor on two branches → one node, second reference marked. Open: the marker is missing |
 | TC-23 | FR-13 | U | V2: for each couple shown, all its children appear; siblings of root appear under root's parents (`family.test.ts`) |
-| TC-24 | FR-13 | U | V2 adds no network call beyond V1 for names (`family.test.ts`) |
+| TC-24 | FR-13, FR-37 | I | V2: every relative shown gets its details, one request each; relatives already known come from the cache; the people on the line are not requested again (`family.details.test.ts`, `TreeScreen.test.tsx`) |
 | TC-25 | FR-14 | U | V3: each child's spouse(s) and their children appear (`family.test.ts`) |
 | TC-26 | FR-14 | I | V3 makes exactly one details request per child (`family.test.ts`) |
 | TC-27 | FR-15 | I | Switch V3→V1→V3 → no repeated requests (`TreeScreen.test.tsx`; request count: open) |
@@ -53,6 +53,7 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 | TC-45 | FR-33 | U | One person fails with a transient error → the other branches keep loading; the person is listed as failed and as pending (`ancestors.failure.test.ts`) |
 | TC-46 | FR-33 | C | Toolbar shows the count of people not loaded; "retry" rebuilds the tree and requests only the failed people again (`TreeScreen.retry.test.tsx`) |
 | TC-47 | FR-33 | U | An expired session (401) stops the whole load; any other error only marks that person (`ancestors.failure.test.ts`) |
+| TC-79 | FR-37, FR-33 | U | A relative whose details fail keeps its light card; an expired session stops the detail loading (`family.details.test.ts`) |
 
 ## Relay (FR-34)
 | ID | Req | Level | Case |
