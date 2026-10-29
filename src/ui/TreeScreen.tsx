@@ -98,15 +98,16 @@ function FamilyTreeView({ services, rootId, onSignOut, onExpired }: FamilyTreeVi
 /**
  * The signed-in screen: the current user is the root of the tree (SDD FR-05, FR-11..FR-16).
  * A rejected session goes to `onExpired` (FR-04); the explicit sign-out button goes to `onSignOut`.
+ * Without `onExpired` a rejected session is treated like a sign-out.
  */
 export function TreeScreen({
   services,
   onSignOut,
-  onExpired,
+  onExpired = onSignOut,
 }: {
   services: Services;
   onSignOut: () => void;
-  onExpired: () => void;
+  onExpired?: () => void;
 }) {
   const t = useT();
   const user = useCurrentUser(services.client);

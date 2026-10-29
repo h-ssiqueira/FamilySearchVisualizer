@@ -67,8 +67,8 @@ function addUnions(
 
 /**
  * V1: the line only. V2: plus every child of each couple shown (siblings of the people on the
- * line) and the spouses and children of the root. No request is needed: relatives come with
- * the details of the people already loaded (SDD objective, section 2.3).
+ * line) and the spouses and children of the root. The relatives come as light cards here; their
+ * details are loaded by `withDetails` (OQ-05).
  */
 export function buildFamilyView(tree: ViewTree, level: 'V1' | 'V2'): FamilyView {
   const cards = new Map<PersonId, FamilyCard>();
@@ -125,6 +125,39 @@ export function buildFamilyView(tree: ViewTree, level: 'V1' | 'V2'): FamilyView 
     cards: [...cards.values()],
     couples: [...couples.values()],
   };
+}
+
+/**
+ * Full details for the relatives drawn as light cards (SDD OQ-05): every card shows dates and
+ * places. One request per relative, served from the cache when already known. A relative that
+ * cannot be loaded stays a light card (FR-33). Relatives are not expanded here: their own spouses
+ * and children are not added.
+ */
+export async function withDetails(
+  view: FamilyView,
+  source: PersonSource,
+  signal?: AbortSignal,
+): Promise<FamilyView> {
+  const targets = view.cards.filter(
+    (card) => card.role !== 'line' && !('parentSets' in card.person),
+  );
+  const loaded = await Promise.all(
+    targets.map(async (card): Promise<readonly [FamilyCard, Person | null]> => {
+      try {
+        return [card, await source.getPerson(card.id, signal)];
+      } catch (error) {
+        if (error instanceof SessionExpiredError) throw error;
+        return [card, null];
+      }
+    }),
+  );
+  if (signal?.aborted) return view;
+
+  const cards = new Map(view.cards.map((card) => [card.id, card] as const));
+  for (const [card, person] of loaded) {
+    if (person) cards.set(card.id, { ...card, person });
+  }
+  return { ...view, cards: [...cards.values()] };
 }
 
 /**
