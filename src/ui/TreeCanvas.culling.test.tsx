@@ -15,6 +15,7 @@ function tallLayout(count: number): FamilyLayout {
     },
     x: 40,
     y: 40 + index * (CARD.height + 60),
+    width: CARD.width,
   }));
   return {
     cards,

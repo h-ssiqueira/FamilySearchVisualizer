@@ -1,5 +1,6 @@
+import type { FamilyLayout } from './familyLayout';
 import { cardLines, formatDate, type Gender } from '@/domain';
-import type { FamilyLayout, MarriageLink } from './familyLayout';
+import type { MarriageLink } from './familyLayout';
 import { CARD } from './layout';
 
 const COLORS: Record<Gender, { top: string; bottom: string; stroke: string }> = {
@@ -66,13 +67,13 @@ export function layoutToSvg(layout: FamilyLayout): string {
       const person = entry.card.person;
       const lines = cardLines(person);
       const colors = COLORS[person.gender];
-      const cx = entry.x + CARD.width / 2;
+      const cx = entry.x + entry.width / 2;
       const text = (y: number, content: string, extra = ''): string =>
         content === ''
           ? ''
           : `<text x="${cx}" y="${entry.y + y}" font-size="12" text-anchor="middle" fill="#000000"${extra}>${escapeXml(clip(content))}</text>`;
       return (
-        `<g><rect x="${entry.x}" y="${entry.y}" width="${CARD.width}" height="${CARD.height}" ` +
+        `<g><rect x="${entry.x}" y="${entry.y}" width="${entry.width}" height="${CARD.height}" ` +
         `fill="url(#fill-${person.gender})" stroke="${colors.stroke}"/>` +
         text(22, `${SYMBOL[person.gender]} ${lines.name}`, ' font-weight="bold"') +
         text(42, lines.dates) +

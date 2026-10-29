@@ -1,4 +1,5 @@
 import type { FamilyCard, FamilyCouple, FamilyView, LifeEvent, PersonId } from '@/domain';
+import { cardWidth } from './cardWidth';
 import { CARD } from './layout';
 
 export const SPACING = {
@@ -18,6 +19,8 @@ export interface PositionedCard {
   card: FamilyCard;
   x: number;
   y: number;
+  /** The card's own width (OQ-22); the layout uses it for the links. */
+  width: number;
 }
 
 export interface MarriageLink {
@@ -43,16 +46,16 @@ export interface FamilyLayout {
   height: number;
 }
 
-const HALF = CARD.width / 2;
-
 /** Which partner of a couple on the line a block belongs to: left or right of the marriage. */
 type Side = 'left' | 'right';
 
+/** A card placed by its centre and its own width. */
 interface Placement {
   id: PersonId;
   row: number;
   /** Centre of the card. */
   cx: number;
+  w: number;
 }
 
 interface Extent {
@@ -68,8 +71,8 @@ interface Union {
 function rowExtents(placements: readonly Placement[]): Map<number, Extent> {
   const rows = new Map<number, Extent>();
   for (const placement of placements) {
-    const left = placement.cx - HALF;
-    const right = placement.cx + HALF;
+    const left = placement.cx - placement.w / 2;
+    const right = placement.cx + placement.w / 2;
     const entry = rows.get(placement.row);
     if (!entry) rows.set(placement.row, { min: left, max: right });
     else {
@@ -84,8 +87,8 @@ function overallExtent(placements: readonly Placement[]): Extent {
   let min = Number.POSITIVE_INFINITY;
   let max = Number.NEGATIVE_INFINITY;
   for (const placement of placements) {
-    min = Math.min(min, placement.cx - HALF);
-    max = Math.max(max, placement.cx + HALF);
+    min = Math.min(min, placement.cx - placement.w / 2);
+    max = Math.max(max, placement.cx + placement.w / 2);
   }
   return { min, max };
 }
@@ -106,11 +109,16 @@ const EMPTY: FamilyLayout = { cards: [], marriages: [], descents: [], width: 0, 
  *
  * The siblings of each partner of a couple go on the outer side of that partner, so the space
  * between the two partners (where the marriage line is drawn) stays free of cards (FR-26).
+ * Each card has its own width (OQ-22): the layout uses it for the spacing and the links.
  */
 export function layoutFamily(view: FamilyView): FamilyLayout {
   const cards = new Map(view.cards.map((card) => [card.id, card] as const));
   if (!cards.has(view.rootId)) return EMPTY;
   const isLine = (id: PersonId): boolean => cards.get(id)?.role === 'line';
+  const widthOf = (id: PersonId): number => {
+    const card = cards.get(id);
+    return card ? cardWidth(card.person) : CARD.width;
+  };
 
   const parentCoupleOf = new Map<PersonId, FamilyCouple>();
   for (const couple of view.couples) {
@@ -167,17 +175,21 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
     const card = cards.get(id);
     if (!card || used.has(id)) return [];
     used.add(id);
-    const placements: Placement[] = [{ id, row: card.row, cx: 0 }];
+    const selfWidth = widthOf(id);
+    const placements: Placement[] = [{ id, row: card.row, cx: 0, w: selfWidth }];
     let previousRight = Number.NEGATIVE_INFINITY;
-    let spouseCount = 0;
+    let lastCx = 0;
+    let lastWidth = selfWidth;
 
     for (const union of unionsOf.get(id) ?? []) {
       let center = 0;
       if (union.spouseId !== undefined && cards.has(union.spouseId) && !used.has(union.spouseId)) {
-        spouseCount += 1;
-        const spouseCx = spouseCount * (CARD.width + SPACING.spouseGap);
+        const spouseWidth = widthOf(union.spouseId);
+        const spouseCx = lastCx + (lastWidth + spouseWidth) / 2 + SPACING.spouseGap;
         used.add(union.spouseId);
-        placements.push({ id: union.spouseId, row: card.row, cx: spouseCx });
+        placements.push({ id: union.spouseId, row: card.row, cx: spouseCx, w: spouseWidth });
+        lastCx = spouseCx;
+        lastWidth = spouseWidth;
         center = spouseCx / 2;
       }
       const group = layoutChildren(union.couple.childIds);
@@ -194,11 +206,13 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
     left: readonly Placement[],
     right: readonly Placement[],
     group: readonly Placement[],
+    leftWidth: number,
+    rightWidth: number,
   ): number {
     const leftRows = rowExtents(left);
     const rightRows = rowExtents(right);
     const groupRows = rowExtents(group);
-    let distance = CARD.width + SPACING.partnerGap;
+    let distance = (leftWidth + rightWidth) / 2 + SPACING.partnerGap;
     for (const [row, l] of leftRows) {
       const r = rightRows.get(row);
       if (r) distance = Math.max(distance, l.max + SPACING.blockGap - r.min);
@@ -253,23 +267,33 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
     const groupRel = shifted(group.placements, -groupCenter);
     const selfRel = (self ? self.cx : groupCenter) - groupCenter;
 
-    const blocks: Placement[][] = [];
+    const blocks: Array<{ id: PersonId; placements: Placement[] }> = [];
     const partnerIds = couple && couple.kind === 'parents' ? couple.partnerIds : [];
     partnerIds.forEach((partnerId, index) => {
       if (!isLine(partnerId) || placedLine.has(partnerId)) return;
-      blocks.push(buildBlock(partnerId, index === 0 ? 'left' : 'right'));
+      blocks.push({ id: partnerId, placements: buildBlock(partnerId, index === 0 ? 'left' : 'right') });
     });
     const [first, second] = blocks;
 
     if (first && second) {
-      const distance = separation(first, second, groupRel);
+      const distance = separation(
+        first.placements,
+        second.placements,
+        groupRel,
+        widthOf(first.id),
+        widthOf(second.id),
+      );
       const center = distance / 2;
-      const combined = [...first, ...shifted(second, distance), ...shifted(groupRel, center)];
+      const combined = [
+        ...first.placements,
+        ...shifted(second.placements, distance),
+        ...shifted(groupRel, center),
+      ];
       return shifted(combined, -(center + selfRel));
     }
     if (first) {
-      const center = singleOffset(first, groupRel);
-      const combined = [...first, ...shifted(groupRel, center)];
+      const center = singleOffset(first.placements, groupRel);
+      const combined = [...first.placements, ...shifted(groupRel, center)];
       return shifted(combined, -(center + selfRel));
     }
     return shifted(groupRel, -selfRel);
@@ -282,10 +306,12 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
   for (const card of view.cards) {
     if (placed.has(card.id)) continue;
     const extent = rowExtents(placements).get(card.row);
+    const w = widthOf(card.id);
     placements.push({
       id: card.id,
       row: card.row,
-      cx: (extent ? extent.max + SPACING.siblingGap : 0) + HALF,
+      cx: (extent ? extent.max + SPACING.siblingGap : 0) + w / 2,
+      w,
     });
     placed.add(card.id);
   }
@@ -308,8 +334,9 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
     if (!card) continue;
     positioned.set(placement.id, {
       card,
-      x: placement.cx - HALF - extent.min + SPACING.padding,
+      x: placement.cx - placement.w / 2 - extent.min + SPACING.padding,
       y: (maxRow - placement.row) * pitch + SPACING.padding,
+      width: placement.w,
     });
   }
 
@@ -326,7 +353,7 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
       const right = left === one ? two : one;
       marriages.push({
         coupleId: couple.id,
-        x1: left.x + CARD.width,
+        x1: left.x + left.width,
         x2: right.x,
         y: left.y + CARD.height / 2,
         ...(couple.event ? { event: couple.event } : {}),
@@ -337,9 +364,9 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
       for (const childId of couple.childIds) {
         const child = positioned.get(childId);
         if (!child) continue;
-        const startX = parent.x + HALF;
+        const startX = parent.x + parent.width / 2;
         const startY = parent.y + CARD.height;
-        const endX = child.x + HALF;
+        const endX = child.x + child.width / 2;
         const middleY = child.y - SPACING.rowGap / 2;
         descents.push({
           coupleId: couple.id,

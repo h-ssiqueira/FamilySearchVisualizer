@@ -1,14 +1,15 @@
 import { useT } from '@/i18n';
 import { cardLines, type Gender, type Person, type PersonRef } from '@/domain';
+import { cardWidth } from '@/tree/cardWidth';
 
 const GENDER_SYMBOL: Record<Gender, string> = { male: '♂', female: '♀', unknown: '?' };
 const REPEATED_SYMBOL = '\u{1F504}';
 
 /**
  * Four fixed lines, truncated with an ellipsis; the full text is in the tooltip (SDD FR-24).
- * A person whose data came back unexpected keeps the name and the id, and says so where the dates
- * go (TC-15). A person with no data says "Not available" (TC-43). An ancestor reached twice carries
- * the repeat symbol (TC-22).
+ * The card is as wide as its text needs, between 250 and 360 px (OQ-22). A person whose data came
+ * back unexpected keeps the name and the id, and says so where the dates go (TC-15). A person with
+ * no data says "Not available" (TC-43). An ancestor reached twice carries the repeat symbol (TC-22).
  */
 export function PersonCard({ person }: { person: Person | PersonRef }) {
   const t = useT();
@@ -20,7 +21,11 @@ export function PersonCard({ person }: { person: Person | PersonRef }) {
   const dates = note || lines.dates;
   const places = note ? '' : lines.places;
   return (
-    <article className={`person-card person-card--${person.gender}`} aria-label={lines.name}>
+    <article
+      className={`person-card person-card--${person.gender}`}
+      aria-label={lines.name}
+      style={{ width: cardWidth(person) }}
+    >
       <p className="person-card__line person-card__name" title={lines.name}>
         <span role="img" aria-label={t(`card.gender.${person.gender}`)}>
           {GENDER_SYMBOL[person.gender]}
