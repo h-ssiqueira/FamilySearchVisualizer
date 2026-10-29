@@ -20,9 +20,13 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 
 ## Decisions confirmed so far
 - Pure client-side SPA hosted on GitHub Pages (no backend).
-- Login (OQ-21 decided): the user signs in with Google through FamilySearch's identity service, at `https://ident.familysearch.org/oauth2/authorization/google` (first lines of `examples.md`); the app has no Google client or SDK, no OAuth client id, no redirect URI and no PKCE. **Unverified:** how the resulting token reaches a page on `github.io` (spike A2; fallbacks in the [auth doc](5-security/1-auth-authorization.md), section 3).
+- Login (OQ-21 decided): the user signs in with Google through FamilySearch's identity service, at `https://ident.familysearch.org/oauth2/authorization/google` (first lines of `examples.md`); the app has no Google client or SDK, no OAuth client id, no redirect URI and no PKCE.
+- **Relay (FR-34):** the app reads the tree through a FamilySearch tab that the user opens from the app and marks with a bookmarklet. The bearer token is only a fallback. **Unverified:** whether the session cookie alone authorises the two endpoints (TC-52b).
 - V1 ancestor depth is **unlimited**: loaded incrementally, generation by generation, always cancellable (ADR-09).
 - Views confirmed (OQ-03 resolved): V1 direct line; V2 = V1 + all children of every couple shown; V3 = V2 + the spouses of those children and their children, one level only (see [objective](1-overview/2-objective.md)).
+- **Preferred family (OQ-04 decided):** parent families always show the preferred one (the first when none is flagged). Spouse families: when one is flagged as preferred, only the flagged ones are shown; when none is flagged, every spouse is shown (FR-30). No indicator of the other families yet (FR-19).
+- **Dates (NFR-08 vs FR-25 resolved):** complete dates stay `yyyy-MM-dd` in every locale (FR-25). Prose dates come localized from FamilySearch. Numbers and counts follow the locale (NFR-08).
+- **Unexpected data (TC-15 decided):** a person whose data comes back in an unexpected shape keeps its place on the tree, marked "Unexpected response", and the rest of the tree goes on.
 - **Endpoints (OQ-06 resolved):** the app uses the endpoints exactly as in `8-attachments/examples.md` (the website's `platform/users/current` and `service/tree/tree-data/v8/person/{id}/details`); ADR-10 (documented API) is **not adopted** and stays as a fallback. What the samples show is in [API findings](4-design/6-api-findings.md).
 - **Languages (OQ-08 resolved):** English and Brazilian Portuguese (pt-BR), designed to be extended with more locales (ADR-11).
 - **URL (OQ-12 resolved):** the repository's default GitHub Pages address, project page at the Pages root of the repository: `https://h-ssiqueira.github.io/FamilySearchVisualizer/` (host derived from the owner name, to confirm); Vite `base` = `/FamilySearchVisualizer/`.
@@ -46,7 +50,7 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 | OQ-01 | ~~Google login mechanism~~ **Resolved:** Google is used through FamilySearch's identity service, at `https://ident.familysearch.org/oauth2/authorization/google`; the app never talks to Google. The address could not be opened for inspection (automated access blocked) and is not part of the documented OAuth flow. | 5-security |
 | OQ-02 | ~~Maximum generations~~ **Resolved: unlimited.** Remaining: how many generations to auto-load before asking the user to continue (proposed: 4)? | FR-12, ADR-09 |
 | OQ-03 | ~~V2/V3 interpretation~~ **Resolved: confirmed.** | FR-13, FR-14 |
-| OQ-04 | People can have several parent sets (biological, adoptive, step) and several spouses. Show only the first/preferred, or let the user switch? | FR-19, data model |
+| OQ-04 | ~~Several parent sets or spouses~~ **Decided:** show the preferred family (see decisions); no indicator of the others yet. | FR-19, data model |
 | OQ-05 | Do all cards need dates/places or can cards show name only until selected? | NFR-02, flows |
 | OQ-06 | ~~Documented API or internal endpoint?~~ **Resolved:** use the endpoints as in `examples.md`. ADR-10 not adopted (kept as fallback). Accepted risk: the endpoints may change without notice (R-01). | R-01, data model |
 | OQ-07 | ~~Developer key status~~ **Dropped** (out of scope, author's decision). | – |
@@ -63,4 +67,4 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 | OQ-18 | ~~Orientation~~ **Decided:** vertical, root at the bottom. | 4-design/5-ui-spec |
 | OQ-19 | ~~Card width~~ **Decided:** fixed 250 px with truncation (tooltip shows full text). | 4-design/5-ui-spec |
 | OQ-20 | Families with very many children in one row (e.g. 15+): one long row with pan/zoom, or wrap into several rows? | 4-design/5-ui-spec |
-| OQ-21 | ~~How does the SPA get a token?~~ **Decided (author):** through the Google login address above, as in the first lines of `examples.md`. **Open verification:** the samples use the website's session id as Bearer token and run same-origin; a page on `github.io` cannot read that session, so the spike must prove how the token reaches the SPA. Fallbacks if not: paste the token; run on familysearch.org; small proxy (reverses ADR-01). | ADR-01, ADR-02, auth, R-02 |
+| OQ-21 | ~~How does the SPA get a token?~~ **Decided (author):** through the Google login address above, as in the first lines of `examples.md`. **Open verification:** the samples use the website's session id as Bearer token and run same-origin; a page on `github.io` cannot read that session, so the spike must prove how the token reaches the SPA. Fallbacks if not: paste the token; run on familysearch.org; small proxy (reverses ADR-01). The relay (FR-34) is the path in use. | ADR-01, ADR-02, auth, R-02 |

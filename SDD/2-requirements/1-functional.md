@@ -21,7 +21,8 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-10 | Responses are cached in memory for the session; the same person is never requested twice in one session unless refreshed. | S |
 | FR-23 | Concurrency of outgoing requests is bounded (configurable, default proposed: 4). | M |
 | FR-31 | "Load next generation" and "load all remaining" must consider each branch: loading never stops at one branch while another branch still has parents to load. | M |
-| FR-33 | A person whose details fail with a transient error (throttling that does not end, network failure, server error, unexpected data) does not stop the rest of the tree. The person is shown as not loaded, the count is visible, and "retry" requests them again. Only a person with no data (not found, restricted) ends a branch, and only an expired session stops the load. | M |
+| FR-33 | A person whose details fail with a transient error (throttling that does not end, network failure, server error) does not stop the rest of the tree. The person is shown as not loaded, the count is visible, and "retry" requests them again. Only a person with no data (not found, restricted) ends a branch, and only an expired session stops the load. | M |
+| FR-36 | A person whose data comes back in an unexpected shape keeps its place on the tree, marked as "Unexpected response" where the dates go, with the name known from the parent entry; the rest of the tree goes on and that person's parents are not requested (TC-15). | M |
 
 ## Views
 | ID | Requirement | Pri |
@@ -34,12 +35,12 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-16 | Selecting a person opens a panel with the person's details and a link to the person's page on familysearch.org. | C |
 | FR-17 | A person card shows four lines: name; birth date – death date (age); birth place – death place; person id (see [UI spec](../4-design/5-ui-spec.md)). | M |
 | FR-18 | A card can be expanded to show death place, marriages and the FamilySearch id with a link to the person on familysearch.org. | S |
-| FR-19 | When a person has several parent sets or spouses, the app shows the first set/spouse and indicates others exist (OQ-04). | S |
+| FR-19 | Preferred family only (OQ-04): parent families show the preferred one (the first when none is flagged); spouse families show only the flagged ones when one is flagged, and every spouse when none is flagged (FR-30). The other families are not drawn; an indicator that they exist is not built yet. | S |
 | FR-20 | Loading, empty, partial-failure and error states are visible and recoverable (retry per node, FR-33). | M |
 | FR-21 | Pan and zoom of the tree canvas. | S |
 | FR-22 | Export current view as image/PDF. | C |
 | FR-24 | Cards have a fixed size (250 × 90 px); long text is truncated with an ellipsis and the full text is available in a tooltip. | M |
-| FR-25 | Dates are shown as `yyyy-MM-dd` when complete; partial, approximate or range dates show only what is known or the raw text; no invented day/month. Age is shown only for deceased people; living people show only the birth date. | M |
+| FR-25 | Dates are shown as `yyyy-MM-dd` when complete, in every locale; partial, approximate or range dates show only what is known or the raw text; no invented day/month. Age is shown only for deceased people; living people show only the birth date. | M |
 | FR-26 | Partners are joined by a horizontal line labelled with the marriage date and location; no card lies on that line: the siblings of each partner are placed on its outer side; children hang from both parents with orthogonal lines; no arrowheads. | M |
 | FR-27 | Gender is shown by card colour (blue = male, pink = female, neutral grey = unknown) **and** by a non-colour cue (NFR-06). | M |
 | FR-28 | Layout as sketched: vertical, ancestors above and descendants below (root at the bottom); man left and woman right in a parent couple; a person's spouse to the right. | M |

@@ -59,8 +59,8 @@ ESLint enforces the boundaries: `domain` imports nothing, `api` never imports Re
 - Branches: `feature/<name>`; stacked branches are allowed when a change builds on another. The default branch is `master`.
 
 ## Current state (keep this section up to date)
-- Implemented: login (relay and token fallback), V1/V2/V3 views, layout with no card on marriage lines, pan and zoom, SVG export, progressive loading, partial failures with retry (FR-33), waiting indicator (FR-09), session expiry keeping the view (FR-04), network back-off (NFR-03), number formatting (NFR-08), dark theme following the system with a toggle (FR-35).
-- Not implemented yet: placeholders for unknown parents (FR-11), "unavailable" card for restricted people (TC-43), pedigree-collapse marker (TC-22), several parent sets shown to the user (FR-19), keyboard navigation between cards (TC-50), PNG/PDF export (FR-22), wrapping of very large sibling groups (OQ-20).
+- Implemented: login (relay and token fallback), V1/V2/V3 views, layout with no card on marriage lines, pan and zoom, SVG export, progressive loading, partial failures with retry (FR-33), unexpected-data card (FR-36), waiting indicator (FR-09), session expiry keeping the view (FR-04), network back-off (NFR-03), number formatting (NFR-08), preferred spouse family (FR-19), dark theme following the system with a toggle (FR-35).
+- Not implemented yet: placeholders for unknown parents (FR-11), "unavailable" card for restricted people (TC-43), pedigree-collapse marker (TC-22), indicator that other families exist (FR-19), keyboard navigation between cards (TC-50), PNG/PDF export (FR-22), wrapping of very large sibling groups (OQ-20).
 - Never executed as a whole: the code was written without running install, tests or build. First real run: `npm ci`, then `typecheck`, `lint`, `test`, `build`, and send the errors back.
 - Unverified: whether the FamilySearch session cookie alone authorises the two endpoints when called through the relay (TC-52b). If not, the token fallback is the path.
 - CI workflows live in `.github/workflows-pending/` until they are moved to `.github/workflows/` (`git mv`). The GitHub connector cannot write there.

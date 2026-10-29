@@ -22,9 +22,9 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 | TC-10 | FR-05 | U | `users/current` mapped to `CurrentUser` (id, name, gender, birthDate) |
 | TC-11 | FR-07 | U | `formalText` present → used; absent → `normalizedText`; both absent → unknown |
 | TC-12 | FR-06 | U | Person with no death → no `ageAtDeath` shown |
-| TC-13 | FR-19 | U | Two parent sets and two spouses → both kept in the model, with the preferred flag (`mappers.parentSets.test.ts`). Views using the first one: open |
+| TC-13 | FR-19 | U | Two parent sets and two spouses → both kept in the model, with the preferred flag (`mappers.parentSets.test.ts`). The views show the preferred family only when one is flagged (`family.preferred.test.ts`; see TC-78). The indicator of the other families: open |
 | TC-14 | data model | U | Parent with only `parent1` → placeholder for the missing parent. Open: placeholders are not drawn (FR-11) |
-| TC-15 | NFR-12 | C | Response violating the schema → node shows "unexpected response", app continues. Partly: the app continues and counts the person as failed; the message is open |
+| TC-15 | FR-36, NFR-12 | C/U | Response in an unexpected shape → the person keeps its place, marked; the card says "Unexpected response" where the dates go; the rest of the tree goes on; its parents are not requested; a root in that state counts as a failure (`ancestors.invalid.test.ts`, `PersonCard.invalid.test.tsx`, `schemaError.test.ts`) |
 | TC-16 | FR-10 | U | Same person requested twice → one network call (`personSource.test.ts`) |
 
 ## Views
@@ -94,6 +94,7 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 | TC-70 | FR-30 | U | Person with 2 spouses → both drawn to the right on the same row, each with its own marriage label (`familyLayout.test.ts`) |
 | TC-71 | FR-25 | U | Living person → only the birth date, no dash, no death part, no age; deceased person → age shown (`cardText.test.ts`) |
 | TC-75 | FR-26 | U | Siblings of the left partner lie on its left, siblings of the right partner on its right; no card crosses the marriage line, also when a sibling has a spouse (`familyLayout.siblings.test.ts`) |
+| TC-78 | FR-19 | U | Person with two spouses: when one is flagged preferred, V2 shows only that spouse; when none is flagged, both are shown (`family.preferred.test.ts`) |
 
 ## Waiting indicator (FR-09)
 | ID | Req | Level | Case |
