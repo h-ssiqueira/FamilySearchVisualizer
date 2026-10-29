@@ -21,7 +21,7 @@ interface Frontier {
   id: PersonId;
   slot: number;
   childId?: PersonId;
-  /** What the parent entry says about this person: the name we show if the person's data is unexpected. */
+  /** What the parent entry says about this person: the name we show when its data is missing or unexpected. */
   ref?: PersonRef;
 }
 
@@ -52,11 +52,12 @@ export function assignParentSlots(
  * generation so the UI can render progressively; stops when no parents are known, when the
  * requested generation is reached, or when the signal is aborted.
  *
- * A person whose details fail with a transient error (throttling, server error) does not stop the
- * rest of the tree: the person is listed in `failed` and in `pending`, so loading again retries it
- * (SDD FR-33). A person whose data came back in an unexpected shape keeps its place, marked as
- * unexpected, and its parents are not requested (TC-15). A person with no data (`null`) simply ends
- * that branch (FR-31). Only an expired session stops the whole load.
+ * A person whose details fail with a transient error does not stop the rest of the tree: it is
+ * listed in `failed` and `pending`, so loading again retries it (FR-33). A person with no data
+ * (restricted, missing) gets an "unavailable" card in its place, and its branch ends there (TC-43,
+ * FR-38). A person whose data came back unexpected keeps its place, marked, and its parents are not
+ * requested (TC-15). The same ancestor reached twice is one card, marked as repeated (TC-22); its
+ * second parent entry is an extra edge. Only an expired session stops the whole load.
  */
 export async function* buildAncestorTree(
   rootId: PersonId,
@@ -70,6 +71,7 @@ export async function* buildAncestorTree(
   const edges: TreeEdge[] = [];
   const placed = new Set<PersonId>();
   const failed = new Set<PersonId>();
+  const repeated = new Set<PersonId>();
   let frontier: Frontier[] = [{ id: rootId, slot: 0 }];
 
   for (let generation = 0; frontier.length > 0 && generation <= lastGeneration; generation += 1) {
@@ -95,27 +97,27 @@ export async function* buildAncestorTree(
     const next: Frontier[] = [];
     for (const item of frontier) {
       if (placed.has(item.id)) {
-        // Pedigree collapse: the same ancestor reached twice is one node with two edges.
-        if (item.childId) edges.push({ from: item.childId, to: item.id, kind: 'parent' });
+        // Pedigree collapse: the same ancestor reached twice is one card, marked, with an extra edge.
+        if (item.childId) {
+          edges.push({ from: item.childId, to: item.id, kind: 'parent' });
+          repeated.add(item.id);
+        }
         continue;
       }
       const person = loaded.get(item.id);
       if (!person) {
-        if (malformed.has(item.id)) {
-          if (item.ref) {
-            placed.add(item.id);
-            nodes.push({
-              id: item.id,
-              person: { ...item.ref, invalid: true },
-              generation,
-              slot: item.slot,
-              role: 'ancestor',
-            });
-            if (item.childId) edges.push({ from: item.childId, to: item.id, kind: 'parent' });
-          } else {
-            // Without a parent entry there is no name to show: it counts as a failure.
-            failed.add(item.id);
-          }
+        if (!item.ref) {
+          // The root has no parent entry to name it: a failure, not a card.
+          if (malformed.has(item.id)) failed.add(item.id);
+          continue;
+        }
+        if (malformed.has(item.id) || loaded.has(item.id)) {
+          placed.add(item.id);
+          const marked: PersonRef = malformed.has(item.id)
+            ? { ...item.ref, invalid: true }
+            : { ...item.ref, unavailable: true };
+          nodes.push({ id: item.id, person: marked, generation, slot: item.slot, role: 'ancestor' });
+          if (item.childId) edges.push({ from: item.childId, to: item.id, kind: 'parent' });
         }
         continue;
       }
@@ -147,7 +149,9 @@ export async function* buildAncestorTree(
     yield {
       view: 'V1',
       root: rootId,
-      nodes: [...nodes],
+      nodes: nodes.map((node) =>
+        repeated.has(node.id) ? { ...node, person: { ...node.person, repeated: true } } : node,
+      ),
       edges: [...edges],
       pending: [...pending],
       failed: [...failed],

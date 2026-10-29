@@ -77,7 +77,9 @@
   "error": { "generic": "Algo deu errado. Recarregue a página." },
   "card": {
     "gender": { "male": "Masculino", "female": "Feminino", "unknown": "Gênero desconhecido" },
-    "unexpected": "Resposta inesperada"
+    "unexpected": "Resposta inesperada",
+    "unavailable": "Indisponível",
+    "repeated": "Aparece de novo nesta árvore"
   },
   "language": { "label": "Idioma", "en": "English", "pt-BR": "Português (Brasil)" }
 }

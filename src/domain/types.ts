@@ -19,8 +19,9 @@ export interface LifeEvent {
 }
 
 /**
- * "Light" person: what another person's response says about a relative. `invalid` is set when
- * the person's own data came back unexpected (SDD TC-15): the card then says so.
+ * "Light" person: what another person's response says about a relative. Flags set by the tree
+ * builders: `invalid` (unexpected data, TC-15), `unavailable` (no data, TC-43), `repeated` (the
+ * same ancestor reached twice, TC-22).
  */
 export interface PersonRef {
   id: PersonId;
@@ -28,6 +29,8 @@ export interface PersonRef {
   gender: Gender;
   living: boolean;
   invalid?: boolean;
+  unavailable?: boolean;
+  repeated?: boolean;
 }
 
 export interface Couple {
@@ -49,6 +52,7 @@ export interface Person {
   ageAtDeath?: number;
   parentSets: Couple[];
   unions: Couple[];
+  repeated?: boolean;
 }
 
 export interface CurrentUser {
