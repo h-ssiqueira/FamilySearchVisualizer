@@ -29,7 +29,7 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 ## Views
 | ID | Requirement | Pri |
 |----|-------------|-----|
-| FR-11 | **V1** shows the root and direct ancestors as a binary tree; missing parents render as placeholders; a second occurrence of the same ancestor is marked with an icon (TC-22, OQ-24, icon OQ-26). | M |
+| FR-11 | **V1** shows the root and direct ancestors as a binary tree; missing parents render as placeholders; a second occurrence of the same ancestor is marked with the 🔄 icon (TC-22, OQ-24, OQ-26). | M |
 | FR-12 | Ancestor depth is **unlimited**. The app auto-loads a first batch of generations (4, OQ-02), then offers "load next generation" and "load all remaining"; loading shows progress and can be paused/cancelled at any time; it stops by itself when no further parents are known in any branch (see FR-31). | M |
 | FR-13 | **V2** adds, for every couple shown, all their children (including the root's own spouse and children). | M |
 | FR-14 | **V3** adds the spouses of the children shown in V2 and the children of those unions. | M |
@@ -37,7 +37,7 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-16 | Selecting a person opens a panel with the person's details and a link to the person's page on familysearch.org. | C |
 | FR-17 | A person card shows four lines: name; birth date – death date (age); birth place – death place; person id (see [UI spec](../4-design/5-ui-spec.md)). This holds for every person drawn, in V1, V2 and V3; relatives in V2 and V3 get their details first (FR-37). | M |
 | FR-18 | A card can be expanded to show death place, marriages and the FamilySearch id with a link to the person on familysearch.org. | S |
-| FR-19 | Preferred family (OQ-04): parent families show the preferred one (the first when none is flagged); spouse families show only the flagged ones when one is flagged, and every spouse when none is flagged (FR-30). A person with other families shows a button with two crossed arrows (OQ-23); its behaviour is open (OQ-25). | S |
+| FR-19 | Preferred family (OQ-04): parent families show the preferred one (the first when none is flagged); spouse families show only the flagged ones when one is flagged, and every spouse when none is flagged (FR-30). A person with other families shows a button with two crossed arrows (OQ-23); each press shows the next family on the same card, and the number of families is shown next to the button (OQ-25). | S |
 | FR-20 | Loading, empty, partial-failure and error states are visible and recoverable (retry per node, FR-33). | M |
 | FR-21 | Pan and zoom of the tree canvas. | S |
 | FR-22 | Export current view as image/PDF. | C |

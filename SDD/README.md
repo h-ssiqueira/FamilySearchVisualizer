@@ -27,11 +27,11 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 - Views confirmed (OQ-03 resolved): V1 direct line; V2 = V1 + all children of every couple shown; V3 = V2 + the spouses of those children and their children, one level only (see [objective](1-overview/2-objective.md)).
 - **Relatives show their details (OQ-05 decided):** every card drawn shows the four lines, dates and places included. Relatives in V2 and V3 are loaded with one request each, served from the cache when already known; a relative that cannot be loaded keeps a light card (FR-33).
 - **Preferred family (OQ-04 decided):** parent families always show the preferred one (the first when none is flagged). Spouse families: when one is flagged as preferred, only the flagged ones are shown; when none is flagged, every spouse is shown (FR-30).
-- **Other families indicator (OQ-23 decided):** a button with two crossed arrows (a "change" symbol) on the card of a person who has other families. Behaviour of the button: to be confirmed (OQ-25).
+- **Other families (OQ-23, OQ-25 decided):** a button with two crossed arrows on the card of a person who has other families. Each press shows the next family of that person on the same card, cycling; the number of families is shown next to the button.
+- **Pedigree collapse (OQ-24, OQ-26 decided):** an icon marks the second occurrence of an ancestor: the 🔄 symbol. The alternative (two arrows in the same direction, crossing) is kept as the fallback if 🔄 does not read well at card size.
 - **Large sibling groups (OQ-20 decided):** one long row, with pan and zoom. No wrapping into several rows.
 - **Card width (OQ-19 decided: flexible; OQ-22 decided: 250 px minimum, 360 px maximum, truncation with tooltip above the maximum).**
 - **Unavailable people (TC-43 decided):** a restricted or missing parent or spouse shows an "unavailable" card in its place (FR-38).
-- **Pedigree collapse (TC-22):** the second occurrence of an ancestor is marked with an icon (OQ-24 decided: icon; which icon: open, OQ-26).
 - **Telemetry (OQ-11 decided): zero.** No analytics, no error reporting service, no third-party scripts (NFR-05).
 - **Dates (NFR-08 vs FR-25 resolved):** complete dates stay `yyyy-MM-dd` in every locale (FR-25). Prose dates come localized from FamilySearch. Numbers and counts follow the locale (NFR-08).
 - **Unexpected data (TC-15 decided):** a person whose data comes back in an unexpected shape keeps its place on the tree, marked "Unexpected response", and the rest of the tree goes on.
@@ -78,7 +78,7 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 | OQ-20 | ~~Very many children in one row~~ **Decided:** one long row, with pan and zoom; no wrapping. | 4-design/5-ui-spec |
 | OQ-21 | ~~How does the SPA get a token?~~ **Decided (author):** through the Google login address above, as in the first lines of `examples.md`. **Open verification:** the samples use the website's session id as Bearer token and run same-origin; a page on `github.io` cannot read that session, so the spike must prove how the token reaches the SPA. Fallbacks if not: paste the token; run on familysearch.org; small proxy (reverses ADR-01). The relay (FR-34) is the path in use. | ADR-01, ADR-02, auth, R-02 |
 | OQ-22 | ~~Flexible card width limits~~ **Decided:** 250 px minimum, 360 px maximum; text above the maximum is truncated with a tooltip. | FR-24, TC-61, TC-63, layout |
-| OQ-23 | ~~Form of the other-families indicator~~ **Decided:** a button with two crossed arrows ("change" symbol) on the card. Its behaviour is open (OQ-25). | FR-19, FR-18, UI spec |
-| OQ-24 | ~~Form of the pedigree-collapse marker~~ **Decided:** an icon. Which icon is open (OQ-26). | FR-11, TC-22, UI spec |
-| OQ-25 | **New.** What does the crossed-arrows button do? Proposal: each press shows the next family of that person on the same card (cycling through them), with the number of families shown next to the button. | FR-19, layout, TC-78 |
-| OQ-26 | **New.** Which icon marks the pedigree collapse (OQ-24)? Options: a link symbol, a repeat/return arrow, or a small "=" sign. | FR-11, TC-22, UI spec |
+| OQ-23 | ~~Form of the other-families indicator~~ **Decided:** a button with two crossed arrows ("change" symbol) on the card. | FR-19, FR-18, UI spec |
+| OQ-24 | ~~Form of the pedigree-collapse marker~~ **Decided:** an icon (see OQ-26). | FR-11, TC-22, UI spec |
+| OQ-25 | ~~What the crossed-arrows button does~~ **Decided:** each press shows the next family of that person on the same card (cycling); the number of families is shown next to the button. | FR-19, layout, TC-78 |
+| OQ-26 | ~~Which icon marks the pedigree collapse~~ **Decided:** the 🔄 symbol. Fallback if it does not read well at card size: two arrows in the same direction, crossing each other. | FR-11, TC-22, UI spec |
