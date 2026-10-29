@@ -27,7 +27,7 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 - **Relatives show their details (OQ-05 decided):** every card drawn shows the four lines, dates and places included. Relatives in V2 and V3 are loaded with one request each, served from the cache when already known; a relative that cannot be loaded keeps a light card (FR-33).
 - **Preferred family (OQ-04 decided):** parent families always show the preferred one (the first when none is flagged). Spouse families: when one is flagged as preferred, only the flagged ones are shown; when none is flagged, every spouse is shown (FR-30). No indicator of the other families yet (FR-19).
 - **Large sibling groups (OQ-20 decided):** one long row, with pan and zoom. No wrapping into several rows.
-- **Telemetry (OQ-11, proposed):** zero telemetry. Nothing is sent to any service other than FamilySearch. Awaiting the author's confirmation.
+- **Telemetry (OQ-11 decided): zero.** No analytics, no error reporting service, no third-party scripts (NFR-05).
 - **Dates (NFR-08 vs FR-25 resolved):** complete dates stay `yyyy-MM-dd` in every locale (FR-25). Prose dates come localized from FamilySearch. Numbers and counts follow the locale (NFR-08).
 - **Unexpected data (TC-15 decided):** a person whose data comes back in an unexpected shape keeps its place on the tree, marked "Unexpected response", and the rest of the tree goes on.
 - **Endpoints (OQ-06 resolved):** the app uses the endpoints exactly as in `8-attachments/examples.md` (the website's `platform/users/current` and `service/tree/tree-data/v8/person/{id}/details`); ADR-10 (documented API) is **not adopted** and stays as a fallback. What the samples show is in [API findings](4-design/6-api-findings.md).
@@ -60,7 +60,7 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 | OQ-08 | ~~UI languages~~ **Resolved:** English and pt-BR, extensible to other locales (ADR-11). | NFR-08 |
 | OQ-09 | ~~Real people in the samples~~ **Confirmed:** `examples.md` has real data and live credentials (action A3); `3-interfaces.md` is synthetic. | NFR-05, R-05, R-07 |
 | OQ-10 | ~~Placement of parents~~ **As drawn in the sketch:** man left, woman right (confirm; same-sex or unknown gender: `parent1` left). In the samples `parent1` is the man, which matches this layout. | data model, FR-11 |
-| OQ-11 | Is client-side error reporting (e.g. Sentry) acceptable, or zero telemetry? **Proposed: zero telemetry** (see decisions); awaiting confirmation. | 7-operations, NFR-05 |
+| OQ-11 | ~~Telemetry~~ **Decided: zero telemetry** (see decisions; NFR-05). | 7-operations, NFR-05 |
 | OQ-12 | ~~Final URL~~ **Resolved:** default repository Pages URL (see decisions). | 7-operations |
 | OQ-13 | ~~Production review~~ **Dropped** (out of scope, author's decision). | – |
 | OQ-14 | ~~Public client type / client secret~~ **Dropped**: no OAuth client is used. | – |
