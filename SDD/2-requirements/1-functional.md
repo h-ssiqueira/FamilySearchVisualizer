@@ -29,7 +29,7 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 ## Views
 | ID | Requirement | Pri |
 |----|-------------|-----|
-| FR-11 | **V1** shows the root and direct ancestors as a binary tree; missing parents render as placeholders; a second occurrence of the same ancestor is marked (TC-22, form OQ-24). | M |
+| FR-11 | **V1** shows the root and direct ancestors as a binary tree; missing parents render as placeholders; a second occurrence of the same ancestor is marked with an icon (TC-22, OQ-24, icon OQ-26). | M |
 | FR-12 | Ancestor depth is **unlimited**. The app auto-loads a first batch of generations (4, OQ-02), then offers "load next generation" and "load all remaining"; loading shows progress and can be paused/cancelled at any time; it stops by itself when no further parents are known in any branch (see FR-31). | M |
 | FR-13 | **V2** adds, for every couple shown, all their children (including the root's own spouse and children). | M |
 | FR-14 | **V3** adds the spouses of the children shown in V2 and the children of those unions. | M |
@@ -37,11 +37,11 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-16 | Selecting a person opens a panel with the person's details and a link to the person's page on familysearch.org. | C |
 | FR-17 | A person card shows four lines: name; birth date – death date (age); birth place – death place; person id (see [UI spec](../4-design/5-ui-spec.md)). This holds for every person drawn, in V1, V2 and V3; relatives in V2 and V3 get their details first (FR-37). | M |
 | FR-18 | A card can be expanded to show death place, marriages and the FamilySearch id with a link to the person on familysearch.org. | S |
-| FR-19 | Preferred family (OQ-04): parent families show the preferred one (the first when none is flagged); spouse families show only the flagged ones when one is flagged, and every spouse when none is flagged (FR-30). **An indicator that other families exist is shown (OQ-23 decided: yes; its form is open).** | S |
+| FR-19 | Preferred family (OQ-04): parent families show the preferred one (the first when none is flagged); spouse families show only the flagged ones when one is flagged, and every spouse when none is flagged (FR-30). A person with other families shows a button with two crossed arrows (OQ-23); its behaviour is open (OQ-25). | S |
 | FR-20 | Loading, empty, partial-failure and error states are visible and recoverable (retry per node, FR-33). | M |
 | FR-21 | Pan and zoom of the tree canvas. | S |
 | FR-22 | Export current view as image/PDF. | C |
-| FR-24 | Cards have a flexible width, between a minimum and a maximum (proposed 250 px to 360 px, OQ-22), with the same height (90 px). Text above the maximum is truncated with an ellipsis and the full text is in a tooltip. | M |
+| FR-24 | Cards have a flexible width, between 250 px (minimum) and 360 px (maximum), with a fixed height of 90 px (OQ-19, OQ-22). Text above the maximum is truncated with an ellipsis and the full text is in a tooltip. | M |
 | FR-25 | Dates are shown as `yyyy-MM-dd` when complete, in every locale; partial, approximate or range dates show only what is known or the raw text; no invented day/month. Age is shown only for deceased people; living people show only the birth date. | M |
 | FR-26 | Partners are joined by a horizontal line labelled with the marriage date and location; no card lies on that line: the siblings of each partner are placed on its outer side; children hang from both parents with orthogonal lines; no arrowheads. | M |
 | FR-27 | Gender is shown by card colour (blue = male, pink = female, neutral grey = unknown) **and** by a non-colour cue (NFR-06). | M |
