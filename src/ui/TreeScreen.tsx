@@ -75,6 +75,7 @@ function FamilyTreeView({ services, rootId, onSignOut, onExpired }: FamilyTreeVi
               layout={layout}
               selectedId={selectedId}
               onSelect={(id) => setSelectedId((current) => (current === id ? undefined : id))}
+              onCycleFamilies={tree.cycleFamilies}
             />
             {selected ? (
               <PersonPanel
