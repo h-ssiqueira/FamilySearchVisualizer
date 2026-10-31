@@ -29,13 +29,13 @@ Before calling work done: `typecheck`, `lint`, `test` and `build` must pass. Run
 src/
   domain/    types, date and card rules, couple helpers, family view model. Imports nothing from other layers.
   api/       endpoint allow-list, request queue, whitelisting zod mappers, FamilySearch client. Never imports React or UI.
-  tree/      V1 ancestor builder, V2/V3 family views, layout, SVG export. Depends on domain only.
+  tree/      V1 ancestor builder, V2/V3 family views, layout, card width, SVG and PDF writers. Depends on domain only.
   state/     session cache, person source, sign-out, session expiry, view memory.
   relay/     client side of the FamilySearch-tab relay (postMessage) and the bookmarklet.
   auth/      in-memory token store, login navigation, URL scrubbing.
   config/    validated VITE_* build-time settings.
   i18n/      en and pt-BR JSON catalogs, locale detection, number formatting.
-  ui/        screens and components, theme (light/dark). Never calls fetch directly.
+  ui/        screens and components, theme (light/dark), export (download, rasterize). Never calls fetch directly.
   services.ts wires client, queue, cache, token and language.
 relay/fsv-relay.js  script that runs on familysearch.org in the tab opened by the app (bookmarklet).
 ```
@@ -47,7 +47,7 @@ ESLint enforces the boundaries: `domain` imports nothing, `api` never imports Re
 - The API client only issues `GET` requests to the two endpoints of the allow-list (`src/api/allowList.ts`). The relay script keeps an identical copy; a test enforces it. Changing one means changing both.
 - Untrusted text (names, places) is rendered as React text only. Never use `dangerouslySetInnerHTML`.
 - Logs never contain payloads or personal data: log the error class and HTTP status only.
-- No analytics, trackers or third-party scripts.
+- No analytics, trackers, third-party scripts or telemetry (NFR-05, decided).
 
 ## Conventions
 - Code and comments in English. UI strings only through the i18n catalogs (`src/i18n/locales/en.json` and `pt-BR.json`); both must have the same keys (there is a test).
@@ -59,16 +59,18 @@ ESLint enforces the boundaries: `domain` imports nothing, `api` never imports Re
 - Branches: `feature/<name>`; stacked branches are allowed when a change builds on another. The default branch is `master`.
 
 ## Current state (keep this section up to date)
-- Implemented: login (relay and token fallback), V1/V2/V3 views, layout with no card on marriage lines, pan and zoom, SVG export, progressive loading, partial failures with retry (FR-33), unexpected-data card (FR-36), waiting indicator (FR-09), session expiry keeping the view (FR-04), network back-off (NFR-03), number formatting (NFR-08), preferred spouse family (FR-19), dark theme following the system with a toggle (FR-35).
-- Not implemented yet: placeholders for unknown parents (FR-11), "unavailable" card for restricted people (TC-43), pedigree-collapse marker (TC-22), indicator that other families exist (FR-19), keyboard navigation between cards (TC-50), PNG/PDF export (FR-22), wrapping of very large sibling groups (OQ-20).
+- Implemented: login (relay and token fallback), V1/V2/V3 views, layout with no card on marriage lines, flexible card width (250 to 360 px, from the text), pan and zoom, export as SVG, PNG and PDF (no external library for the PDF), progressive loading, partial failures with retry (FR-33), unexpected-data card (FR-36), unavailable card (FR-38), repeat symbol for a repeated ancestor (TC-22), families button for spouse families (FR-19, OQ-25), waiting indicator (FR-09), session expiry keeping the view (FR-04), network back-off (NFR-03), number formatting (NFR-08), preferred spouse family (FR-19), dark theme following the system with a toggle (FR-35).
+- Not implemented yet: families button for parent families (other parent sets), placeholders without a card (FR-11, TC-14), keyboard navigation between cards (TC-50), wrapping of very large sibling groups (OQ-20 decided: one row, so no wrapping is planned).
 - Never executed as a whole: the code was written without running install, tests or build. First real run: `npm ci`, then `typecheck`, `lint`, `test`, `build`, and send the errors back.
 - Unverified: whether the FamilySearch session cookie alone authorises the two endpoints when called through the relay (TC-52b). If not, the token fallback is the path.
+- The PNG and PDF exports need a browser to be tested (TC-80 open).
 - CI workflows live in `.github/workflows-pending/` until they are moved to `.github/workflows/` (`git mv`). The GitHub connector cannot write there.
-- Open decisions are in `SDD/README.md` (OQ list). OQ-11 (telemetry) and OQ-20 are still open.
+- Open decisions are in `SDD/README.md` (OQ list). OQ-26 (the repeat symbol) is decided as 🔄, with the crossing arrows as fallback.
 
 ## Where to look first
 - Requirements: `SDD/2-requirements/`. Test cases: `SDD/6-tests/2-test-cases.md`.
 - Relay protocol and security: `SDD/5-security/1-auth-authorization.md` and `relay/fsv-relay.js`.
-- Layout rules: `SDD/4-design/5-ui-spec.md` and `src/tree/familyLayout.ts`.
+- Layout rules: `SDD/4-design/5-ui-spec.md`, `src/tree/familyLayout.ts` and `src/tree/cardWidth.ts`.
 - API facts observed from the samples: `SDD/4-design/6-api-findings.md` (no values copied here).
 - Theme: `src/ui/theme.ts` (choice and storage), `src/ui/styles.css` (variables).
+- Export: `src/tree/exportSvg.ts`, `src/tree/pdf.ts`, `src/ui/exportImage.ts`, `src/ui/ExportButton.tsx`.
