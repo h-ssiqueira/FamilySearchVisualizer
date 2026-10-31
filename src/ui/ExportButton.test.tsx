@@ -39,7 +39,7 @@ afterEach(() => {
   createObjectURL.mockClear();
 });
 
-describe('ExportButton', () => {
+describe('ExportButton (FR-22)', () => {
   it('downloads the current view as family-tree.svg', () => {
     const saved: { name?: string } = {};
     vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
@@ -58,8 +58,16 @@ describe('ExportButton', () => {
     expect(saved.name).toBe('family-tree.svg');
   });
 
-  it('is disabled when there is nothing to export', () => {
+  it('offers PNG and PDF next to SVG', () => {
+    render(<ExportButton layout={layoutFamily(view)} />);
+    expect(screen.getByRole('button', { name: 'Export as PNG' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Export as PDF' })).toBeEnabled();
+  });
+
+  it('disables every export when there is nothing to export', () => {
     render(<ExportButton layout={{ cards: [], marriages: [], descents: [], width: 0, height: 0 }} />);
     expect(screen.getByRole('button', { name: 'Export as SVG' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Export as PNG' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Export as PDF' })).toBeDisabled();
   });
 });
