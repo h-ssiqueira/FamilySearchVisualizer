@@ -4,6 +4,7 @@ import {
   SessionExpiredError,
   type Couple,
   type FamilyCard,
+  type FamilyChoice,
   type FamilyCouple,
   type FamilyView,
   type Person,
@@ -12,6 +13,9 @@ import {
   type PersonSource,
   type ViewTree,
 } from '@/domain';
+
+/** The family chosen with the crossed-arrows button, by person: an index into its unions (OQ-25). */
+export type FamilyChoices = ReadonlyMap<PersonId, number>;
 
 function coupleKey(kind: 'p' | 'u', partnerIds: readonly PersonId[]): string {
   return `${kind}:${[...partnerIds].sort().join('+')}`;
@@ -30,19 +34,42 @@ function orderedPartnerIds(couple: Couple, has: (id: PersonId) => boolean): Pers
 }
 
 /**
- * Adds the spouses and children of a person's unions (SDD V2 for the root, V3 for others).
- * When the user's family is flagged as preferred, only the flagged unions are shown (OQ-04);
- * when none is flagged, every union is shown (FR-30).
+ * The spouse families of a person to draw. Without a choice: the preferred ones when any is flagged
+ * (OQ-04), otherwise all of them (FR-30). With a choice (OQ-25): only the chosen one.
  */
+function spouseFamilies(
+  person: Person,
+  choices?: FamilyChoices,
+): { shown: Couple[]; families?: FamilyChoice } {
+  const total = person.unions.length;
+  if (total < 2) return { shown: person.unions };
+  const chosen = choices?.get(person.id);
+  if (chosen !== undefined) {
+    const index = chosen % total;
+    const union = person.unions[index];
+    return { shown: union ? [union] : [], families: { total, shown: index + 1 } };
+  }
+  const flagged = person.unions.filter((union) => union.preferred);
+  const first = flagged[0] ?? person.unions[0];
+  const shownIndex = first ? person.unions.indexOf(first) + 1 : 1;
+  return {
+    shown: flagged.length > 0 ? flagged : person.unions,
+    families: { total, shown: shownIndex },
+  };
+}
+
+/** Adds the spouses and children of a person's unions (SDD V2 for the root, V3 for others). */
 function addUnions(
   person: Person,
   row: number,
   cards: Map<PersonId, FamilyCard>,
   couples: Map<string, FamilyCouple>,
+  choices?: FamilyChoices,
 ): void {
-  const flagged = person.unions.filter((union) => union.preferred);
-  const unions = flagged.length > 0 ? flagged : person.unions;
-  for (const union of unions) {
+  const { shown, families } = spouseFamilies(person, choices);
+  const owner = cards.get(person.id);
+  if (owner && families) cards.set(person.id, { ...owner, families });
+  for (const union of shown) {
     const spouse = partnerOf(person.id, union);
     // No spouse and no children: nothing to draw ("no spouse, no card").
     if (!spouse && union.children.length === 0) continue;
@@ -70,7 +97,11 @@ function addUnions(
  * line) and the spouses and children of the root. The relatives come as light cards here; their
  * details are loaded by `withDetails` (OQ-05).
  */
-export function buildFamilyView(tree: ViewTree, level: 'V1' | 'V2'): FamilyView {
+export function buildFamilyView(
+  tree: ViewTree,
+  level: 'V1' | 'V2',
+  choices?: FamilyChoices,
+): FamilyView {
   const cards = new Map<PersonId, FamilyCard>();
   const couples = new Map<string, FamilyCouple>();
 
@@ -116,7 +147,9 @@ export function buildFamilyView(tree: ViewTree, level: 'V1' | 'V2'): FamilyView 
 
   if (level === 'V2') {
     const root = tree.nodes.find((node) => node.role === 'root');
-    if (root && 'unions' in root.person) addUnions(root.person, root.generation, cards, couples);
+    if (root && 'unions' in root.person) {
+      addUnions(root.person, root.generation, cards, couples, choices);
+    }
   }
 
   return {
@@ -169,6 +202,7 @@ export async function extendToV3(
   view: FamilyView,
   source: PersonSource,
   signal?: AbortSignal,
+  choices?: FamilyChoices,
 ): Promise<FamilyView> {
   const targets = view.cards.filter(
     (card) => card.role === 'sibling' || (card.role === 'child' && card.row === -1),
@@ -190,7 +224,7 @@ export async function extendToV3(
   for (const [card, person] of loaded) {
     if (!person) continue;
     cards.set(card.id, { ...card, person });
-    addUnions(person, card.row, cards, couples);
+    addUnions(person, card.row, cards, couples, choices);
   }
 
   return {

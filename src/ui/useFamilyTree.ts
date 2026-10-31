@@ -7,6 +7,7 @@ import {
   extendToV3,
   hasMoreAncestors,
   withDetails,
+  type FamilyChoices,
 } from '@/tree';
 
 /** Generations loaded automatically; the user asks for more (SDD FR-12, OQ-02). */
@@ -35,6 +36,8 @@ export interface FamilyTreeState {
   loadAll: () => void;
   stop: () => void;
   retry: () => void;
+  /** Shows the next family of a person on its card (OQ-25); `total` is the number of families. */
+  cycleFamilies: (id: PersonId, total: number) => void;
 }
 
 /**
@@ -48,6 +51,7 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
   const [run, setRun] = useState(0);
   const [tree, setTree] = useState<ViewTree | undefined>(undefined);
   const [ancestorsBusy, setAncestorsBusy] = useState(true);
+  const [choices, setChoices] = useState<FamilyChoices>(() => new Map<PersonId, number>());
   const [detailed, setDetailed] = useState<{ level: ViewLevel; view: FamilyView } | undefined>(
     undefined,
   );
@@ -82,8 +86,8 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
   }, [rootId, source, target, run]);
 
   const baseFamily = useMemo(
-    () => (tree ? buildFamilyView(tree, level === 'V1' ? 'V1' : 'V2') : undefined),
-    [tree, level],
+    () => (tree ? buildFamilyView(tree, level === 'V1' ? 'V1' : 'V2', choices) : undefined),
+    [tree, level, choices],
   );
 
   useEffect(() => {
@@ -98,7 +102,7 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
     const withRelatives = withDetails(baseFamily, source, controller.signal);
     const work =
       level === 'V3'
-        ? withRelatives.then((view) => extendToV3(view, source, controller.signal))
+        ? withRelatives.then((view) => extendToV3(view, source, controller.signal, choices))
         : withRelatives;
     work
       .then((view) => {
@@ -112,7 +116,7 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
         setDetailsBusy(false);
       });
     return () => controller.abort();
-  }, [level, baseFamily, ancestorsBusy, source]);
+  }, [level, baseFamily, ancestorsBusy, source, choices]);
 
   useEffect(() => {
     if (error instanceof UnauthorizedError) onUnauthorized();
@@ -130,6 +134,13 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
     setAncestorsBusy(false);
   }, []);
   const retry = useCallback(() => setRun((value) => value + 1), []);
+  const cycleFamilies = useCallback((id: PersonId, total: number) => {
+    setChoices((previous) => {
+      const next = new Map(previous);
+      next.set(id, ((previous.get(id) ?? -1) + 1) % total);
+      return next;
+    });
+  }, []);
 
   const family =
     level === 'V1' ? baseFamily : detailed?.level === level ? detailed.view : baseFamily;
@@ -146,5 +157,6 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
     loadAll,
     stop,
     retry,
+    cycleFamilies,
   };
 }

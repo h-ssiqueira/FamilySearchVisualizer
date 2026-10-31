@@ -20,6 +20,8 @@ const CULL_MARGIN = 300;
 const LABEL_MAX = 24;
 /** A pointer that moves less than this is a click on a card, not a drag of the canvas. */
 const DRAG_THRESHOLD = 4;
+/** The crossed-arrows symbol of the families button (OQ-23). */
+const FAMILIES_SYMBOL = '\u21C4';
 
 function useElementSize(ref: RefObject<HTMLElement | null>): Size {
   const [size, setSize] = useState<Size>({ width: 0, height: 0 });
@@ -51,9 +53,11 @@ interface TreeCanvasProps {
   selectedId?: PersonId;
   /** When given, every card gets a button that selects it (SDD FR-16). */
   onSelect?: (id: PersonId) => void;
+  /** When given, a card of a person with several families gets the families button (OQ-25). */
+  onCycleFamilies?: (id: PersonId, total: number) => void;
 }
 
-export function TreeCanvas({ layout, selectedId, onSelect }: TreeCanvasProps) {
+export function TreeCanvas({ layout, selectedId, onSelect, onCycleFamilies }: TreeCanvasProps) {
   const t = useT();
   const viewportRef = useRef<HTMLDivElement>(null);
   const size = useElementSize(viewportRef);
@@ -156,7 +160,7 @@ export function TreeCanvas({ layout, selectedId, onSelect }: TreeCanvasProps) {
           const top = -transform.y / transform.scale - CULL_MARGIN;
           const bottom = (size.height - transform.y) / transform.scale + CULL_MARGIN;
           return (
-            entry.x + CARD.width >= left &&
+            entry.x + entry.width >= left &&
             entry.x <= right &&
             entry.y + CARD.height >= top &&
             entry.y <= bottom
@@ -232,20 +236,41 @@ export function TreeCanvas({ layout, selectedId, onSelect }: TreeCanvasProps) {
               );
             })}
           </svg>
-          {visible.map((entry) => (
-            <div key={entry.card.id} className="tree-card" style={{ left: entry.x, top: entry.y }}>
-              <PersonCard person={entry.card.person} />
-              {onSelect ? (
-                <button
-                  type="button"
-                  className="tree-card-button"
-                  aria-label={t('tree.select', { name: cardLines(entry.card.person).name })}
-                  aria-pressed={selectedId === entry.card.id}
-                  onClick={() => onSelect(entry.card.id)}
-                />
-              ) : null}
-            </div>
-          ))}
+          {visible.map((entry) => {
+            const families = entry.card.families;
+            return (
+              <div
+                key={entry.card.id}
+                className="tree-card"
+                style={{ left: entry.x, top: entry.y, width: entry.width }}
+              >
+                <PersonCard person={entry.card.person} />
+                {onSelect ? (
+                  <button
+                    type="button"
+                    className="tree-card-button"
+                    aria-label={t('tree.select', { name: cardLines(entry.card.person).name })}
+                    aria-pressed={selectedId === entry.card.id}
+                    onClick={() => onSelect(entry.card.id)}
+                  />
+                ) : null}
+                {families && onCycleFamilies ? (
+                  <button
+                    type="button"
+                    className="family-cycle"
+                    style={{ position: 'absolute', top: 4, right: 4, zIndex: 2 }}
+                    aria-label={t('families.cycle', {
+                      shown: families.shown,
+                      total: families.total,
+                    })}
+                    onClick={() => onCycleFamilies(entry.card.id, families.total)}
+                  >
+                    {FAMILIES_SYMBOL} {families.total}
+                  </button>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

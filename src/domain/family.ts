@@ -6,6 +6,12 @@ import type { Couple, LifeEvent, Person, PersonId, PersonRef, ViewLevel } from '
  */
 export type CardRole = 'line' | 'sibling' | 'spouse' | 'child';
 
+/** How many families a person has, and which one the card shows (1-based), OQ-25. */
+export interface FamilyChoice {
+  total: number;
+  shown: number;
+}
+
 export interface FamilyCard {
   id: PersonId;
   person: Person | PersonRef;
@@ -14,6 +20,8 @@ export interface FamilyCard {
   row: number;
   /** Binary pedigree position of a line card (see TreeNode.slot). */
   slot?: number;
+  /** Set when the person has more than one family: the crossed-arrows button shows them (OQ-23, OQ-25). */
+  families?: FamilyChoice;
 }
 
 export interface FamilyCouple {
