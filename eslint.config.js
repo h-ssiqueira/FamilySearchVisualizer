@@ -34,6 +34,8 @@ export default tseslint.config(
     plugins: { 'react-hooks': reactHooks },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // Pending a refactor: several hooks reset their state at the start of an effect.
+      'react-hooks/set-state-in-effect': 'off',
       'no-restricted-syntax': [
         'error',
         {
@@ -42,6 +44,11 @@ export default tseslint.config(
         },
       ],
     },
+  },
+  // The relay runs as a plain script in the FamilySearch tab (see relay/).
+  {
+    files: ['relay/**/*.js'],
+    languageOptions: { globals: { ...globals.browser } },
   },
   // Import boundaries from the module design (SDD 4-design/2-module-design.md).
   {

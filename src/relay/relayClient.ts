@@ -129,9 +129,6 @@ export function connectRelay(options: RelayOptions = {}): Promise<RelayConnectio
     resolveReady = resolve;
     rejectReady = reject;
   });
-  let hello: number | undefined;
-  let watch: number | undefined;
-  let deadline: number | undefined;
 
   const teardown = (reason: Error): void => {
     if (!opened) return;
@@ -214,13 +211,13 @@ export function connectRelay(options: RelayOptions = {}): Promise<RelayConnectio
     },
   };
 
-  hello = window.setInterval(() => {
+  const hello = window.setInterval(() => {
     if (!ready && opened) target.postMessage({ channel: APP_CHANNEL, type: 'hello' }, origin);
   }, HELLO_INTERVAL_MS);
-  watch = window.setInterval(() => {
+  const watch = window.setInterval(() => {
     if (target.closed) teardown(new RelayClosedError());
   }, WATCH_INTERVAL_MS);
-  deadline = window.setTimeout(() => {
+  const deadline = window.setTimeout(() => {
     if (!ready) teardown(new RelayUnavailableError('timeout'));
   }, handshakeMs);
 

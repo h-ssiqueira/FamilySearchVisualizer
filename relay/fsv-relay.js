@@ -31,7 +31,7 @@
     var parsed;
     try {
       parsed = new URL(url);
-    } catch (error) {
+    } catch {
       return false;
     }
     if (parsed.origin !== FAMILYSEARCH_ORIGIN) return false;

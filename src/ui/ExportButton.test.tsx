@@ -18,7 +18,7 @@ const view: FamilyView = {
   couples: [],
 };
 
-const createObjectURL = vi.fn((_blob: Blob) => 'blob:synthetic');
+const createObjectURL = vi.fn<(blob: Blob) => string>(() => 'blob:synthetic');
 const revokeObjectURL = vi.fn();
 
 beforeEach(() => {

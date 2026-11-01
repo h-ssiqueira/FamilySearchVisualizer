@@ -46,8 +46,9 @@ describe('request budget of the first batch (TC-53, NFR-02)', () => {
       },
     };
 
-    for await (const _tree of buildAncestorTree('R', source, { generations: 4 })) {
-      // The loop is the whole point of the test: the builder yields once per generation.
+    // The builder yields once per generation: every batch must be a tree.
+    for await (const tree of buildAncestorTree('R', source, { generations: 4 })) {
+      expect(tree.root).toBe('R');
     }
 
     expect(requested).toHaveLength(31);
