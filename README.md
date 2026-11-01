@@ -1,4 +1,24 @@
+<div align="center">
+
 # FamilySearch Visualizer
+
+A read-only family tree viewer for FamilySearch, client-side only
+
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev)
+[![Zod](https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white)](https://zod.dev)
+[![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev)
+[![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev)
+[![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-222222?style=for-the-badge&logo=github&logoColor=white)](https://h-ssiqueira.github.io/FamilySearchVisualizer/)
+
+[![CI](https://github.com/h-ssiqueira/FamilySearchVisualizer/actions/workflows/ci.yml/badge.svg)](https://github.com/h-ssiqueira/FamilySearchVisualizer/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/h-ssiqueira/FamilySearchVisualizer?style=for-the-badge)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/h-ssiqueira/FamilySearchVisualizer?style=for-the-badge)](https://github.com/h-ssiqueira/FamilySearchVisualizer/commits)
+[![Top language](https://img.shields.io/github/languages/top/h-ssiqueira/FamilySearchVisualizer?style=for-the-badge)](https://github.com/h-ssiqueira/FamilySearchVisualizer)
+[![Open pull requests](https://img.shields.io/github/issues-pr/h-ssiqueira/FamilySearchVisualizer?style=for-the-badge)](https://github.com/h-ssiqueira/FamilySearchVisualizer/pulls)
+
+</div>
 
 A read-only, client-side web app that shows a FamilySearch family tree in progressively richer views, starting from the signed-in user. Vite + React + TypeScript, hosted on GitHub Pages, with no backend.
 
