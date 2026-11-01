@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { InvalidDataError, SessionExpiredError, type Couple, type Person, type PersonRef, type PersonSource, type ViewTree } from '@/domain';
+import { InvalidDataError, SessionExpiredError, type Person, type PersonRef, type PersonSource, type ViewTree } from '@/domain';
 import { buildFamilyView, withDetails } from './family';
 
 const ref = (id: string, gender: PersonRef['gender'] = 'unknown'): PersonRef => ({

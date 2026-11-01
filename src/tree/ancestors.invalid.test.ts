@@ -86,8 +86,8 @@ describe('unexpected response (TC-15)', () => {
 
   it('shows the card as unexpected in the family view', async () => {
     const view = buildFamilyView(lastOf(await collect(malformedFather())), 'V1');
-    const card = view.cards.find((entry) => entry.card.id === 'F');
-    expect(card?.card.person).toMatchObject({ invalid: true });
+    const card = view.cards.find((entry) => entry.id === 'F');
+    expect(card?.person).toMatchObject({ invalid: true });
   });
 
   it('counts an unexpected root as a failure, because there is no parent entry to name it', async () => {

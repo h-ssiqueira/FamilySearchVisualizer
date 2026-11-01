@@ -3,7 +3,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { UnavailableError, type FamilySearchClient } from '@/api';
 import type { CurrentUser, Gender, Person, PersonRef } from '@/domain';
 import { DEFAULT_LOCALE, setLocale } from '@/i18n';
-import { PersonCache, createPersonSource, type Services } from '@/state';
+import type { Services } from '@/services';
+import { PersonCache, createPersonSource } from '@/state';
 import { TreeScreen } from './TreeScreen';
 
 const ref = (id: string, gender: Gender = 'unknown'): PersonRef => ({
