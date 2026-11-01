@@ -1,0 +1,82 @@
+# MOVE ME: this file lives in .github/workflows-pending/ only because the connector used to
+# create the branch could not write to .github/workflows/. Run:
+#   git mv .github/workflows-pending .github/workflows
+name: ci
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Public build-time values (not secrets), same as .env.example.
+env:
+  VITE_BASE_PATH: /FamilySearchVisualizer/
+  VITE_FS_API_BASE: https://www.familysearch.org
+  VITE_FS_LOGIN_URL: https://ident.familysearch.org/oauth2/authorization/google
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      # TODO: pin third-party actions by commit SHA (SDD security controls, section 3).
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          # TODO: add `cache: npm` once package-lock.json is committed.
+      - name: Install
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - name: Type-check
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      # TODO: remove continue-on-error after running `npm run format` once and committing the result.
+      - name: Format check
+        run: npm run format:check
+        continue-on-error: true
+      - name: Unit, component and integration tests with coverage
+        run: npm run test:coverage
+      - name: Build
+        run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Install
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+      - name: End-to-end tests
+        run: npm run test:e2e
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Install
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+      - name: Dependency audit (high and critical)
+        run: npm audit --audit-level=high
