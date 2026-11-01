@@ -4,6 +4,7 @@ import { UnauthorizedError } from '@/api';
 import type { CurrentUser, Gender, Person, PersonRef } from '@/domain';
 import { DEFAULT_LOCALE, setLocale } from '@/i18n';
 import type { Services } from '@/services';
+import { viewStore } from '@/state/viewStore';
 import { TreeScreen } from './TreeScreen';
 
 const ref = (id: string, gender: Gender = 'unknown'): PersonRef => ({
@@ -77,6 +78,8 @@ function fakeServices(user: () => Promise<CurrentUser> = defaultUser) {
 
 afterEach(() => {
   window.localStorage.clear();
+  // The chosen view is kept in memory, so each test starts from the direct line again.
+  viewStore.clear();
   setLocale(DEFAULT_LOCALE, false);
 });
 

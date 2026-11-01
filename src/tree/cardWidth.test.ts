@@ -18,7 +18,8 @@ describe('card width (OQ-22, FR-24)', () => {
   });
 
   it('grows with a long place, up to the maximum', () => {
-    const medium = cardWidth(person('John Example', 'Campinas, São Paulo, Brazil'));
+    // About 290 px of text: wider than the minimum, narrower than the maximum.
+    const medium = cardWidth(person('John Example', 'Campinas, Estado de São Paulo, Brasil'));
     expect(medium).toBeGreaterThan(CARD_MIN_WIDTH);
     expect(medium).toBeLessThanOrEqual(CARD_MAX_WIDTH);
   });
