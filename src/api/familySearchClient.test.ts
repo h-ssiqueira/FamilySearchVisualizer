@@ -20,7 +20,7 @@ const PERSON_URL = `${BASE}/service/tree/tree-data/v8/person/XXXX-XXX/details`;
 const USER_URL = `${BASE}/platform/users/current`;
 
 const server = setupServer();
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 

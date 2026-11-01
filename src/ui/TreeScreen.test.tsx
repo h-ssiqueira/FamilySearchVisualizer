@@ -4,6 +4,7 @@ import { UnauthorizedError } from '@/api';
 import type { CurrentUser, Gender, Person, PersonRef } from '@/domain';
 import { DEFAULT_LOCALE, setLocale } from '@/i18n';
 import type { Services } from '@/services';
+import { viewStore } from '@/state/viewStore';
 import { TreeScreen } from './TreeScreen';
 
 const ref = (id: string, gender: Gender = 'unknown'): PersonRef => ({
@@ -77,6 +78,8 @@ function fakeServices(user: () => Promise<CurrentUser> = defaultUser) {
 
 afterEach(() => {
   window.localStorage.clear();
+  // The chosen view is kept in memory, so each test starts from the direct line again.
+  viewStore.clear();
   setLocale(DEFAULT_LOCALE, false);
 });
 
@@ -90,15 +93,14 @@ describe('TreeScreen', () => {
     expect(screen.getByTitle('M Example')).toBeInTheDocument();
   });
 
-  it('adds siblings, the spouse and the children of the root in V2, without new requests (TC-24)', async () => {
+  it('adds siblings, the spouse and the children of the root in V2, and loads their details (OQ-05)', async () => {
     const { services, requested } = fakeServices();
     render(<TreeScreen services={services} onSignOut={vi.fn()} />);
     await waitFor(() => expect(screen.getAllByRole('article')).toHaveLength(3));
-    const before = requested.length;
 
     fireEvent.click(screen.getByRole('button', { name: 'Couples and children' }));
     await waitFor(() => expect(screen.getAllByRole('article')).toHaveLength(6));
-    expect(requested).toHaveLength(before);
+    await waitFor(() => expect(requested).toEqual(expect.arrayContaining(['SIB', 'S', 'K'])));
   });
 
   it('loads the relatives of the children in V3 (TC-26) and goes back to V1 (TC-27)', async () => {

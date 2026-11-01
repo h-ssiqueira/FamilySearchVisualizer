@@ -1,6 +1,9 @@
 import {
+  InvalidDataError,
   preferredCouple,
+  SessionExpiredError,
   type Couple,
+  type Person,
   type PersonId,
   type PersonRef,
   type PersonSource,
@@ -18,6 +21,8 @@ interface Frontier {
   id: PersonId;
   slot: number;
   childId?: PersonId;
+  /** What the parent entry says about this person: the name we show when its data is missing or unexpected. */
+  ref?: PersonRef;
 }
 
 /** Man left (even slot), woman right (odd slot); otherwise `partner1` left (SDD UI spec). */
@@ -47,8 +52,12 @@ export function assignParentSlots(
  * generation so the UI can render progressively; stops when no parents are known, when the
  * requested generation is reached, or when the signal is aborted.
  *
- * `pending` lists the parents of every branch that are known but not loaded yet, so "is there
- * more to load" looks at all branches, never only at the deepest generation (SDD FR-31).
+ * A person whose details fail with a transient error does not stop the rest of the tree: it is
+ * listed in `failed` and `pending`, so loading again retries it (FR-33). A person with no data
+ * (restricted, missing) gets an "unavailable" card in its place, and its branch ends there (TC-43,
+ * FR-38). A person whose data came back unexpected keeps its place, marked, and its parents are not
+ * requested (TC-15). The same ancestor reached twice is one card, marked as repeated (TC-22); its
+ * second parent entry is an extra edge. Only an expired session stops the whole load.
  */
 export async function* buildAncestorTree(
   rootId: PersonId,
@@ -61,28 +70,60 @@ export async function* buildAncestorTree(
   const nodes: TreeNode[] = [];
   const edges: TreeEdge[] = [];
   const placed = new Set<PersonId>();
+  const failed = new Set<PersonId>();
+  const repeated = new Set<PersonId>();
   let frontier: Frontier[] = [{ id: rootId, slot: 0 }];
 
   for (let generation = 0; frontier.length > 0 && generation <= lastGeneration; generation += 1) {
     if (signal?.aborted) return;
 
     const ids = [...new Set(frontier.map((item) => item.id))].filter((id) => !placed.has(id));
-    const loaded = new Map(
-      await Promise.all(ids.map(async (id) => [id, await source.getPerson(id, signal)] as const)),
+    const loaded = new Map<PersonId, Person | null>();
+    const malformed = new Set<PersonId>();
+    await Promise.all(
+      ids.map(async (id) => {
+        try {
+          loaded.set(id, await source.getPerson(id, signal));
+        } catch (error) {
+          if (error instanceof SessionExpiredError) throw error;
+          if (signal?.aborted) return;
+          if (error instanceof InvalidDataError) malformed.add(id);
+          else failed.add(id);
+        }
+      }),
     );
     if (signal?.aborted) return;
 
     const next: Frontier[] = [];
     for (const item of frontier) {
       if (placed.has(item.id)) {
-        // Pedigree collapse: the same ancestor reached twice is one node with two edges.
-        if (item.childId) edges.push({ from: item.childId, to: item.id, kind: 'parent' });
+        // Pedigree collapse: the same ancestor reached twice is one card, marked, with an extra edge.
+        if (item.childId) {
+          edges.push({ from: item.childId, to: item.id, kind: 'parent' });
+          repeated.add(item.id);
+        }
         continue;
       }
       const person = loaded.get(item.id);
-      if (!person) continue;
+      if (!person) {
+        if (!item.ref) {
+          // The root has no parent entry to name it: a failure, not a card.
+          if (malformed.has(item.id)) failed.add(item.id);
+          continue;
+        }
+        if (malformed.has(item.id) || loaded.has(item.id)) {
+          placed.add(item.id);
+          const marked: PersonRef = malformed.has(item.id)
+            ? { ...item.ref, invalid: true }
+            : { ...item.ref, unavailable: true };
+          nodes.push({ id: item.id, person: marked, generation, slot: item.slot, role: 'ancestor' });
+          if (item.childId) edges.push({ from: item.childId, to: item.id, kind: 'parent' });
+        }
+        continue;
+      }
 
       placed.add(item.id);
+      failed.delete(item.id);
       nodes.push({
         id: person.id,
         person,
@@ -95,13 +136,25 @@ export async function* buildAncestorTree(
       const couple = preferredCouple(person.parentSets);
       if (couple) {
         for (const parent of assignParentSlots(couple, item.slot)) {
-          next.push({ id: parent.ref.id, slot: parent.slot, childId: person.id });
+          next.push({ id: parent.ref.id, slot: parent.slot, childId: person.id, ref: parent.ref });
         }
       }
     }
 
     frontier = next;
-    const pending = [...new Set(next.map((item) => item.id))].filter((id) => !placed.has(id));
-    yield { view: 'V1', root: rootId, nodes: [...nodes], edges: [...edges], pending };
+    const pending = new Set<PersonId>([
+      ...next.map((item) => item.id).filter((id) => !placed.has(id)),
+      ...failed,
+    ]);
+    yield {
+      view: 'V1',
+      root: rootId,
+      nodes: nodes.map((node) =>
+        repeated.has(node.id) ? { ...node, person: { ...node.person, repeated: true } } : node,
+      ),
+      edges: [...edges],
+      pending: [...pending],
+      failed: [...failed],
+    };
   }
 }

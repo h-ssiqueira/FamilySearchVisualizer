@@ -1,10 +1,28 @@
 {
   "app": { "title": "FamilySearch Visualizer" },
+  "theme": { "dark": "Modo escuro" },
   "login": {
     "heading": "FamilySearch Visualizer",
     "description": "Veja a sua árvore genealógica em visões simples e cada vez mais detalhadas.",
     "button": "Entrar com Google (FamilySearch)",
     "privacy": "Você entra com o Google por meio do FamilySearch. O token da sua sessão no FamilySearch e os dados da sua família ficam apenas nesta aba do navegador; nada é guardado nem enviado a lugar nenhum além do FamilySearch.",
+    "expired": "Sua sessão no FamilySearch terminou. Entre de novo: a visão que você tinha aberta será mantida.",
+    "relay": {
+      "heading": "Conectar por uma aba do FamilySearch",
+      "description": "Abra o FamilySearch e entre na sua conta. Depois clique no favorito abaixo nessa aba. Os dados passam por essa aba, então você não precisa copiar um token.",
+      "open": "Abrir o FamilySearch e conectar",
+      "waiting": "Aguardando o favorito na aba do FamilySearch…",
+      "cancel": "Cancelar",
+      "failed": {
+        "popup": "O navegador bloqueou a janela do FamilySearch. Permita pop-ups para este site e tente de novo.",
+        "timeout": "A aba do FamilySearch não respondeu. Confirme que você clicou no favorito nessa aba.",
+        "closed": "A aba do FamilySearch foi fechada. Conecte de novo.",
+        "unknown": "Não foi possível conectar. Tente de novo."
+      },
+      "bookmarkletSummary": "Como instalo o favorito?",
+      "bookmarkletHelp": "Arraste o link abaixo para a barra de favoritos. Na aba do FamilySearch, clique nele uma vez. Se a página recarregar, clique de novo.",
+      "bookmarkletLabel": "FSV relay"
+    },
     "manual": {
       "heading": "Usar um token de acesso existente",
       "description": "Informe um token de acesso válido do FamilySearch para continuar.",
@@ -22,11 +40,16 @@
     "loading": "Carregando…",
     "loadingDetails": "Carregando parentes…",
     "generations": "Gerações carregadas: {{count}}",
+    "waiting": "O FamilySearch pediu para aguardar {{seconds}} s",
+    "failed": "{{count}} pessoas não puderam ser carregadas",
+    "retryFailed": "Tentar as que falharam",
     "next": "Carregar próxima geração",
     "all": "Carregar todas as gerações",
     "stop": "Parar",
     "retry": "Tentar de novo",
     "export": "Exportar como SVG",
+    "exportPng": "Exportar como PNG",
+    "exportPdf": "Exportar como PDF",
     "error": "Não foi possível carregar a árvore. Verifique a conexão e tente de novo.",
     "canvas": "Árvore genealógica. Arraste para mover; use as setas para mover, mais e menos para ampliar, zero para ajustar.",
     "zoomIn": "Ampliar",
@@ -48,6 +71,9 @@
       "V3": "Família estendida"
     }
   },
+  "families": {
+    "cycle": "Mostrar outra família ({{shown}} de {{total}})"
+  },
   "config": {
     "heading": "Problema de configuração",
     "body": "O app está sem configurações ou com valores inválidos:",
@@ -55,7 +81,10 @@
   },
   "error": { "generic": "Algo deu errado. Recarregue a página." },
   "card": {
-    "gender": { "male": "Masculino", "female": "Feminino", "unknown": "Gênero desconhecido" }
+    "gender": { "male": "Masculino", "female": "Feminino", "unknown": "Gênero desconhecido" },
+    "unexpected": "Resposta inesperada",
+    "unavailable": "Indisponível",
+    "repeated": "Aparece de novo nesta árvore"
   },
   "language": { "label": "Idioma", "en": "English", "pt-BR": "Português (Brasil)" }
 }

@@ -16,6 +16,7 @@ const treeOf = (nodes: TreeNode[]): ViewTree => ({
   nodes,
   edges: [],
   pending: [],
+  failed: [],
 });
 
 describe('layoutAncestors', () => {

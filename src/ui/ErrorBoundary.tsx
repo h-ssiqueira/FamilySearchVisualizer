@@ -1,4 +1,4 @@
-import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Component, type ReactNode } from 'react';
 import { getLocale, translate } from '@/i18n';
 
 interface State {
@@ -13,7 +13,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
     return { failed: true };
   }
 
-  override componentDidCatch(error: Error, _info: ErrorInfo): void {
+  override componentDidCatch(error: Error): void {
     console.error('Unhandled UI error:', error.name);
   }
 

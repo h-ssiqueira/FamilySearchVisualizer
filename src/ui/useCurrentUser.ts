@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import type { FamilySearchClient } from '@/api';
+import { UnauthorizedError } from '@/api';
 import type { CurrentUser } from '@/domain';
+import type { FamilySearchClient } from '@/api';
 
 export type CurrentUserState =
   | { status: 'loading' }
@@ -27,3 +28,5 @@ export function useCurrentUser(client: FamilySearchClient): CurrentUserState {
 
   return state;
 }
+
+export { UnauthorizedError };

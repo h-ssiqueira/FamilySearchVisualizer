@@ -18,12 +18,19 @@ export interface LifeEvent {
   place?: Place;
 }
 
-/** "Light" person: what another person's response says about a relative. */
+/**
+ * "Light" person: what another person's response says about a relative. Flags set by the tree
+ * builders: `invalid` (unexpected data, TC-15), `unavailable` (no data, TC-43), `repeated` (the
+ * same ancestor reached twice, TC-22).
+ */
 export interface PersonRef {
   id: PersonId;
   name: string;
   gender: Gender;
   living: boolean;
+  invalid?: boolean;
+  unavailable?: boolean;
+  repeated?: boolean;
 }
 
 export interface Couple {
@@ -45,6 +52,7 @@ export interface Person {
   ageAtDeath?: number;
   parentSets: Couple[];
   unions: Couple[];
+  repeated?: boolean;
 }
 
 export interface CurrentUser {
@@ -75,5 +83,8 @@ export interface ViewTree {
   root: PersonId;
   nodes: TreeNode[];
   edges: TreeEdge[];
+  /** Known ancestors not loaded yet, plus the failed ones: loading more can reach them. */
   pending: PersonId[];
+  /** People whose details could not be loaded because of a transient error (FR-33). */
+  failed: PersonId[];
 }

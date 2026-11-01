@@ -1,5 +1,5 @@
-import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 const APP = '/FamilySearchVisualizer/';
 
@@ -28,4 +28,19 @@ test('loading the app makes no request to another host (TC-54)', async ({ page }
   await page.goto(APP);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   expect(foreign).toEqual([]);
+});
+
+test('the login screen fits a 360 px phone without sideways scrolling (TC-56)', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto(APP);
+  await expect(
+    page.getByRole('button', { name: 'Sign in with Google (FamilySearch)' }),
+  ).toBeVisible();
+
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
 });

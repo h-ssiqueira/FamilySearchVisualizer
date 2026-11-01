@@ -1,4 +1,6 @@
-const ALLOWED_PATHS: readonly RegExp[] = [
+// Endpoints the app may call (SDD NFR-11, TC-60). The relay script keeps its own copy and a
+// test checks that the two lists are identical.
+export const ALLOWED_PATHS: readonly RegExp[] = [
   /^\/platform\/users\/current$/,
   /^\/service\/tree\/tree-data\/v8\/person\/[A-Z0-9]{2,8}-[A-Z0-9]{2,8}\/details$/i,
 ];

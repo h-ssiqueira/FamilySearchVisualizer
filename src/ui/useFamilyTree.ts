@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { UnauthorizedError } from '@/api';
 import type { FamilyView, PersonId, PersonSource, ViewLevel, ViewTree } from '@/domain';
-import { buildAncestorTree, buildFamilyView, extendToV3, hasMoreAncestors } from '@/tree';
+import {
+  buildAncestorTree,
+  buildFamilyView,
+  extendToV3,
+  hasMoreAncestors,
+  withDetails,
+  type FamilyChoices,
+} from '@/tree';
 
 /** Generations loaded automatically; the user asks for more (SDD FR-12, OQ-02). */
 export const INITIAL_GENERATIONS = 4;
@@ -20,18 +27,23 @@ export interface FamilyTreeState {
   generations: number;
   /** Ancestors are still being fetched. */
   busy: boolean;
-  /** V3 relatives are still being fetched. */
+  /** Relatives' details are still being fetched (V2, V3). */
   detailsBusy: boolean;
   canLoadMore: boolean;
+  /** People whose details could not be loaded yet (FR-33). */
+  failed: number;
   loadNext: () => void;
   loadAll: () => void;
   stop: () => void;
   retry: () => void;
+  /** Shows the next family of a person on its card (OQ-25); `total` is the number of families. */
+  cycleFamilies: (id: PersonId, total: number) => void;
 }
 
 /**
  * Loads the ancestors generation by generation (cancellable, unlimited), and derives the
- * requested view from them. Switching view never refetches: the person cache serves it.
+ * requested view from them. V2 and V3 then load the details of the relatives they show (OQ-05).
+ * Switching view never refetches what is already cached.
  */
 export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
   const { source, rootId, level, onUnauthorized } = options;
@@ -39,7 +51,10 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
   const [run, setRun] = useState(0);
   const [tree, setTree] = useState<ViewTree | undefined>(undefined);
   const [ancestorsBusy, setAncestorsBusy] = useState(true);
-  const [detailed, setDetailed] = useState<FamilyView | undefined>(undefined);
+  const [choices, setChoices] = useState<FamilyChoices>(() => new Map<PersonId, number>());
+  const [detailed, setDetailed] = useState<{ level: ViewLevel; view: FamilyView } | undefined>(
+    undefined,
+  );
   const [detailsBusy, setDetailsBusy] = useState(false);
   const [error, setError] = useState<unknown>(undefined);
   const controllerRef = useRef<AbortController | undefined>(undefined);
@@ -71,22 +86,28 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
   }, [rootId, source, target, run]);
 
   const baseFamily = useMemo(
-    () => (tree ? buildFamilyView(tree, level === 'V1' ? 'V1' : 'V2') : undefined),
-    [tree, level],
+    () => (tree ? buildFamilyView(tree, level === 'V1' ? 'V1' : 'V2', choices) : undefined),
+    [tree, level, choices],
   );
 
   useEffect(() => {
-    if (level !== 'V3' || !baseFamily || ancestorsBusy) {
+    if (level === 'V1' || !baseFamily || ancestorsBusy) {
       setDetailed(undefined);
       setDetailsBusy(false);
       return;
     }
     const controller = new AbortController();
     setDetailsBusy(true);
-    extendToV3(baseFamily, source, controller.signal)
+    // V2 shows the relatives with their details (OQ-05); V3 adds one more level on top of them.
+    const withRelatives = withDetails(baseFamily, source, controller.signal);
+    const work =
+      level === 'V3'
+        ? withRelatives.then((view) => extendToV3(view, source, controller.signal, choices))
+        : withRelatives;
+    work
       .then((view) => {
         if (controller.signal.aborted) return;
-        setDetailed(view);
+        setDetailed({ level, view });
         setDetailsBusy(false);
       })
       .catch((caught: unknown) => {
@@ -95,7 +116,7 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
         setDetailsBusy(false);
       });
     return () => controller.abort();
-  }, [level, baseFamily, ancestorsBusy, source]);
+  }, [level, baseFamily, ancestorsBusy, source, choices]);
 
   useEffect(() => {
     if (error instanceof UnauthorizedError) onUnauthorized();
@@ -113,17 +134,29 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
     setAncestorsBusy(false);
   }, []);
   const retry = useCallback(() => setRun((value) => value + 1), []);
+  const cycleFamilies = useCallback((id: PersonId, total: number) => {
+    setChoices((previous) => {
+      const next = new Map(previous);
+      next.set(id, ((previous.get(id) ?? -1) + 1) % total);
+      return next;
+    });
+  }, []);
+
+  const family =
+    level === 'V1' ? baseFamily : detailed?.level === level ? detailed.view : baseFamily;
 
   return {
     status: error !== undefined ? 'error' : tree ? 'ready' : 'loading',
-    family: level === 'V3' && detailed ? detailed : baseFamily,
+    family,
     generations,
     busy: ancestorsBusy,
     detailsBusy,
     canLoadMore,
+    failed: tree ? tree.failed.length : 0,
     loadNext,
     loadAll,
     stop,
     retry,
+    cycleFamilies,
   };
 }

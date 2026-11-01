@@ -23,11 +23,23 @@ export interface ClientOptions {
   /** Value for the `Accept-Language` header (the response text is localized to it). */
   getAcceptLanguage: () => string;
   queue: RequestQueue;
+  /** How requests leave the browser. The relay supplies its own (see src/relay). */
   fetchImpl?: typeof fetch;
+  /**
+   * With a token (fallback mode) the client must have one. Through the relay the user's own
+   * session authorises the calls, so no token is needed.
+   */
+  requireToken?: boolean;
+  /** Retries of a request that failed at network level (NFR-03, TC-42). Default 3. */
+  networkRetries?: number;
+  /** First wait between network retries; doubles each time. Default 1000 ms. */
+  backoffBaseMs?: number;
 }
 
 const DEFAULT_RETRY_MS = 5_000;
 const MAX_RETRY_MS = 5 * 60_000;
+const DEFAULT_NETWORK_RETRIES = 3;
+const DEFAULT_BACKOFF_MS = 1_000;
 
 /** `Retry-After` is either a number of seconds or an HTTP date. */
 export function parseRetryAfter(value: string | null, now: number = Date.now()): number {
@@ -40,29 +52,72 @@ export function parseRetryAfter(value: string | null, now: number = Date.now()):
   return Number.isNaN(date) ? DEFAULT_RETRY_MS : clamp(date - now);
 }
 
+function abortError(): DOMException {
+  return new DOMException('The request was aborted', 'AbortError');
+}
+
+/** Waits `ms`, or stops at once when the signal is aborted. */
+function sleep(ms: number, signal: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal.aborted) {
+      reject(abortError());
+      return;
+    }
+    const timer = setTimeout(() => {
+      signal.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    function onAbort(): void {
+      clearTimeout(timer);
+      reject(abortError());
+    }
+    signal.addEventListener('abort', onAbort, { once: true });
+  });
+}
+
 export function createFamilySearchClient(options: ClientOptions): FamilySearchClient {
   const doFetch: typeof fetch = options.fetchImpl ?? ((input, init) => fetch(input, init));
+  const requireToken = options.requireToken ?? true;
+  const networkRetries = options.networkRetries ?? DEFAULT_NETWORK_RETRIES;
+  const backoffBase = options.backoffBaseMs ?? DEFAULT_BACKOFF_MS;
+
+  /**
+   * A network failure (the request never got an answer) is retried with exponential back-off.
+   * An HTTP answer, even an error one, is not retried here: throttling is handled by the queue.
+   */
+  async function fetchWithBackoff(url: string, init: RequestInit, signal: AbortSignal): Promise<Response> {
+    for (let attempt = 0; ; attempt += 1) {
+      try {
+        return await doFetch(url, { ...init, signal });
+      } catch (error) {
+        if (signal.aborted || !(error instanceof TypeError) || attempt >= networkRetries) {
+          throw error;
+        }
+        await sleep(backoffBase * 2 ** attempt, signal);
+      }
+    }
+  }
 
   function requestJson(path: string, signal?: AbortSignal): Promise<unknown> {
     return options.queue.enqueue(async (taskSignal) => {
       const url = new URL(path, options.apiBase).toString();
       if (!isAllowedRequest(url, 'GET', options.apiBase)) throw new NotAllowedError();
       const token = options.getToken();
-      if (!token) throw new MissingTokenError();
+      if (!token && requireToken) throw new MissingTokenError();
 
-      const response = await doFetch(url, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          'Accept-Language': options.getAcceptLanguage(),
-          Authorization: `Bearer ${token}`,
-          'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36',
-        },
-        credentials: 'omit',
-        referrerPolicy: 'no-referrer',
-        signal: taskSignal,
-      });
+      const headers: Record<string, string> = {
+        Accept: 'application/json',
+        'Accept-Language': options.getAcceptLanguage(),
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36',
+      };
+      if (token) headers.Authorization = `Bearer ${token}`;
+
+      const response = await fetchWithBackoff(
+        url,
+        { method: 'GET', headers, credentials: 'omit', referrerPolicy: 'no-referrer' },
+        taskSignal,
+      );
 
       if (response.status === 401) throw new UnauthorizedError();
       if (response.status === 403 || response.status === 404) {
