@@ -1,16 +1,35 @@
+import { useMemo } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { startLogin, useToken } from '@/auth';
-import type { ConfigResult } from '@/config';
+import type { AppConfig, ConfigResult } from '@/config';
+import { createServices, type Services } from '@/services';
 import { signOut } from '@/state';
 import { ConfigError } from '@/ui/ConfigError';
 import { LoginScreen } from '@/ui/LoginScreen';
 import { TreeScreen } from '@/ui/TreeScreen';
 
-export function App({ configResult }: { configResult: ConfigResult }) {
+interface AppProps {
+  configResult: ConfigResult;
+  /** Replaceable in tests. */
+  createServices?: (config: AppConfig) => Services;
+}
+
+function Authenticated({
+  config,
+  factory,
+}: {
+  config: AppConfig;
+  factory: (config: AppConfig) => Services;
+}) {
+  const services = useMemo(() => factory(config), [config, factory]);
+  return <TreeScreen services={services} onSignOut={signOut} />;
+}
+
+export function App({ configResult, createServices: factory = createServices }: AppProps) {
   const token = useToken();
 
   if (!configResult.ok) return <ConfigError missing={configResult.missing} />;
-  const { loginUrl } = configResult.config;
+  const { config } = configResult;
 
   return (
     <Routes>
@@ -18,9 +37,9 @@ export function App({ configResult }: { configResult: ConfigResult }) {
         path="/"
         element={
           token ? (
-            <TreeScreen onSignOut={signOut} />
+            <Authenticated config={config} factory={factory} />
           ) : (
-            <LoginScreen onSignIn={() => startLogin(loginUrl)} />
+            <LoginScreen onSignIn={() => startLogin(config.loginUrl)} />
           )
         }
       />

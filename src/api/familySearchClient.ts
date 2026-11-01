@@ -56,6 +56,8 @@ export function createFamilySearchClient(options: ClientOptions): FamilySearchCl
           Accept: 'application/json',
           'Accept-Language': options.getAcceptLanguage(),
           Authorization: `Bearer ${token}`,
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36',
         },
         credentials: 'omit',
         referrerPolicy: 'no-referrer',

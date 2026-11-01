@@ -46,6 +46,9 @@ export function assignParentSlots(
  * V1: the root and its direct ancestors, one generation per step. Yields the tree after each
  * generation so the UI can render progressively; stops when no parents are known, when the
  * requested generation is reached, or when the signal is aborted.
+ *
+ * `pending` lists the parents of every branch that are known but not loaded yet, so "is there
+ * more to load" looks at all branches, never only at the deepest generation (SDD FR-31).
  */
 export async function* buildAncestorTree(
   rootId: PersonId,
@@ -98,6 +101,7 @@ export async function* buildAncestorTree(
     }
 
     frontier = next;
-    yield { view: 'V1', root: rootId, nodes: [...nodes], edges: [...edges], pending: [] };
+    const pending = [...new Set(next.map((item) => item.id))].filter((id) => !placed.has(id));
+    yield { view: 'V1', root: rootId, nodes: [...nodes], edges: [...edges], pending };
   }
 }

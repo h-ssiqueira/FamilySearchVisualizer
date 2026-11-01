@@ -49,6 +49,9 @@ describe('createFamilySearchClient', () => {
     expect(captured.headers?.get('authorization')).toBe('Bearer synthetic-token');
     expect(captured.headers?.get('accept-language')).toBe('pt');
     expect(captured.headers?.get('accept')).toBe('application/json');
+    expect(captured.headers?.get('user-agent')).toBe(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36',
+    );
   });
 
   it('maps the current user', async () => {

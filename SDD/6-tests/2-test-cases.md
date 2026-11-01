@@ -36,7 +36,7 @@ Format: Given / When / Then. Level: U unit, C component, I integration, E end-to
 | TC-25 | FR-14 | U | V3: each child's spouse(s) and their children appear |
 | TC-26 | FR-14 | I | V3 makes exactly one details request per child |
 | TC-27 | FR-15 | I | Switch V3→V1→V3 → no repeated requests |
-| TC-28 | FR-12 | U | "Next generation" / "load all" fetch only missing generations; loading stops when no parents remain |
+| TC-28 | FR-12 | U | "Next generation" / "load all" fetch only missing generations in a branch; loading stops when no parents remain in current branch |
 | TC-29 | FR-17 | C | Card shows name, life span, birth place; "unknown" fallback |
 | TC-30 | FR-18 | C | Expanding a light card fetches details once |
 

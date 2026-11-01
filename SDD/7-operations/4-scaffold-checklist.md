@@ -6,14 +6,14 @@ Goal: an empty but **working, tested and deployable** app (Vite + React + TypeSc
 - [x] **OQ-06**: use the endpoints exactly as in `8-attachments/examples.md` (ADR-10 not adopted). See [API findings](../4-design/6-api-findings.md).
 - [x] **OQ-08**: English and pt-BR, extensible (ADR-11).
 - [x] **OQ-12**: default GitHub Pages address of the repository, `https://h-ssiqueira.github.io/FamilySearchVisualizer/` (host to confirm); Vite `base` = `/FamilySearchVisualizer/`.
-- [x] **OQ-21**: the token is obtained through the Google login address of FamilySearch's identity service (`https://ident.familysearch.org/oauth2/authorization/google`), as in the first lines of `examples.md`. **Still to verify in the spike:** how the token reaches a page on `github.io` (fallbacks in the auth doc, section 3).
+- [x] **OQ-21**: the token is obtained through the Google login address of FamilySearch's identity service (`https://ident.familysearch.org/oauth2/authorization/google`), as in the first lines of `examples.md`. **Still to verify in the spike:** how the token reaches a page on `github.io` (fallbacks in the auth doc, section 3). **Current behavior:** redirection to original family search website after login.
 - [ ] **OQ-11**: error reporting allowed or zero telemetry (default in the scaffold: zero telemetry).
 - [ ] **A3 (urgent, owner: the author, who will remove the file and clean the Git history)**: `8-attachments/examples.md` contains a live token, personal data and real people. Sign out of FamilySearch everywhere first. After the cleanup, keep a **redacted** copy for the SDD. No fixture may be derived from the original.
 - Note: the repository's default branch is **`master`**, not `main`.
 
 ## 1. Repository hygiene
 - [ ] `.gitignore` (node_modules, dist, .env*, coverage, playwright-report) and `.editorconfig`
-- [ ] `LICENSE` already present; confirm it is the intended one
+- [x] `LICENSE` already present
 - [ ] Root `README.md` for developers: what it is, requirements, run, test, build, env variables, link to `SDD/README.md`
 - [ ] `.github/pull_request_template.md` (checklist: tests, a11y, no real personal data, SDD updated)
 - [ ] Secret scanning and push protection enabled (security controls, section 3)
@@ -33,7 +33,7 @@ Goal: an empty but **working, tested and deployable** app (Vite + React + TypeSc
 - [ ] `src/test/fixtures/` contains **synthetic** data only, with a README stating the anonymization rule (NFR-05)
 
 ## 4. Configuration (no secrets)
-- [ ] `.env.example` with `VITE_BASE_PATH=/FamilySearchVisualizer/`, `VITE_FS_API_BASE=https://www.familysearch.org` and `VITE_FS_LOGIN_URL=https://ident.familysearch.org/oauth2/authorization/google`
+- [ ] `.env.example` with `VITE_BASE_PATH=/FamilySearchVisualizer/`, `TOKEN=` (optional), `VITE_FS_API_BASE=https://www.familysearch.org` and `VITE_FS_LOGIN_URL=https://ident.familysearch.org/oauth2/authorization/google`
 - [ ] Local dev URL follows the base path (`http://localhost:5173/FamilySearchVisualizer/`); production is `https://h-ssiqueira.github.io/FamilySearchVisualizer/`
 - [ ] `src/config` reads and **validates** these at start-up and shows a clear error screen when something is missing
 - [ ] No secrets in the repository; the session token is never stored or logged (NFR-04)
@@ -43,6 +43,7 @@ Goal: an empty but **working, tested and deployable** app (Vite + React + TypeSc
 - [ ] `HashRouter` (ADR-06)
 - [ ] Login: the button navigates to `VITE_FS_LOGIN_URL`; token intake as confirmed by the spike (OQ-21); any token in the URL is removed with `history.replaceState` before the router starts (auth doc, section 4; TC-08)
 - [ ] Routes: login, callback handling, tree view (V1/V2/V3), error/404
+- [ ] Optionally: a input text to inform the authentication Bearer token to be used in the section
 
 ## 6. Security baseline
 - [ ] CSP `<meta>` in `index.html` with the hosts from security controls, section 2 (check that the dev server still works; relax only in dev)
