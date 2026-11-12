@@ -46,7 +46,7 @@ ESLint enforces the boundaries: `domain` imports nothing, `api` never imports Re
 - The FamilySearch session token is kept in memory only. Never write it to the URL, logs, error messages, `localStorage` or `sessionStorage`.
 - The API client only issues `GET` requests to the two endpoints of the allow-list (`src/api/allowList.ts`). The relay script keeps an identical copy; a test enforces it. Changing one means changing both.
 - Untrusted text (names, places) is rendered as React text only. Never use `dangerouslySetInnerHTML`.
-- Logs never contain payloads or personal data: log the error class and HTTP status only.
+- Console logs: a person that cannot be loaded is logged with its id, name and reason (FR-39, the only exception to the rule below). Never log tokens, response payloads or places. Other errors: error class and HTTP status only.
 - No analytics, trackers, third-party scripts or telemetry (NFR-05, decided).
 
 ## Conventions
@@ -59,8 +59,8 @@ ESLint enforces the boundaries: `domain` imports nothing, `api` never imports Re
 - Branches: `feature/<name>`; stacked branches are allowed when a change builds on another. The default branch is `master`.
 
 ## Current state (keep this section up to date)
-- Implemented: login (relay and token fallback), V1/V2/V3 views, layout with no card on marriage lines, flexible card width (250 to 360 px, from the text), pan and zoom, export as SVG, PNG and PDF (no external library for the PDF), progressive loading, partial failures with retry (FR-33), unexpected-data card (FR-36), unavailable card (FR-38), repeat symbol for a repeated ancestor (TC-22), families button for spouse families (FR-19, OQ-25), waiting indicator (FR-09), session expiry keeping the view (FR-04), network back-off (NFR-03), number formatting (NFR-08), preferred spouse family (FR-19), dark theme following the system with a toggle (FR-35).
-- Not implemented yet: families button for parent families (other parent sets), placeholders without a card (FR-11, TC-14), keyboard navigation between cards (TC-50), wrapping of very large sibling groups (OQ-20 decided: one row, so no wrapping is planned).
+- Implemented: login (relay and token fallback), V1/V2/V3 views, layout with no card on marriage lines, flexible card width (250 to 360 px, from the text), pan and zoom, export as SVG, PNG and PDF (no external library for the PDF), progressive loading, partial failures with retry (FR-33), console report of people that cannot be loaded (FR-39), unexpected-data card (FR-36), unavailable card (FR-38), repeat symbol for a repeated ancestor (TC-22), families button for spouse families (FR-19, OQ-25), waiting indicator (FR-09), session expiry keeping the view (FR-04), network back-off (NFR-03), number formatting (NFR-08), preferred spouse family (FR-19), dark theme following the system with a toggle (FR-35).
+- Not implemented yet: families button for parent families (other parent sets), placeholders without a card (FR-11, TC-14), keyboard navigation between cards (TC-50), copy-diagnostics button (monitoring section 2).
 - Never executed as a whole: the code was written without running install, tests or build. First real run: `npm ci`, then `typecheck`, `lint`, `test`, `build`, and send the errors back.
 - Unverified: whether the FamilySearch session cookie alone authorises the two endpoints when called through the relay (TC-52b). If not, the token fallback is the path.
 - The PNG and PDF exports need a browser to be tested (TC-80 open).
@@ -74,3 +74,4 @@ ESLint enforces the boundaries: `domain` imports nothing, `api` never imports Re
 - API facts observed from the samples: `SDD/4-design/6-api-findings.md` (no values copied here).
 - Theme: `src/ui/theme.ts` (choice and storage), `src/ui/styles.css` (variables).
 - Export: `src/tree/exportSvg.ts`, `src/tree/pdf.ts`, `src/ui/exportImage.ts`, `src/ui/ExportButton.tsx`.
+- Console report: `src/tree/ancestors.ts` (`report`).

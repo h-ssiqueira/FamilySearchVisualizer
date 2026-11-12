@@ -47,6 +47,28 @@ export function assignParentSlots(
   return [];
 }
 
+/** The reason of a failed load, from the error class and message only (never the payload). */
+function reasonOf(error: unknown): string {
+  return error instanceof Error ? `${error.name}: ${error.message}` : 'unknown error';
+}
+
+/**
+ * Writes one console line for a person who could not be loaded, with the id, the name (when the
+ * parent entry gave it) and the reason (SDD FR-39). Written once per person and reason within one
+ * build. Never a token or a response payload.
+ */
+function report(
+  written: Set<string>,
+  id: PersonId,
+  name: string | undefined,
+  reason: string,
+): void {
+  const key = `${id}|${reason}`;
+  if (written.has(key)) return;
+  written.add(key);
+  console.warn(`[FamilySearch Visualizer] person ${id} (${name ?? 'name unknown'}): ${reason}`);
+}
+
 /**
  * V1: the root and its direct ancestors, one generation per step. Yields the tree after each
  * generation so the UI can render progressively; stops when no parents are known, when the
@@ -57,7 +79,8 @@ export function assignParentSlots(
  * (restricted, missing) gets an "unavailable" card in its place, and its branch ends there (TC-43,
  * FR-38). A person whose data came back unexpected keeps its place, marked, and its parents are not
  * requested (TC-15). The same ancestor reached twice is one card, marked as repeated (TC-22); its
- * second parent entry is an extra edge. Only an expired session stops the whole load.
+ * second parent entry is an extra edge. Every person that cannot be loaded is reported to the
+ * console with id, name and reason (FR-39). Only an expired session stops the whole load.
  */
 export async function* buildAncestorTree(
   rootId: PersonId,
@@ -72,11 +95,16 @@ export async function* buildAncestorTree(
   const placed = new Set<PersonId>();
   const failed = new Set<PersonId>();
   const repeated = new Set<PersonId>();
+  const written = new Set<string>();
+  const names = new Map<PersonId, string>();
   let frontier: Frontier[] = [{ id: rootId, slot: 0 }];
 
   for (let generation = 0; frontier.length > 0 && generation <= lastGeneration; generation += 1) {
     if (signal?.aborted) return;
 
+    for (const item of frontier) {
+      if (item.ref) names.set(item.id, item.ref.name);
+    }
     const ids = [...new Set(frontier.map((item) => item.id))].filter((id) => !placed.has(id));
     const loaded = new Map<PersonId, Person | null>();
     const malformed = new Set<PersonId>();
@@ -87,8 +115,12 @@ export async function* buildAncestorTree(
         } catch (error) {
           if (error instanceof SessionExpiredError) throw error;
           if (signal?.aborted) return;
-          if (error instanceof InvalidDataError) malformed.add(id);
-          else failed.add(id);
+          if (error instanceof InvalidDataError) {
+            malformed.add(id);
+          } else {
+            failed.add(id);
+            report(written, id, names.get(id), reasonOf(error));
+          }
         }
       }),
     );
@@ -108,14 +140,26 @@ export async function* buildAncestorTree(
       if (!person) {
         if (!item.ref) {
           // The root has no parent entry to name it: a failure, not a card.
-          if (malformed.has(item.id)) failed.add(item.id);
+          if (malformed.has(item.id)) {
+            failed.add(item.id);
+            report(written, item.id, undefined, 'InvalidDataError: unexpected response shape');
+          }
           continue;
         }
         if (malformed.has(item.id) || loaded.has(item.id)) {
           placed.add(item.id);
-          const marked: PersonRef = malformed.has(item.id)
+          const isMalformed = malformed.has(item.id);
+          const marked: PersonRef = isMalformed
             ? { ...item.ref, invalid: true }
             : { ...item.ref, unavailable: true };
+          report(
+            written,
+            item.id,
+            item.ref.name,
+            isMalformed
+              ? 'InvalidDataError: unexpected response shape'
+              : 'no data (restricted or not found)',
+          );
           nodes.push({ id: item.id, person: marked, generation, slot: item.slot, role: 'ancestor' });
           if (item.childId) edges.push({ from: item.childId, to: item.id, kind: 'parent' });
         }

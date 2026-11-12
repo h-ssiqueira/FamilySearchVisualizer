@@ -25,6 +25,7 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-36 | A person whose data comes back in an unexpected shape keeps its place on the tree, marked as "Unexpected response" where the dates go, with the name known from the parent entry; the rest of the tree goes on and that person's parents are not requested (TC-15). | M |
 | FR-37 | In V2 and V3, every relative shown has its details loaded (one request each, cached), so that its card shows dates and places as well (OQ-05). A relative that cannot be loaded keeps a light card (FR-33). | M |
 | FR-38 | A parent or spouse with no data (restricted, not found) is shown as an "unavailable" card in its place, and its branch ends there (TC-43). Its name, when known from the parent entry, is shown. | M |
+| FR-39 | Every person who cannot be loaded (transient failure, no data, unexpected data) is written to the browser console with the person's id, the name when known, and the reason (the error class and message). Written once per person and reason within one load. Never a token or a response payload. The console is the user's own browser; nothing is sent anywhere (NFR-05). | S |
 
 ## Views
 | ID | Requirement | Pri |
