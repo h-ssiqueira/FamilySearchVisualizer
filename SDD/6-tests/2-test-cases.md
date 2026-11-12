@@ -54,6 +54,7 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 | TC-46 | FR-33 | C | Toolbar shows the count of people not loaded; "retry" rebuilds the tree and requests only the failed people again (`TreeScreen.retry.test.tsx`) |
 | TC-47 | FR-33 | U | An expired session (401) stops the whole load; any other error only marks that person (`ancestors.failure.test.ts`) |
 | TC-79 | FR-37, FR-33 | U | A relative whose details fail keeps its light card; an expired session stops the detail loading (`family.details.test.ts`) |
+| TC-83 | FR-39 | U | A person whose load fails, has no data, or has unexpected data is written to the console with id, name and reason, once per reason in a load; a person that loads correctly writes nothing (`ancestors.logging.test.ts`) |
 
 ## Relay (FR-34)
 | ID | Req | Level | Case |
