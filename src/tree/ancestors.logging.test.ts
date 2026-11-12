@@ -38,6 +38,7 @@ const people = new Map<string, Person>([
 async function build(source: PersonSource): Promise<void> {
   for await (const _tree of buildAncestorTree('R', source, { generations: 'all' })) {
     // Only the side effects matter here: the console lines.
+    console.log(_tree);
   }
 }
 
