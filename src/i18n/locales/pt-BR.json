@@ -77,6 +77,7 @@
     "toGraph": "Visão em grafo",
     "listHeading": "Pessoas no grafo",
     "canvas": "Grafo da família. Clique numa pessoa para selecioná-la; a lista ao lado funciona pelo teclado.",
+    "exportPng": "Exportar como PNG",
     "loading": "Carregando o grafo…"
   },
   "families": {

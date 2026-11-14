@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { UnauthorizedError } from '@/api';
-import type { PersonId, ViewLevel } from '@/domain';
-import { cardLines } from '@/domain';
+import { cardLines, type PersonId, type ViewLevel } from '@/domain';
 import { toGraphData } from '@/graph';
 import { applyPreferredLocale, useT } from '@/i18n';
 import type { Services } from '@/services';
@@ -75,6 +74,7 @@ function GraphView({ services, rootId, onSignOut, onExpired }: GraphViewProps) {
               selectedId={selectedId}
               onSelect={onSelect}
               label={t('graph.canvas')}
+              exportLabel={t('graph.exportPng')}
               noteText={(note) => t(`card.${note}`)}
             />
           </div>

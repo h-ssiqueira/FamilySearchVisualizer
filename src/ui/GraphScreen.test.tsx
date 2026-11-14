@@ -29,6 +29,9 @@ vi.mock('force-graph', () => {
     onNodeClick(): this {
       return this;
     }
+    d3Force(): this {
+      return this;
+    }
     graphData(): this {
       return this;
     }
@@ -96,7 +99,7 @@ afterEach(() => {
   setLocale(DEFAULT_LOCALE, false);
 });
 
-describe('GraphScreen (FR-40, FR-45)', () => {
+describe('GraphScreen (FR-40, FR-44, FR-45)', () => {
   it('lists the same people as the tree, for keyboard and screen-reader use', async () => {
     render(<GraphScreen services={fakeServices()} onSignOut={vi.fn()} onExpired={vi.fn()} />);
     expect(await screen.findByRole('button', { name: 'R Example' })).toBeInTheDocument();
@@ -114,6 +117,13 @@ describe('GraphScreen (FR-40, FR-45)', () => {
 
   it('links back to the tree page', async () => {
     render(<GraphScreen services={fakeServices()} onSignOut={vi.fn()} onExpired={vi.fn()} />);
-    await waitFor(() => expect(screen.getByRole('link', { name: 'Tree view' })).toHaveAttribute('href', '#/'));
+    await waitFor(() =>
+      expect(screen.getByRole('link', { name: 'Tree view' })).toHaveAttribute('href', '#/'),
+    );
+  });
+
+  it('offers the PNG export of the canvas (FR-22, OQ-30)', async () => {
+    render(<GraphScreen services={fakeServices()} onSignOut={vi.fn()} onExpired={vi.fn()} />);
+    expect(await screen.findByRole('button', { name: 'Export as PNG' })).toBeInTheDocument();
   });
 });

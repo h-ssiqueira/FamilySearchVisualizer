@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react';
 import ForceGraph from 'force-graph';
-import type { FamilyCard } from '@/domain';
-import type { PersonId } from '@/domain';
-import { nodeLines, type GraphData } from '@/graph';
+import type { FamilyCard, PersonId } from '@/domain';
+import { boxCollisionForce, nodeLines, type GraphData } from '@/graph';
+import { downloadBlob } from './download';
+import { themeStore } from './theme';
 
 const FILL = { male: '#dae8fc', female: '#f8cecc', unknown: '#f5f5f5' } as const;
 const STROKE = { male: '#6c8ebf', female: '#b85450', unknown: '#666666' } as const;
@@ -40,6 +41,7 @@ interface GraphHandle {
   linkColor(color: () => string): GraphHandle;
   linkLineDash(dash: (link: object) => number[]): GraphHandle;
   onNodeClick(handler: (node: object) => void): GraphHandle;
+  d3Force(name: string, force: unknown): GraphHandle;
   graphData(data: { nodes: object[]; links: object[] }): GraphHandle;
   _destructor(): void;
 }
@@ -92,6 +94,7 @@ interface ForceGraphCanvasProps {
   selectedId?: PersonId;
   onSelect: (id: PersonId) => void;
   label: string;
+  exportLabel: string;
   noteText: (note: 'unexpected' | 'unavailable') => string;
 }
 
@@ -99,7 +102,14 @@ interface ForceGraphCanvasProps {
  * The canvas of the graph page. The library owns the canvas and the physics; React only passes the
  * data and listens to clicks. The library is created once and fed new data when the view changes.
  */
-export function ForceGraphCanvas({ data, selectedId, onSelect, label, noteText }: ForceGraphCanvasProps) {
+export function ForceGraphCanvas({
+  data,
+  selectedId,
+  onSelect,
+  label,
+  exportLabel,
+  noteText,
+}: ForceGraphCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<GraphHandle | undefined>(undefined);
   const selectedRef = useRef<PersonId | undefined>(selectedId);
@@ -131,9 +141,10 @@ export function ForceGraphCanvas({ data, selectedId, onSelect, label, noteText }
           (note) => noteTextRef.current(note),
         );
       })
-      .linkColor(() => LINK_COLOR)
       .linkLineDash((link) => ((link as PaintedLink).kind === 'marriage' ? MARRIAGE_DASH : []))
-      .onNodeClick((node) => onSelectRef.current((node as PaintedNode).id));
+      .onNodeClick((node) => onSelectRef.current((node as PaintedNode).id))
+      // Keeps the cards apart: a pair that overlaps is pushed apart (OQ-27 gap, design section 4).
+      .d3Force('collide', boxCollisionForce());
     handleRef.current = handle;
 
     const observer =
@@ -151,6 +162,19 @@ export function ForceGraphCanvas({ data, selectedId, onSelect, label, noteText }
     };
   }, []);
 
+  // The link colour follows the theme (FR-35): read the variable again whenever the theme changes.
+  useEffect(() => {
+    const apply = (): void => {
+      const value = getComputedStyle(document.documentElement)
+        .getPropertyValue('--line')
+        .trim();
+      const color = value === '' ? LINK_COLOR : value;
+      handleRef.current?.linkColor(() => color);
+    };
+    apply();
+    return themeStore.subscribe(apply);
+  }, []);
+
   useEffect(() => {
     handleRef.current?.graphData({
       nodes: data.nodes.map((node) => ({ ...node })),
@@ -158,5 +182,31 @@ export function ForceGraphCanvas({ data, selectedId, onSelect, label, noteText }
     });
   }, [data]);
 
-  return <div ref={containerRef} role="img" aria-label={label} style={{ width: '100%', height: '100%' }} />;
+  /** Saves what is on the canvas as a PNG (FR-22, OQ-30). The canvas is the only thing in it. */
+  const exportPng = (): void => {
+    const canvas = containerRef.current?.querySelector('canvas');
+    if (!canvas) return;
+    canvas.toBlob((blob) => {
+      if (blob) downloadBlob('family-graph.png', blob);
+    }, 'image/png');
+  };
+
+  return (
+    <>
+      <div
+        ref={containerRef}
+        role="img"
+        aria-label={label}
+        style={{ width: '100%', height: '100%' }}
+      />
+      <button
+        type="button"
+        className="button"
+        onClick={exportPng}
+        style={{ position: 'absolute', top: 4, right: 4, zIndex: 2 }}
+      >
+        {exportLabel}
+      </button>
+    </>
+  );
 }
