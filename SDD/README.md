@@ -39,7 +39,7 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 - **Endpoints (OQ-06 resolved):** the app uses the endpoints exactly as in `8-attachments/examples.md` (the website's `platform/users/current` and `service/tree/tree-data/v8/person/{id}/details`); ADR-10 (documented API) is **not adopted** and stays as a fallback. What the samples show is in [API findings](4-design/6-api-findings.md).
 - **Languages (OQ-08 resolved):** English and Brazilian Portuguese (pt-BR), designed to be extended with more locales (ADR-11).
 - **URL (OQ-12 decided, confirmed by the author):** `https://h-ssiqueira.github.io/FamilySearchVisualizer/` (the repository name is the path). Vite `base` = `/FamilySearchVisualizer/`.
-- **Second page (proposed, see [force-graph view](4-design/7-force-graph-view.md)):** a 2D force-directed graph at `#/graph`, drawn with the `force-graph` library over the same data and the same card content; ancestors stay above their descendants; an accessible list covers the canvas (FR-40 to FR-45). Decisions still open: OQ-27 to OQ-31.
+- **Second page (see [force-graph view](4-design/7-force-graph-view.md)):** a 2D force-directed graph at `#/graph`, drawn with the `force-graph` library over the same data, the same card content and the same connection rules (FR-40 to FR-45). Layout is free (OQ-29 decided); the library is a separate chunk (OQ-31 decided); export from the graph page comes after its first implementation (OQ-30 decided).
 - Developer key, app registration and FamilySearch's compatibility review are **out of scope** of this SDD (author's decision). No OAuth client id or redirect URI is used.
 - `4-design/3-interfaces.md` is a draw.io card/layout sketch with synthetic data; the [UI spec](4-design/5-ui-spec.md) is derived from it. `8-attachments/examples.md` holds real personal data and live credentials (action A3, urgent).
 
@@ -83,8 +83,8 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 | OQ-24 | ~~Form of the pedigree-collapse marker~~ **Decided:** an icon (see OQ-26). | FR-11, TC-22, UI spec |
 | OQ-25 | ~~What the crossed-arrows button does~~ **Decided:** each press shows the next family of that person on the same card (cycling); the number of families is shown next to the button. | FR-19, layout, TC-78 |
 | OQ-26 | ~~Which icon marks the pedigree collapse~~ **Decided:** the 🔄 symbol. Fallback if it does not read well at card size: two arrows in the same direction, crossing each other. | FR-11, TC-22, UI spec |
-| OQ-27 | **New (graph page).** Strength of the generation force and the distance between generations (proposed: 60 px between rows; tune on a real tree). | FR-42, graph design |
-| OQ-28 | **New (graph page).** Viewport culling in the graph's node painter: needed at 1,000 nodes, or not? Decide after measuring (TC-90). | graph design, NFR-02 |
-| OQ-29 | **New (graph page).** Generations forced into rows (proposed: yes), or a free layout, less exact but more natural? | FR-42, graph design |
-| OQ-30 | **New (graph page).** Export from the graph page (PNG of the canvas): in this version or later? Proposed: later. | FR-22, graph design |
-| OQ-31 | **New (graph page).** Keep the `force-graph` library in the main bundle, or load the graph page as a separate chunk? Proposed: separate chunk. | graph design, bundle |
+| OQ-27 | Distances of the link and couple forces in the graph page (proposed: parent-child longer than marriage; tuned on a real tree). | FR-42, graph design |
+| OQ-28 | Viewport culling in the graph's node painter: needed at 1,000 nodes, or not? Decide after measuring (TC-90). | graph design, NFR-02 |
+| OQ-29 | ~~Layout of the graph page~~ **Decided: free force layout**, with the same connection rules as the tree (FR-42). | FR-42, graph design |
+| OQ-30 | ~~Export from the graph page~~ **Decided: after the first implementation of the graph page.** | FR-22, graph design |
+| OQ-31 | ~~Bundle of the graph page~~ **Decided: separate chunk**, loaded when the page opens. | graph design, bundle |

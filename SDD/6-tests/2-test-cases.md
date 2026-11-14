@@ -122,8 +122,9 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 |----|-----|-------|------|
 | TC-84 | FR-41 | C | Route `#/graph` renders the graph page; the tree page links to it and back; the selected view level is kept between the two pages (planned) |
 | TC-85 | FR-41 | I | Switching to the graph makes no new FamilySearch request for people already loaded (planned) |
-| TC-86 | FR-40, FR-42 | U | The graph data maps every card to a node and every parent-child and marriage pair to a link; the generation sets the row force (planned, `src/graph/graphData.test.ts`) |
+| TC-86 | FR-40, FR-42 | U | The graph data maps every card to a node, every parent-child pair to a solid link and every couple to a dashed marriage link, with the same endpoints as the tree (planned, `src/graph/graphData.test.ts`) |
 | TC-87 | FR-43 | U | A node's size and text lines equal the card's (`cardWidth`, `cardLines`); unexpected, unavailable and repeated notes appear as on the tree (planned) |
 | TC-88 | FR-44 | C | Clicking a node selects that person and opens the details panel; the selection is kept when switching to the tree (planned, graph component test with a stubbed library) |
 | TC-89 | FR-45 | C | The accessible list has one row per person, is operable with the keyboard, and selecting a row selects the same person as a node click (planned) |
 | TC-90 | NFR-02 | E | The graph stays responsive with 300 and 1,000 nodes: the layout settles and pan/zoom respond (planned; measured, see OQ-28) |
+| TC-91 | FR-40 | I | The graph page is a separate chunk: the tree page's bundle does not contain the graph library (planned, build check) |
