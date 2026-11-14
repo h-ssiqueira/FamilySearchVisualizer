@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UnauthorizedError } from '@/api';
 import type { PersonId, ViewLevel } from '@/domain';
 import { applyPreferredLocale, useT } from '@/i18n';
 import type { Services } from '@/services';
 import { viewStore } from '@/state/viewStore';
 import { layoutFamily } from '@/tree';
+import { useMemo } from 'react';
 import { ExportButton } from './ExportButton';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { PersonPanel } from './PersonPanel';
@@ -125,6 +126,7 @@ export function TreeScreen({
     <main className="tree-screen">
       <header className="tree-header">
         <h1>{t('tree.heading')}</h1>
+        <a href="#/graph">{t('graph.toGraph')}</a>
         <LanguageSwitcher />
       </header>
       {user.status === 'ready' ? (

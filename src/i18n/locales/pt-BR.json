@@ -71,6 +71,14 @@
       "V3": "Família estendida"
     }
   },
+  "graph": {
+    "heading": "Grafo da família",
+    "toTree": "Visão em árvore",
+    "toGraph": "Visão em grafo",
+    "listHeading": "Pessoas no grafo",
+    "canvas": "Grafo da família. Clique numa pessoa para selecioná-la; a lista ao lado funciona pelo teclado.",
+    "loading": "Carregando o grafo…"
+  },
   "families": {
     "cycle": "Mostrar outra família ({{shown}} de {{total}})"
   },

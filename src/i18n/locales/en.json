@@ -71,6 +71,14 @@
       "V3": "Extended family"
     }
   },
+  "graph": {
+    "heading": "Family graph",
+    "toTree": "Tree view",
+    "toGraph": "Graph view",
+    "listHeading": "People on the graph",
+    "canvas": "Family graph. Click a person to select it; the list beside it works with the keyboard.",
+    "loading": "Loading the graph…"
+  },
   "families": {
     "cycle": "Show another family ({{shown}} of {{total}})"
   },
