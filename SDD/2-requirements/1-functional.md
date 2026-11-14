@@ -52,3 +52,13 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-32 | Menu icons, buttons and the interface have priority over the tree: the tree must never cover or override them. | M |
 | FR-34 | The app reads the tree through a FamilySearch tab that the user opens from the app and marks with a bookmarklet (relay). The relay answers only the two allowed GET endpoints, only to the app's origin, and only while the user's FamilySearch session is active. | M |
 | FR-35 | The interface has a dark theme. It follows the system setting by default; a control on every screen switches between light and dark, and the choice is remembered in this browser. Cards keep light colours so that their text stays readable. The exported SVG keeps a white background. | S |
+
+## Graph page (proposed, see [force-graph design](4-design/7-force-graph-view.md))
+| ID | Requirement | Pri |
+|----|-------------|-----|
+| FR-40 | A second page shows the people and relations of the same view as a 2D force-directed graph, drawn with the `force-graph` library. The tree page is unchanged. | S |
+| FR-41 | The page is at the route `#/graph`. The user switches between the tree and the graph with a control on each page; the view level (V1/V2/V3) and the loaded data are shared, so no new FamilySearch request is made for people already loaded. | S |
+| FR-42 | In the graph, every generation stays in its own row: ancestors above, descendants below, as in the tree (generation force, OQ-29). Partners of a couple are kept close, so the marriage link is short. | S |
+| FR-43 | Each node shows the same card content and colours as the tree: four lines (FR-17), gender colour and cue (FR-27), the unexpected, unavailable and repeated notes (FR-36, FR-38, FR-11). | S |
+| FR-44 | Clicking a node selects that person and opens the details panel (FR-16); nodes can be dragged; the graph can be panned and zoomed. | S |
+| FR-45 | The graph page has an accessible list of the same people, operable with the keyboard; selecting a row selects the same person as a click on the graph (NFR-06). | S |
