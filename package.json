@@ -20,6 +20,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "force-graph": "1.51.4",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router-dom": "^7.18.5",

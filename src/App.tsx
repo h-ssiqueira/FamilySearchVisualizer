@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { startLogin, useToken } from '@/auth';
 import type { AppConfig, ConfigResult } from '@/config';
@@ -9,6 +10,11 @@ import { expireSession, isSessionExpired, signOut } from '@/state';
 import { ConfigError } from '@/ui/ConfigError';
 import { LoginScreen } from '@/ui/LoginScreen';
 import { TreeScreen } from '@/ui/TreeScreen';
+
+/** The graph page is its own chunk: the library is downloaded only when the page opens (OQ-31). */
+const GraphScreen = lazy(() =>
+  import('@/ui/GraphScreen').then((module) => ({ default: module.GraphScreen })),
+);
 
 interface AppProps {
   configResult: ConfigResult;
@@ -21,13 +27,26 @@ interface AuthenticatedProps {
   factory: (config: AppConfig, options: ServiceOptions) => Services;
   transport?: typeof fetch;
   requireToken: boolean;
+  page: 'tree' | 'graph';
 }
 
-function Authenticated({ config, factory, transport, requireToken }: AuthenticatedProps) {
+/**
+ * Both pages share one set of services, so the cache and the queue serve both (FR-41). The view
+ * level is kept in the view store, so the two pages show the same level.
+ */
+function Authenticated({ config, factory, transport, requireToken, page }: AuthenticatedProps) {
+  const t = useT();
   const services = useMemo(
     () => factory(config, { transport, requireToken }),
     [config, factory, transport, requireToken],
   );
+  if (page === 'graph') {
+    return (
+      <Suspense fallback={<p role="status" className="notice">{t('graph.loading')}</p>}>
+        <GraphScreen services={services} onSignOut={signOut} onExpired={expireSession} />
+      </Suspense>
+    );
+  }
   return <TreeScreen services={services} onSignOut={signOut} onExpired={expireSession} />;
 }
 
@@ -47,18 +66,23 @@ export function App({ configResult, createServices: factory = createServices }: 
   const signedIn = token !== null || connection !== undefined;
   const expired = !signedIn && isSessionExpired();
 
+  const signedInAt = (page: 'tree' | 'graph') => (
+    <Authenticated
+      config={config}
+      factory={factory}
+      transport={connection?.fetch}
+      requireToken={connection === undefined}
+      page={page}
+    />
+  );
+
   return (
     <Routes>
       <Route
         path="/"
         element={
           signedIn ? (
-            <Authenticated
-              config={config}
-              factory={factory}
-              transport={connection?.fetch}
-              requireToken={connection === undefined}
-            />
+            signedInAt('tree')
           ) : (
             <>
               {expired ? (
@@ -70,6 +94,10 @@ export function App({ configResult, createServices: factory = createServices }: 
             </>
           )
         }
+      />
+      <Route
+        path="/graph"
+        element={signedIn ? signedInAt('graph') : <Navigate to="/" replace />}
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
