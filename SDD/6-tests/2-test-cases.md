@@ -2,7 +2,7 @@
 
 Format: Given / When / Then. Level: U unit, C component, I integration, E end-to-end, M manual.
 
-Status notes: "(`file`)" points to the test that covers the case. "open" means the behaviour is not implemented or not tested yet. "Decided" means the expected behaviour is fixed, but the code may not follow it yet.
+Status notes: "(`file`)" points to the test that covers the case. "open" means the behaviour is not implemented or not tested yet. "Decided" means the expected behaviour is fixed, but the code may not follow it yet. "Planned" means the test is designed for a feature that is not built yet.
 
 ## Authentication
 | ID | Req | Level | Case |
@@ -116,3 +116,14 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 |----|-----|-------|------|
 | TC-76 | FR-35 | C | The theme button switches to dark, marks the page, remembers the choice, and switches back to light (`theme.test.tsx`) |
 | TC-77 | FR-35 | C | With the choice "system" the page follows the operating system (no explicit marker); the button is labelled in pt-BR (`theme.test.tsx`). Visual contrast in dark mode: open |
+
+## Graph page (planned, see [force-graph design](../4-design/7-force-graph-view.md))
+| ID | Req | Level | Case |
+|----|-----|-------|------|
+| TC-84 | FR-41 | C | Route `#/graph` renders the graph page; the tree page links to it and back; the selected view level is kept between the two pages (planned) |
+| TC-85 | FR-41 | I | Switching to the graph makes no new FamilySearch request for people already loaded (planned) |
+| TC-86 | FR-40, FR-42 | U | The graph data maps every card to a node and every parent-child and marriage pair to a link; the generation sets the row force (planned, `src/graph/graphData.test.ts`) |
+| TC-87 | FR-43 | U | A node's size and text lines equal the card's (`cardWidth`, `cardLines`); unexpected, unavailable and repeated notes appear as on the tree (planned) |
+| TC-88 | FR-44 | C | Clicking a node selects that person and opens the details panel; the selection is kept when switching to the tree (planned, graph component test with a stubbed library) |
+| TC-89 | FR-45 | C | The accessible list has one row per person, is operable with the keyboard, and selecting a row selects the same person as a node click (planned) |
+| TC-90 | NFR-02 | E | The graph stays responsive with 300 and 1,000 nodes: the layout settles and pan/zoom respond (planned; measured, see OQ-28) |
