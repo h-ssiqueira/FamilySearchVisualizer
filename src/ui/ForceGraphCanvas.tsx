@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import ForceGraph from 'force-graph';
-import { cardLines, type FamilyCard, type PersonId } from '@/domain';
+import { cardLines, formatDate, type FamilyCard, type PersonId } from '@/domain';
 import { boxCollisionForce, nodeLines, type GraphData } from '@/graph';
 import { downloadBlob } from './download';
 import { themeStore } from './theme';
@@ -11,7 +11,9 @@ const SYMBOL = { male: '\u2642', female: '\u2640', unknown: '?' } as const;
 const REPEAT_SYMBOL = '\u{1F504}';
 const LINE_Y = [22, 42, 60, 78];
 const LINK_COLOR = '#8a939c';
-const MARRIAGE_DASH = [6, 4];
+/** Same look as the tree (TC-65, TC-67): a parent and a child, or two partners, are joined by solid lines. */
+const PARENT_LINK_DISTANCE = 130;
+const MARRIAGE_LINK_DISTANCE = 70;
 
 /** A node as the library hands it back: our data plus the position the library computes. */
 interface PaintedNode {
@@ -25,6 +27,15 @@ interface PaintedNode {
 
 interface PaintedLink {
   kind: 'parent' | 'marriage';
+  event?: { date?: { text: string }; place?: { text: string } };
+}
+
+/** The marriage line shows its date and place, as on the tree (TC-65). */
+function marriageText(link: PaintedLink): string {
+  if (link.kind !== 'marriage') return '';
+  return [formatDate(link.event?.date), link.event?.place?.text ?? '']
+    .filter((line) => line !== '')
+    .join(' · ');
 }
 
 /**
@@ -41,6 +52,7 @@ interface GraphHandle {
   nodeLabel(label: (node: object) => string): GraphHandle;
   linkColor(color: () => string): GraphHandle;
   linkLineDash(dash: (link: object) => number[]): GraphHandle;
+  linkLabel(label: (link: object) => string): GraphHandle;
   onNodeClick(handler: (node: object) => void): GraphHandle;
   d3Force(name: string, force: unknown): GraphHandle;
   graphData(data: { nodes: object[]; links: object[] }): GraphHandle;
@@ -144,10 +156,19 @@ export function ForceGraphCanvas({
       })
       // Hovering a node shows its full name (FR-44): the card may truncate the text.
       .nodeLabel((node) => cardLines((node as PaintedNode).card.person).name)
-      .linkLineDash((link) => ((link as PaintedLink).kind === 'marriage' ? MARRIAGE_DASH : []))
+      // Same style as the tree: solid lines for parents and children and for the marriage (TC-65, TC-67).
+      .linkLineDash(() => [])
+      .linkLabel((link) => marriageText(link as PaintedLink))
       .onNodeClick((node) => onSelectRef.current((node as PaintedNode).id))
       // Keeps the cards apart: a pair that overlaps is pushed apart (OQ-27 gap, design section 4).
       .d3Force('collide', boxCollisionForce());
+    // Partners are close (the marriage link is short) and children sit at a normal distance.
+    const linkForce = handle.d3Force('link') as unknown as
+      | { distance?: (distance: (link: object) => number) => unknown }
+      | undefined;
+    linkForce?.distance?.((link) =>
+      (link as PaintedLink).kind === 'marriage' ? MARRIAGE_LINK_DISTANCE : PARENT_LINK_DISTANCE,
+    );
     handleRef.current = handle;
 
     const observer =

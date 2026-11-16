@@ -20,10 +20,16 @@ vi.mock('force-graph', () => {
     nodeCanvasObject(): this {
       return this;
     }
+    nodeLabel(): this {
+      return this;
+    }
     linkColor(): this {
       return this;
     }
     linkLineDash(): this {
+      return this;
+    }
+    linkLabel(): this {
       return this;
     }
     onNodeClick(): this {
