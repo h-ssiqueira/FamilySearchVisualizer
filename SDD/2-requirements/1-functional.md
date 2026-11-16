@@ -30,7 +30,7 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 ## Views
 | ID | Requirement | Pri |
 |----|-------------|-----|
-| FR-12 | Ancestor depth is **unlimited**. The app auto-loads a first batch of generations (4, OQ-02), then offers "load next generation" and "load all remaining"; loading shows progress and can be paused/cancelled at any time; it stops by itself when no further parents are known in any branch (see FR-31). | M |
+| FR-12 | Ancestor depth is **unlimited**. The app auto-loads a first batch of generations (4, OQ-02), then offers "load next generation" and "load all remaining". While loading, the toolbar shows the progress: the generations and the people loaded so far. Loading can be paused at any time: what is loaded stays visible, and "load next generation" resumes it. It stops by itself when no further parents are known in any branch (see FR-31). | M |
 | FR-13 | **V2** adds, for every couple shown, all their children (including the root's own spouse and children). | M |
 | FR-14 | **V3** adds the spouses of the children shown in V2 and the children of those unions. | M |
 | FR-15 | The user can switch V1/V2/V3 without reloading data already cached. | M |
@@ -38,7 +38,7 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-17 | A person card shows four lines: name; birth date – death date (age); birth place – death place; person id (see [UI spec](../4-design/5-ui-spec.md)). This holds for every person drawn, in V1, V2 and V3; relatives in V2 and V3 get their details first (FR-37). | M |
 | FR-18 | A card can be expanded to show death place, marriages and the FamilySearch id with a link to the person on familysearch.org. | S |
 | FR-19 | Preferred family (OQ-04): parent families show the preferred one (the first when none is flagged); spouse families show only the flagged ones when one is flagged, and every spouse when none is flagged (FR-30). A person with several spouse families shows a button with two crossed arrows; each press shows the next family on the same card, and the button shows the number of families (OQ-23, OQ-25). Built for spouse families. Other parent sets are not yet selectable. | S |
-| FR-20 | Loading, empty, partial-failure and error states are visible and recoverable (retry per node, FR-33). | M |
+| FR-20 | Loading, empty, partial-failure and error states are visible and recoverable. A person with no parents on record sees a message saying so. A person that could not be loaded is listed with its own "try again" action (FR-33). The error state has a retry action. | M |
 | FR-21 | Pan and zoom of the tree canvas. | S |
 | FR-22 | Export the current view as SVG, PNG or PDF. The PNG and PDF are drawn at twice the size of the screen layout. The PDF is one page with one image, built without an external library. The graph page exports PNG (OQ-30). | C |
 | FR-24 | Cards have a flexible width, between 250 px (minimum) and 360 px (maximum), with a fixed height of 90 px (OQ-19, OQ-22). The width is estimated from the text, so the layout and the card agree. Text above the maximum is truncated with an ellipsis and the full text is in a tooltip. | M |
@@ -59,5 +59,5 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-41 | The page is at the route `#/graph`. The user switches between the tree and the graph with a control on each page; the view level (V1/V2/V3) and the loaded data are shared, so no new FamilySearch request is made for people already loaded. | S |
 | FR-42 | The graph uses a free force layout (OQ-29) with a collision force that keeps cards apart. It follows the same connection rules as the tree: each parent and child is joined by a solid link, and the two partners of a couple by a dashed marriage link, with the marriage date and place; partners are kept close. Ancestors are not forced into rows. | S |
 | FR-43 | Each node shows the same card content and colours as the tree: four lines (FR-17), gender colour and cue (FR-27), the unexpected and unavailable notes (FR-36, FR-38), and the repeat symbol on a repeated ancestor. | S |
-| FR-44 | Clicking a node selects that person and opens the details panel (FR-16); nodes can be dragged; the graph can be panned and zoomed. | S |
+| FR-44 | Clicking a node selects that person and opens the details panel (FR-16). Hovering a node shows its full name. Nodes can be dragged; the graph can be panned and zoomed. | S |
 | FR-45 | The graph page has an accessible list of the same people, operable with the keyboard; selecting a row selects the same person as a click on the graph (NFR-06). | S |
