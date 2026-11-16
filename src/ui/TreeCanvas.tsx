@@ -10,7 +10,7 @@ import {
 } from 'react';
 import { cardLines, formatDate, type PersonId } from '@/domain';
 import { useT } from '@/i18n';
-import { CARD, type FamilyLayout, type MarriageLink } from '@/tree';
+import { CARD, type FamilyLayout, type MarriageLink, type PositionedCard } from '@/tree';
 import { PersonCard } from './PersonCard';
 import { ZOOM_STEP, usePanZoom, type Size } from './usePanZoom';
 
@@ -22,6 +22,43 @@ const LABEL_MAX = 24;
 const DRAG_THRESHOLD = 4;
 /** The crossed-arrows symbol of the families button (OQ-23). */
 const FAMILIES_SYMBOL = '\u21C4';
+/** Space kept between a card and the edge of the viewport when the card is brought into view. */
+const REVEAL_MARGIN = 20;
+
+/** Arrow keys on a card move the focus to the nearest card in that direction (NFR-06). Screen y grows downwards. */
+const DIRECTIONS: Readonly<Record<string, { dx: number; dy: number }>> = {
+  ArrowLeft: { dx: -1, dy: 0 },
+  ArrowRight: { dx: 1, dy: 0 },
+  ArrowUp: { dx: 0, dy: -1 },
+  ArrowDown: { dx: 0, dy: 1 },
+};
+
+/**
+ * The nearest card from `fromId` in a direction: a card that lies that way counts, the nearest in
+ * that direction wins, and a card far off to the side loses to one straight ahead.
+ */
+function nearestCard(
+  layout: FamilyLayout,
+  fromId: PersonId,
+  direction: { dx: number; dy: number },
+): PositionedCard | undefined {
+  const from = layout.cards.find((entry) => entry.card.id === fromId);
+  if (!from) return undefined;
+  const centreX = (entry: PositionedCard): number => entry.x + entry.width / 2;
+  const centreY = (entry: PositionedCard): number => entry.y + CARD.height / 2;
+  let best: { entry: PositionedCard; score: number } | undefined;
+  for (const entry of layout.cards) {
+    if (entry === from) continue;
+    const offsetX = centreX(entry) - centreX(from);
+    const offsetY = centreY(entry) - centreY(from);
+    const ahead = offsetX * direction.dx + offsetY * direction.dy;
+    if (ahead <= 0) continue;
+    const aside = direction.dx !== 0 ? Math.abs(offsetY) : Math.abs(offsetX);
+    const score = ahead + 2 * aside;
+    if (!best || score < best.score) best = { entry, score };
+  }
+  return best?.entry;
+}
 
 function useElementSize(ref: RefObject<HTMLElement | null>): Size {
   const [size, setSize] = useState<Size>({ width: 0, height: 0 });
@@ -66,6 +103,7 @@ export function TreeCanvas({ layout, selectedId, onSelect, onCycleFamilies }: Tr
     null,
   );
   const fitted = useRef(false);
+  const cardButtons = useRef(new Map<PersonId, HTMLButtonElement>());
   const center = { x: size.width / 2, y: size.height / 2 };
 
   useEffect(() => {
@@ -120,6 +158,33 @@ export function TreeCanvas({ layout, selectedId, onSelect, onCycleFamilies }: Tr
         return;
     }
     event.preventDefault();
+  };
+
+  /** Brings a card into view by panning, when part of it is outside the viewport. */
+  const revealCard = (entry: PositionedCard): void => {
+    if (size.width === 0) return;
+    const left = transform.x + entry.x * transform.scale;
+    const top = transform.y + entry.y * transform.scale;
+    const width = entry.width * transform.scale;
+    const height = CARD.height * transform.scale;
+    let dx = 0;
+    let dy = 0;
+    if (left < 0) dx = -left + REVEAL_MARGIN;
+    else if (left + width > size.width) dx = size.width - (left + width) - REVEAL_MARGIN;
+    if (top < 0) dy = -top + REVEAL_MARGIN;
+    else if (top + height > size.height) dy = size.height - (top + height) - REVEAL_MARGIN;
+    if (dx !== 0 || dy !== 0) panBy(dx, dy);
+  };
+
+  /** The arrow keys on a card focus the nearest card that way, and keep it in view (NFR-06). */
+  const onCardKeyDown = (event: KeyboardEvent<HTMLButtonElement>, id: PersonId): void => {
+    const direction = DIRECTIONS[event.key];
+    if (!direction) return;
+    event.preventDefault();
+    const target = nearestCard(layout, id, direction);
+    if (!target) return;
+    cardButtons.current.get(target.card.id)?.focus({ preventScroll: true });
+    revealCard(target);
   };
 
   // The pointer is captured only once it really drags, so a plain click still reaches the card.
@@ -247,11 +312,16 @@ export function TreeCanvas({ layout, selectedId, onSelect, onCycleFamilies }: Tr
                 <PersonCard person={entry.card.person} />
                 {onSelect ? (
                   <button
+                    ref={(element) => {
+                      if (element) cardButtons.current.set(entry.card.id, element);
+                      else cardButtons.current.delete(entry.card.id);
+                    }}
                     type="button"
                     className="tree-card-button"
                     aria-label={t('tree.select', { name: cardLines(entry.card.person).name })}
                     aria-pressed={selectedId === entry.card.id}
                     onClick={() => onSelect(entry.card.id)}
+                    onKeyDown={(event) => onCardKeyDown(event, entry.card.id)}
                   />
                 ) : null}
                 {families && onCycleFamilies ? (
