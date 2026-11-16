@@ -8,6 +8,8 @@ export interface TreeToolbarProps {
   level: ViewLevel;
   onLevel: (level: ViewLevel) => void;
   generations: number;
+  /** People on the tree so far, for the progress line (FR-12). */
+  people?: number;
   busy: boolean;
   detailsBusy: boolean;
   canLoadMore: boolean;
@@ -29,7 +31,10 @@ export function TreeToolbar(props: TreeToolbarProps) {
     waitSeconds > 0
       ? t('tree.waiting', { seconds: formatNumber(waitSeconds) })
       : busy
-        ? t('tree.loading')
+        ? t('tree.progress', {
+            generations: formatNumber(props.generations),
+            people: formatNumber(props.people ?? 0),
+          })
         : detailsBusy
           ? t('tree.loadingDetails')
           : t('tree.generations', { count: formatNumber(props.generations) });
@@ -56,7 +61,7 @@ export function TreeToolbar(props: TreeToolbarProps) {
         {t('tree.all')}
       </button>
       <button type="button" className="button" disabled={!busy} onClick={props.onStop}>
-        {t('tree.stop')}
+        {t('tree.pause')}
       </button>
       <p role="status" className="tree-status">
         {status}

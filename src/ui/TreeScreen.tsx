@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { UnauthorizedError } from '@/api';
 import type { PersonId, ViewLevel } from '@/domain';
 import { applyPreferredLocale, useT } from '@/i18n';
 import type { Services } from '@/services';
 import { viewStore } from '@/state/viewStore';
 import { layoutFamily } from '@/tree';
-import { useMemo } from 'react';
 import { ExportButton } from './ExportButton';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { PersonPanel } from './PersonPanel';
@@ -40,6 +39,8 @@ function FamilyTreeView({ services, rootId, onSignOut, onExpired }: FamilyTreeVi
   const waitSeconds = useQueueWait(services.queue);
   const layout = useMemo(() => (tree.family ? layoutFamily(tree.family) : undefined), [tree.family]);
   const selected = layout?.cards.find((entry) => entry.card.id === selectedId)?.card;
+  // Only the root is on the tree and nobody is loading: the person has no parents on record (FR-20).
+  const noParents = layout !== undefined && !tree.busy && tree.generations === 0 && layout.cards.length <= 1;
 
   return (
     <>
@@ -47,10 +48,11 @@ function FamilyTreeView({ services, rootId, onSignOut, onExpired }: FamilyTreeVi
         level={level}
         onLevel={setLevel}
         generations={tree.generations}
+        people={tree.people}
         busy={tree.busy}
         detailsBusy={tree.detailsBusy}
         canLoadMore={tree.canLoadMore}
-        failedCount={tree.failed}
+        failedCount={tree.failedIds.length}
         onRetry={tree.retry}
         waitSeconds={waitSeconds}
         onNext={tree.loadNext}
@@ -65,6 +67,25 @@ function FamilyTreeView({ services, rootId, onSignOut, onExpired }: FamilyTreeVi
             {t('tree.retry')}
           </button>
         </div>
+      ) : null}
+      {tree.failedIds.length > 0 ? (
+        <section aria-label={t('tree.failedList')} className="notice">
+          <h2 style={{ fontSize: '1rem' }}>{t('tree.failedList')}</h2>
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            {tree.failedIds.map((id) => (
+              <li key={id} style={{ margin: '0.25rem 0' }}>
+                <button type="button" className="button" disabled={tree.busy} onClick={tree.retry}>
+                  {t('tree.retryPerson', { id })}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+      {noParents ? (
+        <p role="status" className="notice">
+          {t('tree.empty')}
+        </p>
       ) : null}
       {layout ? (
         <>

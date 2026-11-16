@@ -25,16 +25,20 @@ export interface FamilyTreeState {
   family: FamilyView | undefined;
   /** Deepest ancestor generation loaded so far. */
   generations: number;
+  /** People on the tree so far, including the root (FR-12 progress). */
+  people: number;
   /** Ancestors are still being fetched. */
   busy: boolean;
   /** Relatives' details are still being fetched (V2, V3). */
   detailsBusy: boolean;
   canLoadMore: boolean;
   /** People whose details could not be loaded yet (FR-33). */
-  failed: number;
+  failedIds: PersonId[];
   loadNext: () => void;
   loadAll: () => void;
+  /** Pauses the loading (FR-12): what is loaded stays; "load next" resumes it. */
   stop: () => void;
+  /** Loads again the people that failed (FR-20); people already loaded come from the cache. */
   retry: () => void;
   /** Shows the next family of a person on its card (OQ-25); `total` is the number of families. */
   cycleFamilies: (id: PersonId, total: number) => void;
@@ -149,10 +153,11 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
     status: error !== undefined ? 'error' : tree ? 'ready' : 'loading',
     family,
     generations,
+    people: tree ? tree.nodes.length : 0,
     busy: ancestorsBusy,
     detailsBusy,
     canLoadMore,
-    failed: tree ? tree.failed.length : 0,
+    failedIds: tree ? tree.failed : [],
     loadNext,
     loadAll,
     stop,
