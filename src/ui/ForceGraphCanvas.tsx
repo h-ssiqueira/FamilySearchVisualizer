@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import ForceGraph from 'force-graph';
-import type { FamilyCard, PersonId } from '@/domain';
+import { cardLines, type FamilyCard, type PersonId } from '@/domain';
 import { boxCollisionForce, nodeLines, type GraphData } from '@/graph';
 import { downloadBlob } from './download';
 import { themeStore } from './theme';
@@ -38,6 +38,7 @@ interface GraphHandle {
   nodeCanvasObject(
     paint: (node: object, ctx: CanvasRenderingContext2D, scale: number) => void,
   ): GraphHandle;
+  nodeLabel(label: (node: object) => string): GraphHandle;
   linkColor(color: () => string): GraphHandle;
   linkLineDash(dash: (link: object) => number[]): GraphHandle;
   onNodeClick(handler: (node: object) => void): GraphHandle;
@@ -141,6 +142,8 @@ export function ForceGraphCanvas({
           (note) => noteTextRef.current(note),
         );
       })
+      // Hovering a node shows its full name (FR-44): the card may truncate the text.
+      .nodeLabel((node) => cardLines((node as PaintedNode).card.person).name)
       .linkLineDash((link) => ((link as PaintedLink).kind === 'marriage' ? MARRIAGE_DASH : []))
       .onNodeClick((node) => onSelectRef.current((node as PaintedNode).id))
       // Keeps the cards apart: a pair that overlaps is pushed apart (OQ-27 gap, design section 4).
