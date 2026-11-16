@@ -165,13 +165,14 @@ Feature: Views of the tree
     And no further generation is requested beyond it
     # placeholders without a card are removed with FR-11
 
-  @TC-22 @R-06 @unit
+  @TC-22 @R-06 @unit @component @integration
   Scenario: An ancestor reached twice is one card with the repeat symbol
     Given an ancestor is the parent of two branches
     When the tree is built
     Then the ancestor is drawn once, marked with the repeat symbol
     And each child has an edge to that ancestor
-    # covered by: src/tree/ancestors.repeated.test.ts, src/ui/PersonCard.markers.test.tsx
+    And the tree page shows that ancestor once, with the repeat symbol on its card
+    # covered by: src/tree/ancestors.repeated.test.ts (builder), src/ui/PersonCard.markers.test.tsx (card), src/ui/TreeScreen.repeated.test.tsx (tree page)
     # the requirement that owned the marker (FR-11) was removed; the graph page still requires it (FR-43)
 
   @TC-23 @FR-13 @unit
