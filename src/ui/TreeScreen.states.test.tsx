@@ -69,7 +69,7 @@ describe('states of the tree (FR-20, FR-12)', () => {
     ).toBeInTheDocument();
   });
 
-  it('lists a person that failed to load, with its own retry, and loads only that person again', async () => {
+  it('names the failed person in its retry action when the name is known', async () => {
     const people = new Map<string, Person>([
       [
         'R',
@@ -91,9 +91,9 @@ describe('states of the tree (FR-20, FR-12)', () => {
         onExpired={vi.fn()}
       />,
     );
-    fireEvent.click(await screen.findByRole('button', { name: 'Try again: F' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Try again: F Example (F)' }));
     await waitFor(() =>
-      expect(screen.queryByRole('button', { name: 'Try again: F' })).toBeNull(),
+      expect(screen.queryByRole('button', { name: 'Try again: F Example (F)' })).toBeNull(),
     );
     expect(calls.get('F')).toBe(2);
     expect(calls.get('R')).toBe(1);

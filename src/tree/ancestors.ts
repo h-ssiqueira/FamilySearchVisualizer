@@ -75,12 +75,13 @@ function report(
  * requested generation is reached, or when the signal is aborted.
  *
  * A person whose details fail with a transient error does not stop the rest of the tree: it is
- * listed in `failed` and `pending`, so loading again retries it (FR-33). A person with no data
- * (restricted, missing) gets an "unavailable" card in its place, and its branch ends there (TC-43,
- * FR-38). A person whose data came back unexpected keeps its place, marked, and its parents are not
- * requested (TC-15). The same ancestor reached twice is one card, marked as repeated (TC-22); its
- * second parent entry is an extra edge. Every person that cannot be loaded is reported to the
- * console with id, name and reason (FR-39). Only an expired session stops the whole load.
+ * listed in `failed` and `pending`, so loading again retries it (FR-33), and its name is kept in
+ * `failedNames` when the parent entry gave it (FR-20). A person with no data (restricted, missing)
+ * gets an "unavailable" card in its place, and its branch ends there (TC-43, FR-38). A person whose
+ * data came back unexpected keeps its place, marked, and its parents are not requested (TC-15). The
+ * same ancestor reached twice is one card, marked as repeated (TC-22); its second parent entry is an
+ * extra edge. Every person that cannot be loaded is reported to the console with id, name and reason
+ * (FR-39). Only an expired session stops the whole load.
  */
 export async function* buildAncestorTree(
   rootId: PersonId,
@@ -190,6 +191,11 @@ export async function* buildAncestorTree(
       ...next.map((item) => item.id).filter((id) => !placed.has(id)),
       ...failed,
     ]);
+    const failedNames: Record<PersonId, string> = {};
+    for (const id of failed) {
+      const name = names.get(id);
+      if (name !== undefined) failedNames[id] = name;
+    }
     yield {
       view: 'V1',
       root: rootId,
@@ -199,6 +205,7 @@ export async function* buildAncestorTree(
       edges: [...edges],
       pending: [...pending],
       failed: [...failed],
+      failedNames,
     };
   }
 }

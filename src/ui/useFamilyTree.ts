@@ -34,6 +34,8 @@ export interface FamilyTreeState {
   canLoadMore: boolean;
   /** People whose details could not be loaded yet (FR-33). */
   failedIds: PersonId[];
+  /** Names of the people in `failedIds`, when known (FR-20). */
+  failedNames: Readonly<Record<PersonId, string>>;
   loadNext: () => void;
   loadAll: () => void;
   /** Pauses the loading (FR-12): what is loaded stays; "load next" resumes it. */
@@ -158,6 +160,7 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
     detailsBusy,
     canLoadMore,
     failedIds: tree ? tree.failed : [],
+    failedNames: tree?.failedNames ?? {},
     loadNext,
     loadAll,
     stop,

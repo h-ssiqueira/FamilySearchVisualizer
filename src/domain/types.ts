@@ -87,4 +87,6 @@ export interface ViewTree {
   pending: PersonId[];
   /** People whose details could not be loaded because of a transient error (FR-33). */
   failed: PersonId[];
+  /** Names of the failed people, when the parent entry gave one (FR-20). */
+  failedNames?: Readonly<Record<PersonId, string>>;
 }
