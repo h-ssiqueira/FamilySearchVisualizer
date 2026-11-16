@@ -30,7 +30,6 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 ## Views
 | ID | Requirement | Pri |
 |----|-------------|-----|
-| FR-11 | **V1** shows the root and direct ancestors as a binary tree; missing parents render as placeholders (not yet drawn: the unavailable card of FR-38 is used instead); a second occurrence of the same ancestor is marked with the 🔄 icon on its card (TC-22, OQ-24, OQ-26). | M |
 | FR-12 | Ancestor depth is **unlimited**. The app auto-loads a first batch of generations (4, OQ-02), then offers "load next generation" and "load all remaining"; loading shows progress and can be paused/cancelled at any time; it stops by itself when no further parents are known in any branch (see FR-31). | M |
 | FR-13 | **V2** adds, for every couple shown, all their children (including the root's own spouse and children). | M |
 | FR-14 | **V3** adds the spouses of the children shown in V2 and the children of those unions. | M |
@@ -41,7 +40,7 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-19 | Preferred family (OQ-04): parent families show the preferred one (the first when none is flagged); spouse families show only the flagged ones when one is flagged, and every spouse when none is flagged (FR-30). A person with several spouse families shows a button with two crossed arrows; each press shows the next family on the same card, and the button shows the number of families (OQ-23, OQ-25). Built for spouse families. Other parent sets are not yet selectable. | S |
 | FR-20 | Loading, empty, partial-failure and error states are visible and recoverable (retry per node, FR-33). | M |
 | FR-21 | Pan and zoom of the tree canvas. | S |
-| FR-22 | Export the current view as SVG, PNG or PDF. The PNG and PDF are drawn at twice the size of the screen layout. The PDF is one page with one image, built without an external library. The graph page export is planned after its first implementation (OQ-30). | C |
+| FR-22 | Export the current view as SVG, PNG or PDF. The PNG and PDF are drawn at twice the size of the screen layout. The PDF is one page with one image, built without an external library. The graph page exports PNG (OQ-30). | C |
 | FR-24 | Cards have a flexible width, between 250 px (minimum) and 360 px (maximum), with a fixed height of 90 px (OQ-19, OQ-22). The width is estimated from the text, so the layout and the card agree. Text above the maximum is truncated with an ellipsis and the full text is in a tooltip. | M |
 | FR-25 | Dates are shown as `yyyy-MM-dd` when complete, in every locale; partial, approximate or range dates show only what is known or the raw text; no invented day/month. Age is shown only for deceased people; living people show only the birth date. | M |
 | FR-26 | Partners are joined by a horizontal line labelled with the marriage date and location; no card lies on that line: the siblings of each partner are placed on its outer side; children hang from both parents with orthogonal lines; no arrowheads. | M |
@@ -53,12 +52,12 @@ Priority: **M**ust / **S**hould / **C**ould (v1 scope = M and S).
 | FR-34 | The app reads the tree through a FamilySearch tab that the user opens from the app and marks with a bookmarklet (relay). The relay answers only the two allowed GET endpoints, only to the app's origin, and only while the user's FamilySearch session is active. | M |
 | FR-35 | The interface has a dark theme. It follows the system setting by default; a control on every screen switches between light and dark, and the choice is remembered in this browser. Cards keep light colours so that their text stays readable. The exported SVG keeps a white background. | S |
 
-## Graph page (proposed, see [force-graph design](4-design/7-force-graph-view.md))
+## Graph page (implemented, see [force-graph design](4-design/7-force-graph-view.md))
 | ID | Requirement | Pri |
 |----|-------------|-----|
 | FR-40 | A second page shows the people and relations of the same view as a 2D force-directed graph, drawn with the `force-graph` library. The tree page is unchanged. The library is loaded as a separate chunk when the page opens (OQ-31). | S |
 | FR-41 | The page is at the route `#/graph`. The user switches between the tree and the graph with a control on each page; the view level (V1/V2/V3) and the loaded data are shared, so no new FamilySearch request is made for people already loaded. | S |
-| FR-42 | The graph uses a free force layout (OQ-29). It follows the same connection rules as the tree: each parent and child is joined by a solid link, and the two partners of a couple by a dashed marriage link, with the marriage date and place; partners are kept close. Ancestors are not forced into rows. | S |
-| FR-43 | Each node shows the same card content and colours as the tree: four lines (FR-17), gender colour and cue (FR-27), the unexpected, unavailable and repeated notes (FR-36, FR-38, FR-11). | S |
+| FR-42 | The graph uses a free force layout (OQ-29) with a collision force that keeps cards apart. It follows the same connection rules as the tree: each parent and child is joined by a solid link, and the two partners of a couple by a dashed marriage link, with the marriage date and place; partners are kept close. Ancestors are not forced into rows. | S |
+| FR-43 | Each node shows the same card content and colours as the tree: four lines (FR-17), gender colour and cue (FR-27), the unexpected and unavailable notes (FR-36, FR-38), and the repeat symbol on a repeated ancestor. | S |
 | FR-44 | Clicking a node selects that person and opens the details panel (FR-16); nodes can be dragged; the graph can be panned and zoomed. | S |
 | FR-45 | The graph page has an accessible list of the same people, operable with the keyboard; selecting a row selects the same person as a click on the graph (NFR-06). | S |

@@ -1,6 +1,6 @@
-# Force-graph view (second page)
+# Software Design Document: force-graph view (second page)
 
-Status: **Implemented, not executed.** The layout, bundle and export decisions are **Decided** (OQ-29, OQ-30, OQ-31). Open details are in section 12. The page is a second way of drawing the same family data; the tree page stays as it is.
+Status: **Implemented, not executed.** Layout, bundle and export decisions are **Decided** (OQ-29, OQ-30, OQ-31).
 
 ## 1. Purpose
 A second page shows the people and relations of the tree as a 2D force-directed graph, drawn on a canvas with the library [`force-graph`](https://github.com/vasturiano/force-graph) (MIT licence, built on `d3-force`). The graph is for exploring how relatives connect; the tree page remains the reference for reading the pedigree.
@@ -33,7 +33,7 @@ There is no force towards a generation row. Ancestors may end up beside their de
 The simulation runs until it cools down and then stops; dragging a node reheats it for that node only.
 
 ## 5. Rendering
-- The library draws on a canvas through a custom `nodeCanvasObject`: a rectangle with the card colours (gender, FR-27), then the four lines of FR-17, truncated to the card width with an ellipsis. The text is the same as the tree's card text (`nodeLines`). Notes (unexpected, unavailable) and the repeat symbol are drawn as on the tree (FR-36, FR-38, FR-11).
+- The library draws on a canvas through a custom `nodeCanvasObject`: a rectangle with the card colours (gender, FR-27), then the four lines of FR-17, truncated to the card width with an ellipsis. The text is the same as the tree's card text (`nodeLines`). Notes (unexpected, unavailable) and the repeat symbol are drawn as on the tree (FR-36, FR-38).
 - Link colour: read from the `--line` variable, and read again whenever the theme changes (FR-35). Card colours by gender stay light in both themes, as on the tree page.
 - Links: solid for parent-child, dashed for marriage (section 3).
 - The canvas is redrawn by the library; React does not re-render on each tick. The graph is a child component that owns the library instance and updates it only when the data changes.
@@ -55,9 +55,13 @@ The simulation runs until it cools down and then stops; dragging a node reheats 
 
 **Bundle (OQ-31 decided): separate chunk.** The graph page is loaded with a dynamic `import()` when the route is opened, so the tree page does not download the library. TC-91 checks it.
 
-**Dependency: `force-graph`, pinned to `1.51.4`** in `package.json`. This pin comes from the library's documentation index; it is **not yet verified on npm**. Before the lock is regenerated, run `npm view force-graph version` and, if needed, change the pin to the latest published version. Then check its licence (MIT).
+**Dependency: `force-graph`, pinned to `1.51.4`** in `package.json`. This pin comes from the library's documentation index; it is **not yet verified on npm**. Check it with `npm view force-graph version` and change the pin if needed. Then check its licence (MIT).
 
-**Lock file procedure.** `package-lock.json` must match `package.json`. After any change to dependencies, run `npm install` locally, check with `npm ci`, and commit both files. The CI uses `npm ci` when the lock file exists; a mismatch fails the install with `Missing ... from lock file`.
+**Lock file.** `package-lock.json` must match `package.json`. Two ways to keep them in sync:
+1. **Automatic (workflow `sync-lockfile.yml`, once it is committed):** when `package.json` changes on a branch other than `master`, the workflow runs `npm install --package-lock-only` and commits the updated lock file to the same branch. It can also be started by hand from the Actions tab. The commit is made with `GITHUB_TOKEN`, so it does not start the CI of that commit: the next push runs it.
+2. **Manual:** `npm install`, then `npm ci` to check, then commit both files.
+
+The CI installs with `npm ci` when the lock file exists. A mismatch fails the install with `Missing ... from lock file`; the sync workflow prevents that for branches where it runs.
 
 ## 8. Security and privacy
 - The library is bundled, not loaded from a CDN, so the existing CSP (`script-src 'self'`) holds (`5-security/2-security-controls.md`).
