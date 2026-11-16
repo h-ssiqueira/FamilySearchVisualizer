@@ -16,7 +16,7 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 
 ## Conventions
 - IDs: `FR-xx` functional, `NFR-xx` non-functional, `ADR-xx` decisions, `TC-xx` test cases, `OQ-xx` open questions, `R-xx` risks.
-- Status tags: **Decided** (confirmed by the author), **Proposed** (drafted, needs confirmation), **Assumption** (inferred, verify).
+- Status tags: **Decided** (confirmed by the author), **Proposed** (drafted, needs confirmation), **Assumption** (inferred, verify), **Removed** (requirement dropped by decision; its number is not reused).
 
 ## Decisions confirmed so far
 - Pure client-side SPA hosted on GitHub Pages (no backend).
@@ -28,7 +28,8 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 - **Relatives show their details (OQ-05 decided):** every card drawn shows the four lines, dates and places included. Relatives in V2 and V3 are loaded with one request each, served from the cache when already known; a relative that cannot be loaded keeps a light card (FR-33).
 - **Preferred family (OQ-04 decided):** parent families always show the preferred one (the first when none is flagged). Spouse families: when one is flagged as preferred, only the flagged ones are shown; when none is flagged, every spouse is shown (FR-30).
 - **Other families (OQ-23, OQ-25 decided):** a button with two crossed arrows on the card of a person who has other families. Each press shows the next family of that person on the same card, cycling; the number of families is shown next to the button.
-- **Pedigree collapse (OQ-24, OQ-26 decided):** an icon marks the second occurrence of an ancestor: the 🔄 symbol. The alternative (two arrows in the same direction, crossing) is kept as the fallback if 🔄 does not read well at card size.
+- **Pedigree collapse (OQ-24, OQ-26 decided):** an icon marks the second occurrence of an ancestor: the 🔄 symbol. The alternative (two arrows in the same direction, crossing) is kept as the fallback if 🔄 does not read well at card size. The requirement that owned the marker (FR-11) was removed; the marker is still required on the graph page (FR-43).
+- **Placeholders for unknown parents (FR-11) removed:** a missing parent is shown by the unavailable card (FR-38), not by an empty slot.
 - **Large sibling groups (OQ-20 decided):** one long row, with pan and zoom. No wrapping into several rows.
 - **Card width (OQ-19 decided: flexible; OQ-22 decided: 250 px minimum, 360 px maximum, truncation with tooltip above the maximum).**
 - **Unavailable people (TC-43 decided):** a restricted or missing parent or spouse shows an "unavailable" card in its place (FR-38).
@@ -39,7 +40,7 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 - **Endpoints (OQ-06 resolved):** the app uses the endpoints exactly as in `8-attachments/examples.md` (the website's `platform/users/current` and `service/tree/tree-data/v8/person/{id}/details`); ADR-10 (documented API) is **not adopted** and stays as a fallback. What the samples show is in [API findings](4-design/6-api-findings.md).
 - **Languages (OQ-08 resolved):** English and Brazilian Portuguese (pt-BR), designed to be extended with more locales (ADR-11).
 - **URL (OQ-12 decided, confirmed by the author):** `https://h-ssiqueira.github.io/FamilySearchVisualizer/` (the repository name is the path). Vite `base` = `/FamilySearchVisualizer/`.
-- **Second page (see [force-graph view](4-design/7-force-graph-view.md)):** a 2D force-directed graph at `#/graph`, drawn with the `force-graph` library over the same data, the same card content and the same connection rules (FR-40 to FR-45). Layout is free (OQ-29 decided); the library is a separate chunk (OQ-31 decided); export from the graph page comes after its first implementation (OQ-30 decided).
+- **Second page (implemented, see [force-graph view](4-design/7-force-graph-view.md)):** a 2D force-directed graph at `#/graph`, drawn with the `force-graph` library over the same data, the same card content and the same connection rules (FR-40 to FR-45). Layout is free (OQ-29 decided); the library is a separate chunk (OQ-31 decided); PNG export of the graph page (OQ-30 decided).
 - Developer key, app registration and FamilySearch's compatibility review are **out of scope** of this SDD (author's decision). No OAuth client id or redirect URI is used.
 - `4-design/3-interfaces.md` is a draw.io card/layout sketch with synthetic data; the [UI spec](4-design/5-ui-spec.md) is derived from it. `8-attachments/examples.md` holds real personal data and live credentials (action A3, urgent).
 
@@ -66,7 +67,7 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 | OQ-07 | ~~Developer key status~~ **Dropped** (out of scope, author's decision). | – |
 | OQ-08 | ~~UI languages~~ **Resolved:** English and pt-BR, extensible to other locales (ADR-11). | NFR-08 |
 | OQ-09 | ~~Real people in the samples~~ **Confirmed:** `examples.md` has real data and live credentials (action A3); `3-interfaces.md` is synthetic. | NFR-05, R-05, R-07 |
-| OQ-10 | ~~Placement of parents~~ **Decided:** the first parent entry (`parent1`) on the left when gender does not decide (same sex or unknown); man left, woman right otherwise. | data model, FR-11 |
+| OQ-10 | ~~Placement of parents~~ **Decided:** the first parent entry (`parent1`) on the left when gender does not decide (same sex or unknown); man left, woman right otherwise. | data model, FR-28 |
 | OQ-11 | ~~Telemetry~~ **Decided: zero telemetry** (see decisions; NFR-05). | 7-operations, NFR-05 |
 | OQ-12 | ~~Final URL~~ **Decided:** `https://h-ssiqueira.github.io/FamilySearchVisualizer/`, confirmed by the author. | 7-operations |
 | OQ-13 | ~~Production review~~ **Dropped** (out of scope, author's decision). | – |
@@ -80,11 +81,11 @@ Read-only, client-side web app that shows a FamilySearch family tree in progress
 | OQ-21 | ~~How does the SPA get a token?~~ **Decided (author):** through the Google login address above, as in the first lines of `examples.md`. **Open verification:** the samples use the website's session id as Bearer token and run same-origin; a page on `github.io` cannot read that session, so the spike must prove how the token reaches the SPA. Fallbacks if not: paste the token; run on familysearch.org; small proxy (reverses ADR-01). The relay (FR-34) is the path in use. | ADR-01, ADR-02, auth, R-02 |
 | OQ-22 | ~~Flexible card width limits~~ **Decided:** 250 px minimum, 360 px maximum; text above the maximum is truncated with a tooltip. | FR-24, TC-61, TC-63, layout |
 | OQ-23 | ~~Form of the other-families indicator~~ **Decided:** a button with two crossed arrows ("change" symbol) on the card. | FR-19, FR-18, UI spec |
-| OQ-24 | ~~Form of the pedigree-collapse marker~~ **Decided:** an icon (see OQ-26). | FR-11, TC-22, UI spec |
+| OQ-24 | ~~Form of the pedigree-collapse marker~~ **Decided:** an icon (see OQ-26). | TC-22, UI spec |
 | OQ-25 | ~~What the crossed-arrows button does~~ **Decided:** each press shows the next family of that person on the same card (cycling); the number of families is shown next to the button. | FR-19, layout, TC-78 |
-| OQ-26 | ~~Which icon marks the pedigree collapse~~ **Decided:** the 🔄 symbol. Fallback if it does not read well at card size: two arrows in the same direction, crossing each other. | FR-11, TC-22, UI spec |
+| OQ-26 | ~~Which icon marks the pedigree collapse~~ **Decided:** the 🔄 symbol. Fallback if it does not read well at card size: two arrows in the same direction, crossing each other. | TC-22, UI spec |
 | OQ-27 | Distances of the link and couple forces in the graph page (proposed: parent-child longer than marriage; tuned on a real tree). | FR-42, graph design |
-| OQ-28 | Viewport culling in the graph's node painter: needed at 1,000 nodes, or not? Decide after measuring (TC-90). | graph design, NFR-02 |
+| OQ-28 | Viewport culling in the graph's node painter, and a spatial index for the collision force: needed at 1,000 nodes, or not? Decide after measuring (TC-90). | graph design, NFR-02 |
 | OQ-29 | ~~Layout of the graph page~~ **Decided: free force layout**, with the same connection rules as the tree (FR-42). | FR-42, graph design |
-| OQ-30 | ~~Export from the graph page~~ **Decided: after the first implementation of the graph page.** | FR-22, graph design |
+| OQ-30 | ~~Export from the graph page~~ **Decided:** PNG, implemented after the first version of the page. | FR-22, graph design |
 | OQ-31 | ~~Bundle of the graph page~~ **Decided: separate chunk**, loaded when the page opens. | graph design, bundle |

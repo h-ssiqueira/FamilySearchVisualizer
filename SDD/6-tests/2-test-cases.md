@@ -2,7 +2,7 @@
 
 Format: Given / When / Then. Level: U unit, C component, I integration, E end-to-end, M manual.
 
-Status notes: "(`file`)" points to the test that covers the case. "open" means the behaviour is not implemented or not tested yet. "Decided" means the expected behaviour is fixed, but the code may not follow it yet. "Planned" means the test is designed for a feature that is not built yet.
+Status notes: "(`file`)" points to the test that covers the case. "open" means the behaviour is not implemented or not tested yet. "Decided" means the expected behaviour is fixed, but the code may not follow it yet. "Planned" means the test is designed for a feature that is not built yet. "Removed" means the requirement was removed by decision.
 
 ## Authentication
 | ID | Req | Level | Case |
@@ -23,16 +23,16 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 | TC-11 | FR-07 | U | `formalText` present → used; absent → `normalizedText`; both absent → unknown |
 | TC-12 | FR-06 | U | Person with no death → no `ageAtDeath` shown |
 | TC-13 | FR-19 | U | Two parent sets and two spouses → both kept in the model, with the preferred flag (`mappers.parentSets.test.ts`). The views show the preferred family only when one is flagged (`family.preferred.test.ts`; see TC-78). The families button: built for spouse families (TC-81); other parent sets: open |
-| TC-14 | data model | U | Parent with only `parent1` → placeholder for the missing parent. Open: placeholders are not drawn; the unavailable card (TC-43) is used for missing data |
+| TC-14 | – | U | **Removed** with FR-11: placeholders for missing parents are not drawn. Missing data is shown by the unavailable card (TC-43) |
 | TC-15 | FR-36, NFR-12 | C/U | Response in an unexpected shape → the person keeps its place, marked; the card says "Unexpected response" where the dates go; the rest of the tree goes on; its parents are not requested; a root in that state counts as a failure (`ancestors.invalid.test.ts`, `PersonCard.invalid.test.tsx`, `schemaError.test.ts`) |
 | TC-16 | FR-10 | U | Same person requested twice → one network call (`personSource.test.ts`) |
 
 ## Views
 | ID | Req | Level | Case |
 |----|-----|-------|------|
-| TC-20 | FR-11 | U | V1 depth 3 for a complete tree → 1+2+4+8 nodes, binary structure (`ancestors.test.ts`) |
-| TC-21 | FR-11 | U | Unknown ancestors → the unavailable card of TC-43 is drawn in their place; recursion stops. Open: placeholders without a card |
-| TC-22 | FR-11, R-06 | U | Pedigree collapse: same ancestor on two branches → one card, marked with the 🔄 symbol, with an edge from each child (`ancestors.repeated.test.ts`, `PersonCard.markers.test.tsx`). Decided placement: the symbol is on the card itself, not on a second card |
+| TC-20 | – | U | V1 depth 3 for a complete tree → 1+2+4+8 nodes, binary structure (`ancestors.test.ts`). The requirement that owned this case (FR-11) was removed; the case stays as a regression test of the V1 builder |
+| TC-21 | – | U | Unknown ancestors → the unavailable card of TC-43 is drawn in their place; recursion stops. The placeholder without a card is removed with FR-11 |
+| TC-22 | R-06 | U | Pedigree collapse: same ancestor on two branches → one card, marked with the 🔄 symbol, with an edge from each child (`ancestors.repeated.test.ts`, `PersonCard.markers.test.tsx`). Decided placement: the symbol is on the card itself, not on a second card. The requirement that owned the marker (FR-11) was removed; the marker is still required on the graph page (FR-43) |
 | TC-23 | FR-13 | U | V2: for each couple shown, all its children appear; siblings of root appear under root's parents (`family.test.ts`) |
 | TC-24 | FR-13, FR-37 | I | V2: every relative shown gets its details, one request each; relatives already known come from the cache; the people on the line are not requested again (`family.details.test.ts`, `TreeScreen.test.tsx`) |
 | TC-25 | FR-14 | U | V3: each child's spouse(s) and their children appear (`family.test.ts`) |
@@ -117,14 +117,15 @@ Status notes: "(`file`)" points to the test that covers the case. "open" means t
 | TC-76 | FR-35 | C | The theme button switches to dark, marks the page, remembers the choice, and switches back to light (`theme.test.tsx`) |
 | TC-77 | FR-35 | C | With the choice "system" the page follows the operating system (no explicit marker); the button is labelled in pt-BR (`theme.test.tsx`). Visual contrast in dark mode: open |
 
-## Graph page (planned, see [force-graph design](../4-design/7-force-graph-view.md))
+## Graph page (implemented, not executed; see [force-graph design](../4-design/7-force-graph-view.md))
 | ID | Req | Level | Case |
 |----|-----|-------|------|
-| TC-84 | FR-41 | C | Route `#/graph` renders the graph page; the tree page links to it and back; the selected view level is kept between the two pages (planned) |
-| TC-85 | FR-41 | I | Switching to the graph makes no new FamilySearch request for people already loaded (planned) |
-| TC-86 | FR-40, FR-42 | U | The graph data maps every card to a node, every parent-child pair to a solid link and every couple to a dashed marriage link, with the same endpoints as the tree (planned, `src/graph/graphData.test.ts`) |
-| TC-87 | FR-43 | U | A node's size and text lines equal the card's (`cardWidth`, `cardLines`); unexpected, unavailable and repeated notes appear as on the tree (planned) |
-| TC-88 | FR-44 | C | Clicking a node selects that person and opens the details panel; the selection is kept when switching to the tree (planned, graph component test with a stubbed library) |
-| TC-89 | FR-45 | C | The accessible list has one row per person, is operable with the keyboard, and selecting a row selects the same person as a node click (planned) |
-| TC-90 | NFR-02 | E | The graph stays responsive with 300 and 1,000 nodes: the layout settles and pan/zoom respond (planned; measured, see OQ-28) |
-| TC-91 | FR-40 | I | The graph page is a separate chunk: the tree page's bundle does not contain the graph library (planned, build check) |
+| TC-84 | FR-41 | C | Route `#/graph` renders the graph page; the tree page links to it and back; the selected view level is kept between the two pages (`GraphScreen.test.tsx` covers the link back; the level between pages: open) |
+| TC-85 | FR-41 | I | Switching to the graph makes no new FamilySearch request for people already loaded: open (needs a request counter in the graph test) |
+| TC-86 | FR-40, FR-42 | U | The graph data maps every card to a node, every parent-child pair to a solid link and every couple to a dashed marriage link, with the same endpoints as the tree (`graphData.test.ts`) |
+| TC-87 | FR-43 | U | A node's size and text lines equal the card's (`graphData.test.ts`, `cardWidth`, `cardLines`); unexpected, unavailable and repeated notes appear as on the tree (`graphData.test.ts`; the drawing: open, needs a browser) |
+| TC-88 | FR-44 | C | Selecting a person from the list opens the details panel (`GraphScreen.test.tsx`). Clicking a node on the canvas: open (needs a browser) |
+| TC-89 | FR-45 | C | The accessible list has one row per person and selecting a row opens the panel (`GraphScreen.test.tsx`). Keyboard operation: the rows are native buttons, open: check in the browser |
+| TC-90 | NFR-02 | E | The graph stays responsive with 300 and 1,000 nodes: the layout settles and pan/zoom respond. Open: measure in the browser (OQ-28) |
+| TC-91 | FR-40 | I | The graph page is a separate chunk: the tree page's bundle does not contain the graph library. Open: check in the build output |
+| TC-92 | FR-42 | U | The collision force pushes two overlapping cards apart and leaves separated cards alone (`collide.test.ts`) |
