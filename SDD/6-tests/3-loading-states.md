@@ -2,7 +2,7 @@
 
 This file adds the cases for FR-12, FR-20 and FR-44 in Gherkin. It complements `2-test-cases.md`.
 
-**Supersedes TC-58 in `2-test-cases.md`:** the control is now called *Pause* (FR-12), not *Stop*. The scenario below replaces it.
+**Supersedes TC-58 in `2-test-cases.md`:** the control is now called *Pause* (FR-12), not *Stop*.
 
 ```gherkin
 Feature: Loading states of the tree and the graph
@@ -36,17 +36,11 @@ Feature: Loading states of the tree and the graph
     Given a parent whose details failed to load
     When the tree page is shown
     Then the person is listed under "People not loaded"
-    And it has an action "Try again: <id>"
+    And it has an action "Try again: <name> (<id>)", or "Try again: <id>" when the name is not known
     When the user presses that action
     Then the person is requested again
     And the people already loaded are not requested again
-    # covered by: src/ui/TreeScreen.states.test.tsx
-  @TC-95 @open
-  Scenario: The per-person action names the person, not only the id
-    Given a parent whose details failed to load
-    When the list is shown
-    Then the action names the person
-    # open: the failed list keeps the id only; the name comes from the parent entry
+    # covered by: src/ui/TreeScreen.states.test.tsx (named action), src/tree/ancestors.failedNames.test.ts (the name is kept)
 
   @TC-96 @FR-44 @component @open
   Scenario: Hovering a node on the graph shows its full name

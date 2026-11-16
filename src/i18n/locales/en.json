@@ -45,6 +45,7 @@
     "empty": "No parents are recorded for this person.",
     "failedList": "People not loaded",
     "retryPerson": "Try again: {{id}}",
+    "retryPersonNamed": "Try again: {{name}} ({{id}})",
     "waiting": "FamilySearch asked us to wait {{seconds}} s",
     "failed": "{{count}} people could not be loaded",
     "retryFailed": "Retry failed",

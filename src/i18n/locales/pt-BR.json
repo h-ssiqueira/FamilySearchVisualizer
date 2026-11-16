@@ -45,6 +45,7 @@
     "empty": "Nenhum pai está registrado para esta pessoa.",
     "failedList": "Pessoas não carregadas",
     "retryPerson": "Tentar de novo: {{id}}",
+    "retryPersonNamed": "Tentar de novo: {{name}} ({{id}})",
     "waiting": "O FamilySearch pediu para aguardar {{seconds}} s",
     "failed": "{{count}} pessoas não puderam ser carregadas",
     "retryFailed": "Tentar as que falharam",
