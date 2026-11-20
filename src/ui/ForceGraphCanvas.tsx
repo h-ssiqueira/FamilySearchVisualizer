@@ -5,15 +5,24 @@ import { boxCollisionForce, nodeLines, type GraphData } from '@/graph';
 import { downloadBlob } from './download';
 import { themeStore } from './theme';
 
-const FILL = { male: '#dae8fc', female: '#f8cecc', unknown: '#f5f5f5' } as const;
-const STROKE = { male: '#6c8ebf', female: '#b85450', unknown: '#666666' } as const;
+/**
+ * The graph is a network view, not the tree: each person is a circle with the name under it. The
+ * cards stay in the tree page (the card layout is too heavy for a graph).
+ */
+const NODE_RADIUS = 9;
+const LABEL_GAP = 4;
+const LABEL_MAX_WIDTH = 150;
+/** Room kept around each circle for its label, so that the collision force leaves space for the text. */
+const COLLIDE_SIZE = 2 * NODE_RADIUS + 40;
+const FILL = { male: '#7ea6e0', female: '#ea6b66', unknown: '#b3b3b3' } as const;
+const STROKE = { male: '#2f5d9e', female: '#9a3b37', unknown: '#555555' } as const;
 const SYMBOL = { male: '\u2642', female: '\u2640', unknown: '?' } as const;
 const REPEAT_SYMBOL = '\u{1F504}';
-const LINE_Y = [22, 42, 60, 78];
 const LINK_COLOR = '#8a939c';
+const TEXT_COLOR = '#111111';
 /** Same look as the tree (TC-65, TC-67): a parent and a child, or two partners, are joined by solid lines. */
-const PARENT_LINK_DISTANCE = 130;
-const MARRIAGE_LINK_DISTANCE = 70;
+const PARENT_LINK_DISTANCE = 110;
+const MARRIAGE_LINK_DISTANCE = 60;
 
 /** A node as the library hands it back: our data plus the position the library computes. */
 interface PaintedNode {
@@ -60,7 +69,7 @@ interface GraphHandle {
   _destructor(): void;
 }
 
-/** Cuts the text with an ellipsis so that it fits the width (the same rule as the tree card). */
+/** Cuts the text with an ellipsis so that it fits the width. */
 function fit(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
   if (ctx.measureText(text).width <= maxWidth) return text;
   let cut = text;
@@ -70,37 +79,41 @@ function fit(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): str
   return `${cut}\u2026`;
 }
 
-/** Draws one card on the canvas: the same colours, the same four lines and notes as the tree (FR-43). */
+/**
+ * Draws one person: a circle coloured by gender, with the gender symbol and the name under it. A
+ * person whose data is unexpected or unavailable is drawn as a dashed hollow circle, and the note is
+ * written after the name, so the state is never shown by colour alone (NFR-06).
+ */
 function paintNode(
   node: PaintedNode,
   ctx: CanvasRenderingContext2D,
   selected: boolean,
+  textColor: string,
   noteText: (note: 'unexpected' | 'unavailable') => string,
 ): void {
-  const x = (node.x ?? 0) - node.width / 2;
-  const y = (node.y ?? 0) - node.height / 2;
-  const gender = node.card.person.gender;
-  ctx.fillStyle = FILL[gender];
-  ctx.fillRect(x, y, node.width, node.height);
-  ctx.lineWidth = selected ? 3 : 1;
-  ctx.strokeStyle = STROKE[gender];
-  ctx.strokeRect(x, y, node.width, node.height);
-
+  const cx = node.x ?? 0;
+  const cy = node.y ?? 0;
   const lines = nodeLines(node.card);
-  const rows = [
-    `${SYMBOL[gender]} ${lines.name}${lines.repeated ? ` ${REPEAT_SYMBOL}` : ''}`,
-    lines.note ? noteText(lines.note) : lines.dates,
-    lines.places,
-    lines.id,
-  ];
-  ctx.fillStyle = '#000000';
+  const gender = node.card.person.gender;
+  const hollow = lines.note !== undefined;
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, NODE_RADIUS, 0, 2 * Math.PI);
+  ctx.fillStyle = hollow ? '#ffffff' : FILL[gender];
+  ctx.fill();
+  ctx.lineWidth = selected ? 3 : 1.5;
+  ctx.strokeStyle = STROKE[gender];
+  ctx.setLineDash(hollow ? [3, 2] : []);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  const name = `${SYMBOL[gender]} ${lines.name}${lines.repeated ? ` ${REPEAT_SYMBOL}` : ''}`;
+  const label = lines.note ? `${name} \u00b7 ${noteText(lines.note)}` : name;
+  ctx.fillStyle = textColor;
   ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  rows.forEach((text, index) => {
-    if (text === '') return;
-    ctx.font = index === 0 ? 'bold 12px system-ui, sans-serif' : '12px system-ui, sans-serif';
-    ctx.fillText(fit(ctx, text, node.width - 16), x + node.width / 2, y + (LINE_Y[index] ?? 0));
-  });
+  ctx.textBaseline = 'top';
+  ctx.font = '11px system-ui, sans-serif';
+  ctx.fillText(fit(ctx, label, LABEL_MAX_WIDTH), cx, cy + NODE_RADIUS + LABEL_GAP);
 }
 
 interface ForceGraphCanvasProps {
@@ -129,6 +142,7 @@ export function ForceGraphCanvas({
   const selectedRef = useRef<PersonId | undefined>(selectedId);
   const onSelectRef = useRef(onSelect);
   const noteTextRef = useRef(noteText);
+  const textColorRef = useRef(TEXT_COLOR);
 
   useEffect(() => {
     selectedRef.current = selectedId;
@@ -148,21 +162,26 @@ export function ForceGraphCanvas({
       .nodeCanvasObjectMode(() => 'replace')
       .nodeCanvasObject((node, ctx) => {
         const painted = node as PaintedNode;
-        paintNode(painted, ctx, painted.id === selectedRef.current, (note) =>
-          noteTextRef.current(note),
+        paintNode(
+          painted,
+          ctx,
+          painted.id === selectedRef.current,
+          textColorRef.current,
+          (note) => noteTextRef.current(note),
         );
       })
-      // Hovering a node shows its full name (FR-44): the card may truncate the text.
+      // Hovering a node shows its full name, since the label may be cut.
       .nodeLabel((node) => cardLines((node as PaintedNode).card.person).name)
       // Same style as the tree: solid lines for parents and children and for the marriage (TC-65, TC-67).
       .linkLineDash(() => [])
       .linkLabel((link) => marriageText(link as PaintedLink))
       .onNodeClick((node) => onSelectRef.current((node as PaintedNode).id))
-      // Keeps the cards apart: a pair that overlaps is pushed apart (OQ-27 gap, design section 4).
+      // Keeps the circles and their labels apart (OQ-27 gap, design section 4).
       .d3Force('collide', boxCollisionForce());
     // Partners are close (the marriage link is short) and children sit at a normal distance.
     const linkForce = handle.d3Force('link') as
-      { distance?: (distance: (link: object) => number) => unknown } | undefined;
+      | { distance?: (distance: (link: object) => number) => unknown }
+      | undefined;
     linkForce?.distance?.((link) =>
       (link as PaintedLink).kind === 'marriage' ? MARRIAGE_LINK_DISTANCE : PARENT_LINK_DISTANCE,
     );
@@ -183,11 +202,14 @@ export function ForceGraphCanvas({
     };
   }, []);
 
-  // The link colour follows the theme (FR-35): read the variable again whenever the theme changes.
+  // The colours follow the theme (FR-35): read the variables again whenever the theme changes.
   useEffect(() => {
     const apply = (): void => {
-      const value = getComputedStyle(document.documentElement).getPropertyValue('--line').trim();
-      const color = value === '' ? LINK_COLOR : value;
+      const style = getComputedStyle(document.documentElement);
+      const line = style.getPropertyValue('--line').trim();
+      const text = style.getPropertyValue('--text').trim();
+      textColorRef.current = text === '' ? TEXT_COLOR : text;
+      const color = line === '' ? LINK_COLOR : line;
       handleRef.current?.linkColor(() => color);
     };
     apply();
@@ -196,7 +218,8 @@ export function ForceGraphCanvas({
 
   useEffect(() => {
     handleRef.current?.graphData({
-      nodes: data.nodes.map((node) => ({ ...node })),
+      // The collision force uses the size of the circle plus its label; the drawing uses the radius.
+      nodes: data.nodes.map((node) => ({ ...node, width: COLLIDE_SIZE, height: COLLIDE_SIZE })),
       links: data.links.map((link) => ({ ...link })),
     });
   }, [data]);
