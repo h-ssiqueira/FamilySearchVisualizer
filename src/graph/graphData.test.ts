@@ -61,37 +61,47 @@ describe('graph nodes (FR-40, FR-43, TC-87)', () => {
 describe('graph links follow the tree rules (FR-42, TC-86)', () => {
   it('joins the two partners of a parents couple with a marriage link and each partner to the child', () => {
     const data = toGraphData(
-      view(
-        [card('R', 0), card('F', 1), card('M', 1)],
-        [parents(['F', 'M'], ['R'])],
-      ),
+      view([card('R', 0), card('F', 1), card('M', 1)], [parents(['F', 'M'], ['R'])]),
     );
-    expect(data.links).toContainEqual(expect.objectContaining({ kind: 'marriage', source: 'F', target: 'M' }));
-    expect(data.links).toContainEqual(expect.objectContaining({ kind: 'parent', source: 'F', target: 'R' }));
-    expect(data.links).toContainEqual(expect.objectContaining({ kind: 'parent', source: 'M', target: 'R' }));
+    expect(data.links).toContainEqual(
+      expect.objectContaining({ kind: 'marriage', source: 'F', target: 'M' }),
+    );
+    expect(data.links).toContainEqual(
+      expect.objectContaining({ kind: 'parent', source: 'F', target: 'R' }),
+    );
+    expect(data.links).toContainEqual(
+      expect.objectContaining({ kind: 'parent', source: 'M', target: 'R' }),
+    );
     expect(data.links).toHaveLength(3);
   });
 
   it('draws a single parent without a marriage link', () => {
     const data = toGraphData(view([card('R', 0), card('F', 1)], [parents(['F'], ['R'])]));
     expect(data.links.filter((link) => link.kind === 'marriage')).toHaveLength(0);
-    expect(data.links).toEqual([expect.objectContaining({ kind: 'parent', source: 'F', target: 'R' })]);
+    expect(data.links).toEqual([
+      expect.objectContaining({ kind: 'parent', source: 'F', target: 'R' }),
+    ]);
   });
 
   it('joins a person and a spouse with a marriage link and each of them to the children of the union', () => {
     const data = toGraphData(
-      view(
-        [card('R', 0), card('S', 0), card('K', -1)],
-        [union(['R', 'S'], ['K'])],
-      ),
+      view([card('R', 0), card('S', 0), card('K', -1)], [union(['R', 'S'], ['K'])]),
     );
-    expect(data.links).toContainEqual(expect.objectContaining({ kind: 'marriage', source: 'R', target: 'S' }));
-    expect(data.links).toContainEqual(expect.objectContaining({ kind: 'parent', source: 'R', target: 'K' }));
-    expect(data.links).toContainEqual(expect.objectContaining({ kind: 'parent', source: 'S', target: 'K' }));
+    expect(data.links).toContainEqual(
+      expect.objectContaining({ kind: 'marriage', source: 'R', target: 'S' }),
+    );
+    expect(data.links).toContainEqual(
+      expect.objectContaining({ kind: 'parent', source: 'R', target: 'K' }),
+    );
+    expect(data.links).toContainEqual(
+      expect.objectContaining({ kind: 'parent', source: 'S', target: 'K' }),
+    );
   });
 
   it('never links to a person that is not on the view', () => {
-    const data = toGraphData(view([card('R', 0), card('F', 1)], [parents(['F', 'GHOST'], ['R', 'MISSING'])]));
+    const data = toGraphData(
+      view([card('R', 0), card('F', 1)], [parents(['F', 'GHOST'], ['R', 'MISSING'])]),
+    );
     const ends = data.links.flatMap((link) => [link.source, link.target]);
     expect(ends).not.toContain('GHOST');
     expect(ends).not.toContain('MISSING');

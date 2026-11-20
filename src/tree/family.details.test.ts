@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { InvalidDataError, SessionExpiredError, type Person, type PersonRef, type PersonSource, type ViewTree } from '@/domain';
+import {
+  InvalidDataError,
+  SessionExpiredError,
+  type Person,
+  type PersonRef,
+  type PersonSource,
+  type ViewTree,
+} from '@/domain';
 import { buildFamilyView, withDetails } from './family';
 
 const ref = (id: string, gender: PersonRef['gender'] = 'unknown'): PersonRef => ({
@@ -60,7 +67,10 @@ function recordingSource(behaviour: (id: string) => Promise<Person | null>) {
 
 describe('relatives get their details in V2 (OQ-05)', () => {
   it('replaces the light relatives with their full details', async () => {
-    const full = (id: string): Person => ({ ...bare(id), birth: { date: { text: '+1900-01-01', source: 'formal' } } });
+    const full = (id: string): Person => ({
+      ...bare(id),
+      birth: { date: { text: '+1900-01-01', source: 'formal' } },
+    });
     const { source, requested } = recordingSource(async (id) => full(id));
 
     const view = await withDetails(v2(), source);

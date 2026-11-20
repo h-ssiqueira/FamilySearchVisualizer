@@ -72,11 +72,7 @@ describe('pending ancestors (FR-31)', () => {
   });
 
   it('reports what is about to be loaded while it streams, and nothing at the end', async () => {
-    const chain = [
-      person('R', [ref('F', 'male'), ref('M', 'female')]),
-      person('F'),
-      person('M'),
-    ];
+    const chain = [person('R', [ref('F', 'male'), ref('M', 'female')]), person('F'), person('M')];
     const result = await trees(chain, 'all');
     expect(result[0]?.pending.sort()).toEqual(['F', 'M']);
     expect(lastOf(result).pending).toEqual([]);

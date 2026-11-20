@@ -128,7 +128,9 @@ export function useFamilyTree(options: FamilyTreeOptions): FamilyTreeState {
     if (error instanceof UnauthorizedError) onUnauthorized();
   }, [error, onUnauthorized]);
 
-  const generations = tree ? tree.nodes.reduce((max, node) => Math.max(max, node.generation), 0) : 0;
+  const generations = tree
+    ? tree.nodes.reduce((max, node) => Math.max(max, node.generation), 0)
+    : 0;
   const canLoadMore = tree !== undefined && !ancestorsBusy && hasMoreAncestors(tree);
 
   const loadNext = useCallback(() => {

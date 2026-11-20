@@ -4,7 +4,11 @@ import { buildPdf, rgbFromRgba } from './pdf';
 const text = (bytes: Uint8Array): string => new TextDecoder('latin1').decode(bytes);
 
 describe('PDF writer (FR-22)', () => {
-  const pdf = buildPdf({ width: 2, height: 1, deflated: new Uint8Array([120, 156, 3, 0, 0, 0, 0, 1]) });
+  const pdf = buildPdf({
+    width: 2,
+    height: 1,
+    deflated: new Uint8Array([120, 156, 3, 0, 0, 0, 0, 1]),
+  });
 
   it('starts with the PDF header and ends with the end-of-file marker', () => {
     expect(text(pdf).startsWith('%PDF-1.4')).toBe(true);

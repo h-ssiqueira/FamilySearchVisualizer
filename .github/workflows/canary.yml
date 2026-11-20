@@ -1,4 +1,3 @@
-# MOVE ME: see .github/workflows-pending/ci.yml (git mv .github/workflows-pending .github/workflows).
 name: canary
 
 on:

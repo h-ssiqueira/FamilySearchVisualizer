@@ -65,7 +65,8 @@ function useElementSize(ref: RefObject<HTMLElement | null>): Size {
   useEffect(() => {
     const element = ref.current;
     if (!element || typeof ResizeObserver === 'undefined') return;
-    const update = (): void => setSize({ width: element.clientWidth, height: element.clientHeight });
+    const update = (): void =>
+      setSize({ width: element.clientWidth, height: element.clientHeight });
     update();
     const observer = new ResizeObserver(update);
     observer.observe(element);
@@ -99,9 +100,13 @@ export function TreeCanvas({ layout, selectedId, onSelect, onCycleFamilies }: Tr
   const viewportRef = useRef<HTMLDivElement>(null);
   const size = useElementSize(viewportRef);
   const { transform, zoomBy, panBy, fit } = usePanZoom();
-  const drag = useRef<{ x: number; y: number; startX: number; startY: number; panning: boolean } | null>(
-    null,
-  );
+  const drag = useRef<{
+    x: number;
+    y: number;
+    startX: number;
+    startY: number;
+    panning: boolean;
+  } | null>(null);
   const fitted = useRef(false);
   const cardButtons = useRef(new Map<PersonId, HTMLButtonElement>());
   const center = { x: size.width / 2, y: size.height / 2 };
@@ -286,7 +291,13 @@ export function TreeCanvas({ layout, selectedId, onSelect, onCycleFamilies }: Tr
               const lines = marriageLines(link);
               return (
                 <g key={link.coupleId}>
-                  <line className="tree-marriage" x1={link.x1} x2={link.x2} y1={link.y} y2={link.y} />
+                  <line
+                    className="tree-marriage"
+                    x1={link.x1}
+                    x2={link.x2}
+                    y1={link.y}
+                    y2={link.y}
+                  />
                   {lines.map((line, index) => (
                     <text
                       key={line}

@@ -64,9 +64,7 @@ describe('states of the tree (FR-20, FR-12)', () => {
         onExpired={vi.fn()}
       />,
     );
-    expect(
-      await screen.findByText('No parents are recorded for this person.'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('No parents are recorded for this person.')).toBeInTheDocument();
   });
 
   it('names the failed person in its retry action when the name is known', async () => {
@@ -77,7 +75,12 @@ describe('states of the tree (FR-20, FR-12)', () => {
           ...bare('R'),
           gender: 'male',
           parentSets: [
-            { partner1: ref('F', 'male'), partner2: undefined, children: [], preferred: true } as Couple,
+            {
+              partner1: ref('F', 'male'),
+              partner2: undefined,
+              children: [],
+              preferred: true,
+            } as Couple,
           ],
         },
       ],

@@ -59,7 +59,12 @@ describe('console report of people that cannot be loaded (FR-39)', () => {
     await build(source);
 
     const lines = warn.mock.calls.map((call) => String(call[0]));
-    expect(lines.some((line) => line.includes('F') && line.includes('F Example') && line.includes('Error: transient'))).toBe(true);
+    expect(
+      lines.some(
+        (line) =>
+          line.includes('F') && line.includes('F Example') && line.includes('Error: transient'),
+      ),
+    ).toBe(true);
   });
 
   it('writes the reason "no data" for a parent that is restricted or missing', async () => {

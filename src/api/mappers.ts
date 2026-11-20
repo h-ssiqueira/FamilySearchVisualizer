@@ -17,7 +17,11 @@ const dateSchema = z
   .object({ formalText: text, normalizedText: text, localizedText: text })
   .nullish();
 const placeSchema = z
-  .object({ id: z.union([z.string(), z.number()]).nullish(), normalizedText: text, localizedText: text })
+  .object({
+    id: z.union([z.string(), z.number()]).nullish(),
+    normalizedText: text,
+    localizedText: text,
+  })
   .nullish();
 const eventSchema = z
   .object({ details: z.object({ date: dateSchema, place: placeSchema }).nullish() })

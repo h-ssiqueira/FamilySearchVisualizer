@@ -20,9 +20,7 @@ describe('loading progress (FR-12)', () => {
   it('shows the generations and the people loaded so far while loading', () => {
     setLocale(DEFAULT_LOCALE, false);
     render(<TreeToolbar {...base} people={5} />);
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Loading: 2 generations, 5 people',
-    );
+    expect(screen.getByRole('status')).toHaveTextContent('Loading: 2 generations, 5 people');
   });
 
   it('offers pause while loading', () => {

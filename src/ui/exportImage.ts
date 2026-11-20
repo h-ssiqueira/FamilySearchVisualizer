@@ -46,7 +46,9 @@ export async function canvasToPdf(canvas: HTMLCanvasElement): Promise<Blob> {
   if (!context) throw new Error('No 2D canvas context');
   const { data } = context.getImageData(0, 0, canvas.width, canvas.height);
   const rgb = rgbFromRgba(data, canvas.width * canvas.height);
-  const compressed = new Blob([rgb as BlobPart]).stream().pipeThrough(new CompressionStream('deflate'));
+  const compressed = new Blob([rgb as BlobPart])
+    .stream()
+    .pipeThrough(new CompressionStream('deflate'));
   const deflated = new Uint8Array(await new Response(compressed).arrayBuffer());
   return new Blob(
     [buildPdf({ width: canvas.width, height: canvas.height, deflated }) as BlobPart],

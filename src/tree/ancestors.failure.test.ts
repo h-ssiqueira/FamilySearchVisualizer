@@ -32,7 +32,10 @@ function person(id: string, parents: PersonRef[] = [], unions: Couple[] = []): P
   };
 }
 
-async function collect(source: PersonSource, generations: number | 'all' = 'all'): Promise<ViewTree[]> {
+async function collect(
+  source: PersonSource,
+  generations: number | 'all' = 'all',
+): Promise<ViewTree[]> {
   const out: ViewTree[] = [];
   for await (const tree of buildAncestorTree('R', source, { generations })) out.push(tree);
   return out;
@@ -108,14 +111,18 @@ describe('transient failures (FR-33)', () => {
   });
 
   it('keeps the V3 relatives going when one of them cannot be loaded', async () => {
-    const root = person('R', [], [
-      {
-        partner1: ref('S', 'female'),
-        partner2: ref('R', 'male'),
-        children: [ref('K', 'male')],
-        preferred: true,
-      },
-    ]);
+    const root = person(
+      'R',
+      [],
+      [
+        {
+          partner1: ref('S', 'female'),
+          partner2: ref('R', 'male'),
+          children: [ref('K', 'male')],
+          preferred: true,
+        },
+      ],
+    );
     const rootOnly: PersonSource = { getPerson: async (id) => (id === 'R' ? root : null) };
     const v2 = buildFamilyView(lastOf(await collect(rootOnly)), 'V2');
     const failing: PersonSource = {

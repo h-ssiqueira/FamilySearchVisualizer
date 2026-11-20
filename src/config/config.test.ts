@@ -23,9 +23,10 @@ describe('readConfig', () => {
       ok: false,
       missing: ['VITE_FS_LOGIN_URL', 'VITE_FS_API_BASE'],
     });
-    expect(
-      readConfig({ ...valid, VITE_FS_LOGIN_URL: 'https://evil.example/login' }),
-    ).toEqual({ ok: false, missing: ['VITE_FS_LOGIN_URL'] });
+    expect(readConfig({ ...valid, VITE_FS_LOGIN_URL: 'https://evil.example/login' })).toEqual({
+      ok: false,
+      missing: ['VITE_FS_LOGIN_URL'],
+    });
     expect(readConfig({ ...valid, VITE_FS_API_BASE: 'http://www.familysearch.org' })).toEqual({
       ok: false,
       missing: ['VITE_FS_API_BASE'],
@@ -40,7 +41,9 @@ describe('readConfig', () => {
 
 describe('isAllowedLoginUrl', () => {
   it('accepts https addresses of familysearch.org only', () => {
-    expect(isAllowedLoginUrl('https://ident.familysearch.org/oauth2/authorization/google')).toBe(true);
+    expect(isAllowedLoginUrl('https://ident.familysearch.org/oauth2/authorization/google')).toBe(
+      true,
+    );
     expect(isAllowedLoginUrl('https://familysearch.org/')).toBe(true);
     expect(isAllowedLoginUrl('http://ident.familysearch.org/')).toBe(false);
     expect(isAllowedLoginUrl('https://familysearch.org.evil.example/')).toBe(false);

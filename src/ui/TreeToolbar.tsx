@@ -65,9 +65,7 @@ export function TreeToolbar(props: TreeToolbarProps) {
       </button>
       <p role="status" className="tree-status">
         {status}
-        {failedCount > 0
-          ? ` · ${t('tree.failed', { count: formatNumber(failedCount) })}`
-          : ''}
+        {failedCount > 0 ? ` · ${t('tree.failed', { count: formatNumber(failedCount) })}` : ''}
       </p>
       {failedCount > 0 && props.onRetry ? (
         <button type="button" className="button" disabled={busy} onClick={props.onRetry}>

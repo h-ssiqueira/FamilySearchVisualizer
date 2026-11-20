@@ -148,11 +148,8 @@ export function ForceGraphCanvas({
       .nodeCanvasObjectMode(() => 'replace')
       .nodeCanvasObject((node, ctx) => {
         const painted = node as PaintedNode;
-        paintNode(
-          painted,
-          ctx,
-          painted.id === selectedRef.current,
-          (note) => noteTextRef.current(note),
+        paintNode(painted, ctx, painted.id === selectedRef.current, (note) =>
+          noteTextRef.current(note),
         );
       })
       // Hovering a node shows its full name (FR-44): the card may truncate the text.
@@ -165,8 +162,7 @@ export function ForceGraphCanvas({
       .d3Force('collide', boxCollisionForce());
     // Partners are close (the marriage link is short) and children sit at a normal distance.
     const linkForce = handle.d3Force('link') as
-      | { distance?: (distance: (link: object) => number) => unknown }
-      | undefined;
+      { distance?: (distance: (link: object) => number) => unknown } | undefined;
     linkForce?.distance?.((link) =>
       (link as PaintedLink).kind === 'marriage' ? MARRIAGE_LINK_DISTANCE : PARENT_LINK_DISTANCE,
     );
@@ -190,9 +186,7 @@ export function ForceGraphCanvas({
   // The link colour follows the theme (FR-35): read the variable again whenever the theme changes.
   useEffect(() => {
     const apply = (): void => {
-      const value = getComputedStyle(document.documentElement)
-        .getPropertyValue('--line')
-        .trim();
+      const value = getComputedStyle(document.documentElement).getPropertyValue('--line').trim();
       const color = value === '' ? LINK_COLOR : value;
       handleRef.current?.linkColor(() => color);
     };

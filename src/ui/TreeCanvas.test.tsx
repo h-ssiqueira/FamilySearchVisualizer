@@ -70,9 +70,7 @@ describe('TreeCanvas', () => {
   });
 
   it('renders nothing but the controls for an empty layout', () => {
-    render(
-      <TreeCanvas layout={{ cards: [], marriages: [], descents: [], width: 0, height: 0 }} />,
-    );
+    render(<TreeCanvas layout={{ cards: [], marriages: [], descents: [], width: 0, height: 0 }} />);
     expect(screen.queryAllByRole('article')).toHaveLength(0);
     expect(screen.getByRole('button', { name: 'Fit to screen' })).toBeInTheDocument();
   });

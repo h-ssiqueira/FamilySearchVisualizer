@@ -21,7 +21,12 @@ const bare = (id: string): Person => ({
 const root: Person = {
   ...bare('R'),
   parentSets: [
-    { partner1: ref('F', 'male'), partner2: ref('M', 'female'), children: [], preferred: true } as Couple,
+    {
+      partner1: ref('F', 'male'),
+      partner2: ref('M', 'female'),
+      children: [],
+      preferred: true,
+    } as Couple,
   ],
 };
 

@@ -43,12 +43,18 @@ const spouseIds = (person: Person): string[] =>
 
 describe('preferred family (OQ-04, FR-30)', () => {
   it('shows only the preferred spouse family when one is flagged', () => {
-    const person = personWithUnions([union(ref('S1', 'female'), false), union(ref('S2', 'female'), true)]);
+    const person = personWithUnions([
+      union(ref('S1', 'female'), false),
+      union(ref('S2', 'female'), true),
+    ]);
     expect(spouseIds(person)).toEqual(['S2']);
   });
 
   it('shows every spouse family when none is flagged', () => {
-    const person = personWithUnions([union(ref('S1', 'female'), false), union(ref('S2', 'female'), false)]);
+    const person = personWithUnions([
+      union(ref('S1', 'female'), false),
+      union(ref('S2', 'female'), false),
+    ]);
     expect(spouseIds(person)).toEqual(['S1', 'S2']);
   });
 });

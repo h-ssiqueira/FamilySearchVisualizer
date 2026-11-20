@@ -161,7 +161,13 @@ export async function* buildAncestorTree(
               ? 'InvalidDataError: unexpected response shape'
               : 'no data (restricted or not found)',
           );
-          nodes.push({ id: item.id, person: marked, generation, slot: item.slot, role: 'ancestor' });
+          nodes.push({
+            id: item.id,
+            person: marked,
+            generation,
+            slot: item.slot,
+            role: 'ancestor',
+          });
           if (item.childId) edges.push({ from: item.childId, to: item.id, kind: 'parent' });
         }
         continue;

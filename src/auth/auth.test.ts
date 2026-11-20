@@ -78,7 +78,9 @@ describe('startLogin (TC-02)', () => {
   it('navigates to the configured FamilySearch login address', () => {
     const navigate = vi.fn();
     startLogin('https://ident.familysearch.org/oauth2/authorization/google', navigate);
-    expect(navigate).toHaveBeenCalledWith('https://ident.familysearch.org/oauth2/authorization/google');
+    expect(navigate).toHaveBeenCalledWith(
+      'https://ident.familysearch.org/oauth2/authorization/google',
+    );
   });
 
   it('refuses any other address', () => {

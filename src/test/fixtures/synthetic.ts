@@ -37,7 +37,10 @@ export const syntheticPersonResponse = {
       parent1: { id: 'DDDD-DDD', name: 'Jane Example', gender: 'FEMALE', living: false },
       parent2: { id: 'XXXX-XXX', name: 'John Example', gender: 'MALE', living: false },
       event: {
-        details: { date: { formalText: '+1825-05-20' }, place: { normalizedText: 'Campinas, Brazil' } },
+        details: {
+          date: { formalText: '+1825-05-20' },
+          place: { normalizedText: 'Campinas, Brazil' },
+        },
       },
       children: [
         { child: { id: 'EEEE-EEE', name: 'Child Example', gender: 'FEMALE', living: false } },

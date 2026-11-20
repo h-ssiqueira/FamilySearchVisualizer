@@ -12,7 +12,8 @@ export function isAllowedLoginUrl(raw: string): boolean {
     const url = new URL(raw);
     const host = url.hostname.toLowerCase();
     return (
-      url.protocol === 'https:' && (host === 'familysearch.org' || host.endsWith('.familysearch.org'))
+      url.protocol === 'https:' &&
+      (host === 'familysearch.org' || host.endsWith('.familysearch.org'))
     );
   } catch {
     return false;

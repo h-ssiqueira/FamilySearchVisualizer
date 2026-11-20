@@ -1,4 +1,11 @@
-import { cardLines, type FamilyCard, type FamilyCouple, type FamilyView, type LifeEvent, type PersonId } from '@/domain';
+import {
+  cardLines,
+  type FamilyCard,
+  type FamilyCouple,
+  type FamilyView,
+  type LifeEvent,
+  type PersonId,
+} from '@/domain';
 import { CARD, cardWidth } from '@/tree';
 
 /**

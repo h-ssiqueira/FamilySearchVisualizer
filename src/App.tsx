@@ -42,7 +42,13 @@ function Authenticated({ config, factory, transport, requireToken, page }: Authe
   );
   if (page === 'graph') {
     return (
-      <Suspense fallback={<p role="status" className="notice">{t('graph.loading')}</p>}>
+      <Suspense
+        fallback={
+          <p role="status" className="notice">
+            {t('graph.loading')}
+          </p>
+        }
+      >
         <GraphScreen services={services} onSignOut={signOut} onExpired={expireSession} />
       </Suspense>
     );
@@ -95,10 +101,7 @@ export function App({ configResult, createServices: factory = createServices }: 
           )
         }
       />
-      <Route
-        path="/graph"
-        element={signedIn ? signedInAt('graph') : <Navigate to="/" replace />}
-      />
+      <Route path="/graph" element={signedIn ? signedInAt('graph') : <Navigate to="/" replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

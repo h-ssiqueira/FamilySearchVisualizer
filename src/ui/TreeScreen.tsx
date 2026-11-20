@@ -37,10 +37,14 @@ function FamilyTreeView({ services, rootId, onSignOut, onExpired }: FamilyTreeVi
     onUnauthorized: onExpired,
   });
   const waitSeconds = useQueueWait(services.queue);
-  const layout = useMemo(() => (tree.family ? layoutFamily(tree.family) : undefined), [tree.family]);
+  const layout = useMemo(
+    () => (tree.family ? layoutFamily(tree.family) : undefined),
+    [tree.family],
+  );
   const selected = layout?.cards.find((entry) => entry.card.id === selectedId)?.card;
   // Only the root is on the tree and nobody is loading: the person has no parents on record (FR-20).
-  const noParents = layout !== undefined && !tree.busy && tree.generations === 0 && layout.cards.length <= 1;
+  const noParents =
+    layout !== undefined && !tree.busy && tree.generations === 0 && layout.cards.length <= 1;
 
   return (
     <>
@@ -76,7 +80,12 @@ function FamilyTreeView({ services, rootId, onSignOut, onExpired }: FamilyTreeVi
               const name = tree.failedNames[id];
               return (
                 <li key={id} style={{ margin: '0.25rem 0' }}>
-                  <button type="button" className="button" disabled={tree.busy} onClick={tree.retry}>
+                  <button
+                    type="button"
+                    className="button"
+                    disabled={tree.busy}
+                    onClick={tree.retry}
+                  >
                     {name
                       ? t('tree.retryPersonNamed', { name, id })
                       : t('tree.retryPerson', { id })}

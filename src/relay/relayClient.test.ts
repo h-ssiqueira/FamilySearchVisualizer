@@ -39,7 +39,11 @@ function fakeBus() {
   return { bus, emit };
 }
 
-const fromRelay = (target: FakeTarget, data: unknown, origin = RELAY_ORIGIN): RelayMessageEvent => ({
+const fromRelay = (
+  target: FakeTarget,
+  data: unknown,
+  origin = RELAY_ORIGIN,
+): RelayMessageEvent => ({
   origin,
   source: target,
   data,
@@ -176,9 +180,9 @@ describe('connectRelay (SDD FR-34)', () => {
     const connecting = connectRelay({ open: () => target, bus, requestTimeoutMs: 20 });
     emit(fromRelay(target, READY));
     const connection = await connecting;
-    await expect(connection.fetch('https://www.familysearch.org/platform/users/current')).rejects.toBeInstanceOf(
-      RelayTimeoutError,
-    );
+    await expect(
+      connection.fetch('https://www.familysearch.org/platform/users/current'),
+    ).rejects.toBeInstanceOf(RelayTimeoutError);
     connection.close();
   });
 
@@ -196,8 +200,8 @@ describe('connectRelay (SDD FR-34)', () => {
     connection.close();
     expect(notified).toBe(1);
     expect(connection.isOpen).toBe(false);
-    await expect(connection.fetch('https://www.familysearch.org/platform/users/current')).rejects.toBeInstanceOf(
-      RelayClosedError,
-    );
+    await expect(
+      connection.fetch('https://www.familysearch.org/platform/users/current'),
+    ).rejects.toBeInstanceOf(RelayClosedError);
   });
 });
