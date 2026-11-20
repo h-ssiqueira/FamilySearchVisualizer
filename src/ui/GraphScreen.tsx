@@ -47,10 +47,11 @@ function GraphView({ services, rootId, onSignOut, onExpired }: GraphViewProps) {
         level={level}
         onLevel={setLevel}
         generations={tree.generations}
+        people={tree.people}
         busy={tree.busy}
         detailsBusy={tree.detailsBusy}
         canLoadMore={tree.canLoadMore}
-        failedCount={tree.failed}
+        failedCount={tree.failedIds.length}
         onRetry={tree.retry}
         waitSeconds={waitSeconds}
         onNext={tree.loadNext}

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import ForceGraph from 'force-graph';
-import { cardLines, formatDate, type FamilyCard, type PersonId } from '@/domain';
+import { cardLines, formatDate, type FamilyCard, type LifeEvent, type PersonId } from '@/domain';
 import { boxCollisionForce, nodeLines, type GraphData } from '@/graph';
 import { downloadBlob } from './download';
 import { themeStore } from './theme';
@@ -27,7 +27,7 @@ interface PaintedNode {
 
 interface PaintedLink {
   kind: 'parent' | 'marriage';
-  event?: { date?: { text: string }; place?: { text: string } };
+  event?: LifeEvent;
 }
 
 /** The marriage line shows its date and place, as on the tree (TC-65). */
@@ -35,7 +35,7 @@ function marriageText(link: PaintedLink): string {
   if (link.kind !== 'marriage') return '';
   return [formatDate(link.event?.date), link.event?.place?.text ?? '']
     .filter((line) => line !== '')
-    .join(' · ');
+    .join(' \u00b7 ');
 }
 
 /**
@@ -54,6 +54,7 @@ interface GraphHandle {
   linkLineDash(dash: (link: object) => number[]): GraphHandle;
   linkLabel(label: (link: object) => string): GraphHandle;
   onNodeClick(handler: (node: object) => void): GraphHandle;
+  d3Force(name: string): unknown;
   d3Force(name: string, force: unknown): GraphHandle;
   graphData(data: { nodes: object[]; links: object[] }): GraphHandle;
   _destructor(): void;
@@ -163,7 +164,7 @@ export function ForceGraphCanvas({
       // Keeps the cards apart: a pair that overlaps is pushed apart (OQ-27 gap, design section 4).
       .d3Force('collide', boxCollisionForce());
     // Partners are close (the marriage link is short) and children sit at a normal distance.
-    const linkForce = handle.d3Force('link') as unknown as
+    const linkForce = handle.d3Force('link') as
       | { distance?: (distance: (link: object) => number) => unknown }
       | undefined;
     linkForce?.distance?.((link) =>
