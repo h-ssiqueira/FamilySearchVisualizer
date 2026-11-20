@@ -105,8 +105,14 @@ describe('relay script (SDD FR-34)', () => {
       url: 'https://evil.example/platform/users/current',
     });
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(app.postMessage).toHaveBeenCalledWith(expect.objectContaining({ id: '4', status: 403 }), APP);
-    expect(app.postMessage).toHaveBeenCalledWith(expect.objectContaining({ id: '5', status: 403 }), APP);
+    expect(app.postMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ id: '4', status: 403 }),
+      APP,
+    );
+    expect(app.postMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ id: '5', status: 403 }),
+      APP,
+    );
   });
 
   it('ignores messages from another origin or from a window that is not the opener', () => {

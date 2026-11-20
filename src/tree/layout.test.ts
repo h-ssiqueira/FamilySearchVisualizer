@@ -44,7 +44,13 @@ describe('layoutAncestors', () => {
 
   it('does not overlap cards of the same generation', () => {
     const positioned = layoutAncestors(
-      treeOf([node('R', 0, 0), node('F', 1, 0), node('M', 1, 1), node('GF', 2, 0), node('GM', 2, 3)]),
+      treeOf([
+        node('R', 0, 0),
+        node('F', 1, 0),
+        node('M', 1, 1),
+        node('GF', 2, 0),
+        node('GM', 2, 3),
+      ]),
     );
     const top = positioned.filter((entry) => entry.node.generation === 2);
     const [left, right] = top;

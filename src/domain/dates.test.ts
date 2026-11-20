@@ -3,10 +3,12 @@ import { formatDate, isIsoDate, makeDateText, toIsoDisplay } from './dates';
 
 describe('makeDateText', () => {
   it('prefers a formal ISO date', () => {
-    expect(makeDateText({ formalText: '+1800-12-31', normalizedText: '31 December 1800' })).toEqual({
-      text: '+1800-12-31',
-      source: 'formal',
-    });
+    expect(makeDateText({ formalText: '+1800-12-31', normalizedText: '31 December 1800' })).toEqual(
+      {
+        text: '+1800-12-31',
+        source: 'formal',
+      },
+    );
   });
 
   it('falls back to normalized prose when the formal date is null', () => {

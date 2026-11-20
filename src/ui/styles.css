@@ -15,7 +15,12 @@
   --disabled: #767676;
   --focus: #f2a900;
   color-scheme: light;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
 }
 
 /* Dark theme: explicit choice, or the system setting when the page has no explicit choice. */

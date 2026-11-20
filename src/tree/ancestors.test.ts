@@ -75,7 +75,9 @@ describe('buildAncestorTree', () => {
 
   it('places the man on the left and the woman on the right, whichever order the API gives', async () => {
     const people = [person('R', [ref('M', 'female'), ref('F', 'male')]), person('F'), person('M')];
-    const last = (await collect(buildAncestorTree('R', sourceOf(people), { generations: 1 }))).at(-1);
+    const last = (await collect(buildAncestorTree('R', sourceOf(people), { generations: 1 }))).at(
+      -1,
+    );
     const slotOf = (id: string) => last?.nodes.find((node) => node.id === id)?.slot;
     expect(slotOf('F')).toBe(0);
     expect(slotOf('M')).toBe(1);
@@ -90,7 +92,9 @@ describe('buildAncestorTree', () => {
       person('Q1'),
       person('Q2'),
     ];
-    const last = (await collect(buildAncestorTree('R', sourceOf(people), { generations: 'all' }))).at(-1);
+    const last = (
+      await collect(buildAncestorTree('R', sourceOf(people), { generations: 'all' }))
+    ).at(-1);
     expect(last?.nodes.filter((node) => node.id === 'P')).toHaveLength(1);
     expect(last?.edges).toContainEqual({ from: 'F', to: 'P', kind: 'parent' });
     expect(last?.edges).toContainEqual({ from: 'M', to: 'P', kind: 'parent' });
@@ -99,9 +103,13 @@ describe('buildAncestorTree', () => {
   it('shows a person the source has no data for as unavailable, and ends that branch (TC-43)', async () => {
     // F is not in the source: it keeps its card from the parent entry, marked unavailable.
     const people = [person('R', [ref('F', 'male'), ref('M', 'female')]), person('M')];
-    const last = (await collect(buildAncestorTree('R', sourceOf(people), { generations: 'all' }))).at(-1);
+    const last = (
+      await collect(buildAncestorTree('R', sourceOf(people), { generations: 'all' }))
+    ).at(-1);
     expect(last?.nodes.map((node) => node.id)).toEqual(['R', 'F', 'M']);
-    expect(last?.nodes.find((node) => node.id === 'F')?.person).toMatchObject({ unavailable: true });
+    expect(last?.nodes.find((node) => node.id === 'F')?.person).toMatchObject({
+      unavailable: true,
+    });
   });
 
   it('yields nothing when it is aborted before it starts (TC-44)', async () => {

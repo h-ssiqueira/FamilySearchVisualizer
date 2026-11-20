@@ -65,7 +65,9 @@ describe('ExportButton (FR-22)', () => {
   });
 
   it('disables every export when there is nothing to export', () => {
-    render(<ExportButton layout={{ cards: [], marriages: [], descents: [], width: 0, height: 0 }} />);
+    render(
+      <ExportButton layout={{ cards: [], marriages: [], descents: [], width: 0, height: 0 }} />,
+    );
     expect(screen.getByRole('button', { name: 'Export as SVG' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Export as PNG' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Export as PDF' })).toBeDisabled();

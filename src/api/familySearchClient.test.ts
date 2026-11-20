@@ -81,7 +81,9 @@ describe('createFamilySearchClient', () => {
       status: 404,
     });
     server.use(http.get(PERSON_URL, () => new HttpResponse(null, { status: 403 })));
-    await expect(makeClient().getPersonDetails('XXXX-XXX')).rejects.toBeInstanceOf(UnavailableError);
+    await expect(makeClient().getPersonDetails('XXXX-XXX')).rejects.toBeInstanceOf(
+      UnavailableError,
+    );
   });
 
   it('maps other failures to HttpError', async () => {
@@ -112,7 +114,8 @@ describe('createFamilySearchClient', () => {
     server.use(
       http.get(PERSON_URL, () => {
         calls += 1;
-        if (calls === 1) return new HttpResponse(null, { status: 429, headers: { 'Retry-After': '0' } });
+        if (calls === 1)
+          return new HttpResponse(null, { status: 429, headers: { 'Retry-After': '0' } });
         return HttpResponse.json(syntheticPersonResponse);
       }),
     );

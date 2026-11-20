@@ -138,7 +138,12 @@ export function buildFamilyView(
     if (level === 'V2') {
       for (const child of source.children) {
         if (!cards.has(child.id)) {
-          cards.set(child.id, { id: child.id, person: child, role: 'sibling', row: node.generation });
+          cards.set(child.id, {
+            id: child.id,
+            person: child,
+            role: 'sibling',
+            row: node.generation,
+          });
         }
       }
     }

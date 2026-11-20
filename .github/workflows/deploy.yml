@@ -1,4 +1,3 @@
-# MOVE ME: see .github/workflows-pending/ci.yml (git mv .github/workflows-pending .github/workflows).
 # The repository's default branch is `master`: that is the branch that deploys.
 name: deploy
 
@@ -22,15 +21,16 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      # TODO: pin third-party actions by commit SHA (SDD security controls, section 3).
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
+          cache: npm
       - name: Install
-        run: |
-          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+        run: npm ci
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run test:coverage

@@ -20,7 +20,12 @@ export function isAllowedRequest(url: string, method: string, apiBase: string): 
     return false;
   }
   if (base.protocol !== 'https:' || target.origin !== base.origin) return false;
-  if (target.search !== '' || target.hash !== '' || target.username !== '' || target.password !== '') {
+  if (
+    target.search !== '' ||
+    target.hash !== '' ||
+    target.username !== '' ||
+    target.password !== ''
+  ) {
     return false;
   }
   return ALLOWED_PATHS.some((pattern) => pattern.test(target.pathname));

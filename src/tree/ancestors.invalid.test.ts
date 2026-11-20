@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { InvalidDataError, type Couple, type Person, type PersonRef, type PersonSource, type ViewTree } from '@/domain';
+import {
+  InvalidDataError,
+  type Couple,
+  type Person,
+  type PersonRef,
+  type PersonSource,
+  type ViewTree,
+} from '@/domain';
 import { buildAncestorTree } from './ancestors';
 import { buildFamilyView, hasMoreAncestors } from './family';
 
@@ -19,7 +26,11 @@ const bare = (id: string): Person => ({
   unions: [],
 });
 
-const couple = (partner1: PersonRef, partner2: PersonRef | undefined, children: PersonRef[]): Couple => ({
+const couple = (
+  partner1: PersonRef,
+  partner2: PersonRef | undefined,
+  children: PersonRef[],
+): Couple => ({
   partner1,
   ...(partner2 ? { partner2 } : {}),
   children,

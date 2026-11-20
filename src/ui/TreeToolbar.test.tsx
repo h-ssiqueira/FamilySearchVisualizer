@@ -37,14 +37,14 @@ describe('TreeToolbar', () => {
   it('shows the generations loaded when idle', () => {
     render(<TreeToolbar {...propsWith()} />);
     expect(screen.getByRole('status')).toHaveTextContent('Generations loaded: 3');
-    expect(screen.getByRole('button', { name: 'Stop' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeDisabled();
   });
 
-  it('shows that it is loading and lets the user stop (FR-12, TC-58)', () => {
+  it('shows that it is loading and lets the user pause (FR-12, TC-58)', () => {
     const props = propsWith({ busy: true, canLoadMore: false });
     render(<TreeToolbar {...props} />);
-    expect(screen.getByRole('status')).toHaveTextContent('Loading…');
-    fireEvent.click(screen.getByRole('button', { name: 'Stop' }));
+    expect(screen.getByRole('status')).toHaveTextContent('Loading');
+    fireEvent.click(screen.getByRole('button', { name: 'Pause' }));
     expect(props.onStop).toHaveBeenCalledTimes(1);
   });
 

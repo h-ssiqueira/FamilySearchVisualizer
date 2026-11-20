@@ -36,7 +36,8 @@ describe('PersonCard', () => {
   });
 
   it('keeps the full text in the tooltip when a place is long (TC-63)', () => {
-    const longPlace = 'A very long place name, in a very long region, in a very long country, far away';
+    const longPlace =
+      'A very long place name, in a very long region, in a very long country, far away';
     const living: Person = {
       ...john,
       living: true,

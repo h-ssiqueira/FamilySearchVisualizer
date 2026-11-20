@@ -23,7 +23,10 @@ function withParents(id: string, father: PersonRef, mother: PersonRef): Person {
   return { ...bare(id), parentSets: [couple] };
 }
 
-async function lastTree(source: PersonSource, generations: number | 'all' = 'all'): Promise<ViewTree> {
+async function lastTree(
+  source: PersonSource,
+  generations: number | 'all' = 'all',
+): Promise<ViewTree> {
   let last: ViewTree | undefined;
   for await (const tree of buildAncestorTree('R', source, { generations })) last = tree;
   if (!last) throw new Error('no tree was built');

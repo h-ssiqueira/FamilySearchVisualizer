@@ -67,9 +67,7 @@ describe('layoutFamily', () => {
     expect(at(layout, 'F').y).toBe(at(layout, 'M').y);
     expect(at(layout, 'R').y).toBeGreaterThan(at(layout, 'F').y);
     expect(center(at(layout, 'R'))).toBe((center(at(layout, 'F')) + center(at(layout, 'M'))) / 2);
-    expect(center(at(layout, 'M')) - center(at(layout, 'F'))).toBe(
-      CARD.width + SPACING.partnerGap,
-    );
+    expect(center(at(layout, 'M')) - center(at(layout, 'F'))).toBe(CARD.width + SPACING.partnerGap);
   });
 
   it('draws siblings side by side, centred under the couple (TC-68)', () => {
@@ -179,10 +177,7 @@ describe('layoutFamily', () => {
   it('links the couple with a marriage line and each parent with each child (TC-65, TC-67)', () => {
     const event: LifeEvent = { date: { text: '+1825-05-20', source: 'formal' } };
     const layout = layoutFamily(
-      viewOf(
-        [card('R', 0), card('F', 1), card('M', 1)],
-        [parents(['F', 'M'], ['R'], event)],
-      ),
+      viewOf([card('R', 0), card('F', 1), card('M', 1)], [parents(['F', 'M'], ['R'], event)]),
     );
     const father = at(layout, 'F');
     const mother = at(layout, 'M');

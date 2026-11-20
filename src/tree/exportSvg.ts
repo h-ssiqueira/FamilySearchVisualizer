@@ -24,7 +24,9 @@ const clip = (text: string): string =>
   text.length > MAX_CHARS ? `${text.slice(0, MAX_CHARS - 1)}…` : text;
 
 function marriageLines(link: MarriageLink): string[] {
-  return [formatDate(link.event?.date), link.event?.place?.text ?? ''].filter((line) => line !== '');
+  return [formatDate(link.event?.date), link.event?.place?.text ?? ''].filter(
+    (line) => line !== '',
+  );
 }
 
 /**

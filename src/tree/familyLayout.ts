@@ -241,7 +241,11 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
    * The children of a couple in the order they are drawn. A partner on the left has its
    * siblings to its left (its own card last); a partner on the right has them to its right.
    */
-  function orderedChildren(childIds: readonly PersonId[], selfId: PersonId, side?: Side): PersonId[] {
+  function orderedChildren(
+    childIds: readonly PersonId[],
+    selfId: PersonId,
+    side?: Side,
+  ): PersonId[] {
     const others = childIds.filter((childId) => childId !== selfId);
     if (side === 'left') return [...others, selfId];
     if (side === 'right') return [selfId, ...others];
@@ -254,10 +258,7 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
   function buildBlock(id: PersonId, side?: Side): Placement[] {
     placedLine.add(id);
     const couple = parentCoupleOf.get(id);
-    const group = layoutChildren(
-      couple ? orderedChildren(couple.childIds, id, side) : [id],
-      id,
-    );
+    const group = layoutChildren(couple ? orderedChildren(couple.childIds, id, side) : [id], id);
     if (group.placements.length === 0) return [];
 
     const row = cards.get(id)?.row ?? 0;
@@ -271,7 +272,10 @@ export function layoutFamily(view: FamilyView): FamilyLayout {
     const partnerIds = couple && couple.kind === 'parents' ? couple.partnerIds : [];
     partnerIds.forEach((partnerId, index) => {
       if (!isLine(partnerId) || placedLine.has(partnerId)) return;
-      blocks.push({ id: partnerId, placements: buildBlock(partnerId, index === 0 ? 'left' : 'right') });
+      blocks.push({
+        id: partnerId,
+        placements: buildBlock(partnerId, index === 0 ? 'left' : 'right'),
+      });
     });
     const [first, second] = blocks;
 

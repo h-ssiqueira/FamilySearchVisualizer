@@ -85,7 +85,11 @@ export function createFamilySearchClient(options: ClientOptions): FamilySearchCl
    * A network failure (the request never got an answer) is retried with exponential back-off.
    * An HTTP answer, even an error one, is not retried here: throttling is handled by the queue.
    */
-  async function fetchWithBackoff(url: string, init: RequestInit, signal: AbortSignal): Promise<Response> {
+  async function fetchWithBackoff(
+    url: string,
+    init: RequestInit,
+    signal: AbortSignal,
+  ): Promise<Response> {
     for (let attempt = 0; ; attempt += 1) {
       try {
         return await doFetch(url, { ...init, signal });
