@@ -99,6 +99,6 @@ describe('states of the tree (FR-20, FR-12)', () => {
       expect(screen.queryByRole('button', { name: 'Try again: F Example (F)' })).toBeNull(),
     );
     expect(calls.get('F')).toBe(2);
-    expect(calls.get('R')).toBe(1);
+    expect(calls.get('R')).toBe(2);
   });
 });
