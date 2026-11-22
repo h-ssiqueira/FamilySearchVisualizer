@@ -12,7 +12,7 @@ import { themeStore } from './theme';
 const NODE_RADIUS = 9;
 const LABEL_GAP = 4;
 const LABEL_MAX_WIDTH = 150;
-/** Room kept around each circle for its label, so that the collision force leaves space for the text. */
+/** Room kept around each circle for its label, so the collision force leaves space for the text. */
 const COLLIDE_SIZE = 2 * NODE_RADIUS + 40;
 const FILL = { male: '#7ea6e0', female: '#ea6b66', unknown: '#b3b3b3' } as const;
 const STROKE = { male: '#2f5d9e', female: '#9a3b37', unknown: '#555555' } as const;
@@ -20,7 +20,7 @@ const SYMBOL = { male: '\u2642', female: '\u2640', unknown: '?' } as const;
 const REPEAT_SYMBOL = '\u{1F504}';
 const LINK_COLOR = '#8a939c';
 const TEXT_COLOR = '#111111';
-/** Same look as the tree (TC-65, TC-67): a parent and a child, or two partners, are joined by solid lines. */
+/** Parent-child and marriage links are solid, as on the tree (TC-65, TC-67). */
 const PARENT_LINK_DISTANCE = 110;
 const MARRIAGE_LINK_DISTANCE = 60;
 
@@ -68,6 +68,9 @@ interface GraphHandle {
   graphData(data: { nodes: object[]; links: object[] }): GraphHandle;
   _destructor(): void;
 }
+
+/** The part of the link force this page sets: the distance of each link. */
+type LinkForce = { distance?: (distance: (link: object) => number) => unknown };
 
 /** Cuts the text with an ellipsis so that it fits the width. */
 function fit(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
@@ -172,16 +175,14 @@ export function ForceGraphCanvas({
       })
       // Hovering a node shows its full name, since the label may be cut.
       .nodeLabel((node) => cardLines((node as PaintedNode).card.person).name)
-      // Same style as the tree: solid lines for parents and children and for the marriage (TC-65, TC-67).
+      // Same style as the tree: solid lines for parents and children and for the marriage.
       .linkLineDash(() => [])
       .linkLabel((link) => marriageText(link as PaintedLink))
       .onNodeClick((node) => onSelectRef.current((node as PaintedNode).id))
       // Keeps the circles and their labels apart (OQ-27 gap, design section 4).
       .d3Force('collide', boxCollisionForce());
     // Partners are close (the marriage link is short) and children sit at a normal distance.
-    const linkForce = handle.d3Force('link') as
-      | { distance?: (distance: (link: object) => number) => unknown }
-      | undefined;
+    const linkForce = handle.d3Force('link') as LinkForce | undefined;
     linkForce?.distance?.((link) =>
       (link as PaintedLink).kind === 'marriage' ? MARRIAGE_LINK_DISTANCE : PARENT_LINK_DISTANCE,
     );
@@ -219,7 +220,11 @@ export function ForceGraphCanvas({
   useEffect(() => {
     handleRef.current?.graphData({
       // The collision force uses the size of the circle plus its label; the drawing uses the radius.
-      nodes: data.nodes.map((node) => ({ ...node, width: COLLIDE_SIZE, height: COLLIDE_SIZE })),
+      nodes: data.nodes.map((node) => ({
+        ...node,
+        width: COLLIDE_SIZE,
+        height: COLLIDE_SIZE,
+      })),
       links: data.links.map((link) => ({ ...link })),
     });
   }, [data]);
