@@ -41,6 +41,6 @@ describe('box collision force (design section 4)', () => {
     force.initialize([a, b]);
     force();
     force();
-    expect(b.y ?? 0 - (a.y ?? 0)).toBeGreaterThan(90);
+    expect((b.y ?? 0) - (a.y ?? 0)).toBeGreaterThan(90);
   });
 });
