@@ -26,6 +26,9 @@ vi.mock('force-graph', () => {
     linkColor(): this {
       return this;
     }
+    linkWidth(): this {
+      return this;
+    }
     linkLineDash(): this {
       return this;
     }
