@@ -11,9 +11,15 @@ import { themeStore } from './theme';
  */
 const NODE_RADIUS = 9;
 const LABEL_GAP = 4;
+const LABEL_LINE = 14;
 const LABEL_MAX_WIDTH = 150;
-/** Room kept around each circle for its label, so the collision force leaves space for the text. */
-const COLLIDE_SIZE = 2 * NODE_RADIUS + 60;
+/**
+ * The box the collision force keeps free around each person: as wide as the longest label, and as
+ * high as the circle plus one line of text. A box that is only as wide as the circle lets the labels
+ * of neighbours overlap.
+ */
+const COLLIDE_WIDTH = LABEL_MAX_WIDTH;
+const COLLIDE_HEIGHT = 2 * NODE_RADIUS + LABEL_GAP + LABEL_LINE;
 const FILL = { male: '#7ea6e0', female: '#ea6b66', unknown: '#b3b3b3' } as const;
 const STROKE = { male: '#2f5d9e', female: '#9a3b37', unknown: '#555555' } as const;
 const SYMBOL = { male: '\u2642', female: '\u2640', unknown: '?' } as const;
@@ -243,11 +249,11 @@ export function ForceGraphCanvas({
 
   useEffect(() => {
     handleRef.current?.graphData({
-      // The collision force uses the size of the circle plus its label; the drawing uses the radius.
+      // The collision force uses the box of the circle and its label; the drawing uses the radius.
       nodes: data.nodes.map((node) => ({
         ...node,
-        width: COLLIDE_SIZE,
-        height: COLLIDE_SIZE,
+        width: COLLIDE_WIDTH,
+        height: COLLIDE_HEIGHT,
       })),
       links: data.links.map((link) => ({ ...link })),
     });
