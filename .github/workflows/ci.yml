@@ -1,6 +1,3 @@
-# MOVE ME: this file lives in .github/workflows-pending/ only because the connector used to
-# create the branch could not write to .github/workflows/. Run:
-#   git mv .github/workflows-pending .github/workflows
 name: ci
 
 on:
@@ -23,24 +20,24 @@ env:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      # TODO: pin third-party actions by commit SHA (SDD security controls, section 3).
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Setup
+        uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-          # TODO: add `cache: npm` once package-lock.json is committed.
+          cache: npm
       - name: Install
-        run: |
-          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+        run: npm ci
       - name: Type-check
         run: npm run typecheck
       - name: Lint
         run: npm run lint
-      # TODO: remove continue-on-error after running `npm run format` once and committing the result.
       - name: Format check
         run: npm run format:check
-        continue-on-error: true
       - name: Unit, component and integration tests with coverage
         run: npm run test:coverage
       - name: Build

@@ -40,6 +40,12 @@
     "loading": "Carregando…",
     "loadingDetails": "Carregando parentes…",
     "generations": "Gerações carregadas: {{count}}",
+    "progress": "Carregando: {{generations}} gerações, {{people}} pessoas",
+    "pause": "Pausar",
+    "empty": "Nenhum pai está registrado para esta pessoa.",
+    "failedList": "Pessoas não carregadas",
+    "retryPerson": "Tentar de novo: {{id}}",
+    "retryPersonNamed": "Tentar de novo: {{name}} ({{id}})",
     "waiting": "O FamilySearch pediu para aguardar {{seconds}} s",
     "failed": "{{count}} pessoas não puderam ser carregadas",
     "retryFailed": "Tentar as que falharam",
@@ -70,6 +76,15 @@
       "V2": "Casais e filhos",
       "V3": "Família estendida"
     }
+  },
+  "graph": {
+    "heading": "Grafo da família",
+    "toTree": "Visão em árvore",
+    "toGraph": "Visão em grafo",
+    "listHeading": "Pessoas no grafo",
+    "canvas": "Grafo da família. Clique numa pessoa para selecioná-la; a lista ao lado funciona pelo teclado.",
+    "exportPng": "Exportar como PNG",
+    "loading": "Carregando o grafo…"
   },
   "families": {
     "cycle": "Mostrar outra família ({{shown}} de {{total}})"

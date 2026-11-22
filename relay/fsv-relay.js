@@ -8,11 +8,15 @@
    *
    * Keep ALLOWED_PATHS identical to src/api/allowList.ts: a test checks it.
    */
-  var APP_ORIGINS = ['https://h-ssiqueira.github.io', 'http://localhost:5173', 'http://localhost:4173'];
+  var APP_ORIGINS = [
+    'https://h-ssiqueira.github.io',
+    'http://localhost:5173',
+    'http://localhost:4173',
+  ];
   var FAMILYSEARCH_ORIGIN = 'https://www.familysearch.org';
   var ALLOWED_PATHS = [
     /^\/platform\/users\/current$/,
-    /^\/service\/tree\/tree-data\/v8\/person\/[A-Z0-9]{2,8}-[A-Z0-9]{2,8}\/details$/i
+    /^\/service\/tree\/tree-data\/v8\/person\/[A-Z0-9]{2,8}-[A-Z0-9]{2,8}\/details$/i,
   ];
   var APP_CHANNEL = 'fsv-app';
   var RELAY_CHANNEL = 'fsv-relay';
@@ -35,7 +39,12 @@
       return false;
     }
     if (parsed.origin !== FAMILYSEARCH_ORIGIN) return false;
-    if (parsed.search !== '' || parsed.hash !== '' || parsed.username !== '' || parsed.password !== '') {
+    if (
+      parsed.search !== '' ||
+      parsed.hash !== '' ||
+      parsed.username !== '' ||
+      parsed.password !== ''
+    ) {
       return false;
     }
     for (var i = 0; i < ALLOWED_PATHS.length; i += 1) {
@@ -66,7 +75,7 @@
 
     var headers = {
       Accept: 'application/json',
-      'Accept-Language': String(data.acceptLanguage || 'en')
+      'Accept-Language': String(data.acceptLanguage || 'en'),
     };
     if (data.token) headers.Authorization = 'Bearer ' + String(data.token);
 
@@ -74,7 +83,7 @@
       method: 'GET',
       credentials: 'include',
       headers: headers,
-      referrerPolicy: 'no-referrer'
+      referrerPolicy: 'no-referrer',
     })
       .then(function (response) {
         var retryAfter = response.headers.get('Retry-After');
@@ -84,7 +93,7 @@
             id: id,
             status: response.status,
             retryAfter: retryAfter,
-            body: body
+            body: body,
           });
         });
       })

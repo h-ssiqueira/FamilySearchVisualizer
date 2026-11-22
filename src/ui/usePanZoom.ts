@@ -22,17 +22,20 @@ export function usePanZoom() {
   const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, scale: 1 });
 
   /** Zooms around `origin` (viewport coordinates) so the point under it stays put. */
-  const zoomBy = useCallback((factor: number, origin: { x: number; y: number } = { x: 0, y: 0 }) => {
-    setTransform((current) => {
-      const scale = clampScale(current.scale * factor);
-      const ratio = scale / current.scale;
-      return {
-        scale,
-        x: origin.x - (origin.x - current.x) * ratio,
-        y: origin.y - (origin.y - current.y) * ratio,
-      };
-    });
-  }, []);
+  const zoomBy = useCallback(
+    (factor: number, origin: { x: number; y: number } = { x: 0, y: 0 }) => {
+      setTransform((current) => {
+        const scale = clampScale(current.scale * factor);
+        const ratio = scale / current.scale;
+        return {
+          scale,
+          x: origin.x - (origin.x - current.x) * ratio,
+          y: origin.y - (origin.y - current.y) * ratio,
+        };
+      });
+    },
+    [],
+  );
 
   const panBy = useCallback((dx: number, dy: number) => {
     setTransform((current) => ({ ...current, x: current.x + dx, y: current.y + dy }));

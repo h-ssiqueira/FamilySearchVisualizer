@@ -49,9 +49,7 @@ describe('App', () => {
     renderApp();
     expect(screen.getByRole('heading', { name: 'Your family tree' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Sign out' }));
-    expect(
-      await screen.findByRole('button', { name: /sign in with google/i }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /sign in with google/i })).toBeInTheDocument();
     expect(tokenStore.get()).toBeNull();
   });
 

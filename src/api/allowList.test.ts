@@ -21,12 +21,18 @@ describe('isAllowedRequest (TC-60)', () => {
   });
 
   it('refuses other hosts, protocols and look-alike origins', () => {
-    expect(isAllowedRequest('https://evil.example/platform/users/current', 'GET', BASE)).toBe(false);
-    expect(isAllowedRequest('http://www.familysearch.org/platform/users/current', 'GET', BASE)).toBe(
+    expect(isAllowedRequest('https://evil.example/platform/users/current', 'GET', BASE)).toBe(
       false,
     );
     expect(
-      isAllowedRequest('https://www.familysearch.org.evil.example/platform/users/current', 'GET', BASE),
+      isAllowedRequest('http://www.familysearch.org/platform/users/current', 'GET', BASE),
+    ).toBe(false);
+    expect(
+      isAllowedRequest(
+        'https://www.familysearch.org.evil.example/platform/users/current',
+        'GET',
+        BASE,
+      ),
     ).toBe(false);
     expect(
       isAllowedRequest(`${BASE}/platform/users/current`, 'GET', 'http://www.familysearch.org'),
@@ -46,9 +52,13 @@ describe('isAllowedRequest (TC-60)', () => {
   });
 
   it('refuses credentials in the URL and unparsable input', () => {
-    expect(isAllowedRequest('https://user:pass@www.familysearch.org/platform/users/current', 'GET', BASE)).toBe(
-      false,
-    );
+    expect(
+      isAllowedRequest(
+        'https://user:pass@www.familysearch.org/platform/users/current',
+        'GET',
+        BASE,
+      ),
+    ).toBe(false);
     expect(isAllowedRequest('not a url', 'GET', BASE)).toBe(false);
     expect(isAllowedRequest(`${BASE}/platform/users/current`, 'GET', 'not a url')).toBe(false);
   });

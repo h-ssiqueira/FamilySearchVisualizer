@@ -7,14 +7,26 @@ const ref = (id: string): PersonRef => ({ id, name: id, gender: 'unknown', livin
 
 describe('partnerOf', () => {
   it('returns the partner whose id differs from the person, whichever slot it is in', () => {
-    const first: Couple = { partner1: ref('SPOUSE'), partner2: ref('ME'), children: [], preferred: true };
-    const second: Couple = { partner1: ref('ME'), partner2: ref('SPOUSE'), children: [], preferred: true };
+    const first: Couple = {
+      partner1: ref('SPOUSE'),
+      partner2: ref('ME'),
+      children: [],
+      preferred: true,
+    };
+    const second: Couple = {
+      partner1: ref('ME'),
+      partner2: ref('SPOUSE'),
+      children: [],
+      preferred: true,
+    };
     expect(partnerOf('ME', first)?.id).toBe('SPOUSE');
     expect(partnerOf('ME', second)?.id).toBe('SPOUSE');
   });
 
   it('returns undefined when there is no other partner', () => {
-    expect(partnerOf('ME', { partner1: ref('ME'), children: [], preferred: false })).toBeUndefined();
+    expect(
+      partnerOf('ME', { partner1: ref('ME'), children: [], preferred: false }),
+    ).toBeUndefined();
   });
 });
 

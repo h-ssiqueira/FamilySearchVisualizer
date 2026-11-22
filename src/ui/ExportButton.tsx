@@ -37,10 +37,20 @@ export function ExportButton({ layout }: { layout: FamilyLayout }) {
       >
         {t('tree.export')}
       </button>
-      <button type="button" className="button" disabled={disabled} onClick={() => void exportRaster('png')}>
+      <button
+        type="button"
+        className="button"
+        disabled={disabled}
+        onClick={() => void exportRaster('png')}
+      >
         {t('tree.exportPng')}
       </button>
-      <button type="button" className="button" disabled={disabled} onClick={() => void exportRaster('pdf')}>
+      <button
+        type="button"
+        className="button"
+        disabled={disabled}
+        onClick={() => void exportRaster('pdf')}
+      >
         {t('tree.exportPdf')}
       </button>
     </>

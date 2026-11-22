@@ -65,7 +65,9 @@ describe('PersonPanel', () => {
   });
 
   it('says so when the details are not available, and still offers the link', async () => {
-    render(<PersonPanel person={light} source={{ getPerson: async () => null }} onClose={vi.fn()} />);
+    render(
+      <PersonPanel person={light} source={{ getPerson: async () => null }} onClose={vi.fn()} />,
+    );
     expect(await screen.findByRole('alert')).toHaveTextContent('not available');
     expect(screen.getByRole('link', { name: 'Open on FamilySearch' })).toBeInTheDocument();
   });

@@ -52,7 +52,12 @@ describe('cardLines', () => {
   });
 
   it('shows only name and id for a light person', () => {
-    const ref: PersonRef = { id: 'CCCC-CCC', name: 'Sibling Example', gender: 'female', living: false };
+    const ref: PersonRef = {
+      id: 'CCCC-CCC',
+      name: 'Sibling Example',
+      gender: 'female',
+      living: false,
+    };
     expect(cardLines(ref)).toEqual({
       name: 'Sibling Example',
       dates: '',

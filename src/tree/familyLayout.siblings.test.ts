@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { FamilyCard, FamilyCouple, FamilyView } from '@/domain';
 import { CARD } from './layout';
-import { layoutFamily, type FamilyLayout, type MarriageLink, type PositionedCard } from './familyLayout';
+import {
+  layoutFamily,
+  type FamilyLayout,
+  type MarriageLink,
+  type PositionedCard,
+} from './familyLayout';
 
 const card = (id: string, row: number, role: FamilyCard['role'] = 'line'): FamilyCard => ({
   id,
@@ -108,7 +113,10 @@ describe('marriage line between parents with siblings (FR-26)', () => {
       const crossing = layout.cards.filter(
         (entry) => !own.includes(entry.card.id) && coversLine(entry, link),
       );
-      expect(crossing.map((entry) => entry.card.id), link.coupleId).toEqual([]);
+      expect(
+        crossing.map((entry) => entry.card.id),
+        link.coupleId,
+      ).toEqual([]);
     }
   });
 
