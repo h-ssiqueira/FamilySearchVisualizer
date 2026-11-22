@@ -13,16 +13,21 @@ const NODE_RADIUS = 9;
 const LABEL_GAP = 4;
 const LABEL_MAX_WIDTH = 150;
 /** Room kept around each circle for its label, so the collision force leaves space for the text. */
-const COLLIDE_SIZE = 2 * NODE_RADIUS + 40;
+const COLLIDE_SIZE = 2 * NODE_RADIUS + 60;
 const FILL = { male: '#7ea6e0', female: '#ea6b66', unknown: '#b3b3b3' } as const;
 const STROKE = { male: '#2f5d9e', female: '#9a3b37', unknown: '#555555' } as const;
 const SYMBOL = { male: '\u2642', female: '\u2640', unknown: '?' } as const;
 const REPEAT_SYMBOL = '\u{1F504}';
 const LINK_COLOR = '#8a939c';
 const TEXT_COLOR = '#111111';
-/** Parent-child and marriage links are solid, as on the tree (TC-65, TC-67). */
-const PARENT_LINK_DISTANCE = 110;
-const MARRIAGE_LINK_DISTANCE = 60;
+/**
+ * Spacing of the network (OQ-27). The values are first decided for a tree of about 200 people:
+ * the parent-child links are long enough that the names do not overlap, the marriage link is
+ * shorter so that the partners stay together, and the charge pushes unrelated people apart.
+ */
+const PARENT_LINK_DISTANCE = 200;
+const MARRIAGE_LINK_DISTANCE = 120;
+const CHARGE_STRENGTH = -300;
 
 /** A node as the library hands it back: our data plus the position the library computes. */
 interface PaintedNode {
@@ -71,6 +76,9 @@ interface GraphHandle {
 
 /** The part of the link force this page sets: the distance of each link. */
 type LinkForce = { distance?: (distance: (link: object) => number) => unknown };
+
+/** The part of the charge force this page sets: how strongly people push each other apart. */
+type ChargeForce = { strength?: (value: number) => unknown };
 
 /** Cuts the text with an ellipsis so that it fits the width. */
 function fit(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
@@ -181,11 +189,14 @@ export function ForceGraphCanvas({
       .onNodeClick((node) => onSelectRef.current((node as PaintedNode).id))
       // Keeps the circles and their labels apart (OQ-27 gap, design section 4).
       .d3Force('collide', boxCollisionForce());
-    // Partners are close (the marriage link is short) and children sit at a normal distance.
+    // Spacing (OQ-27): longer links for parents and children, shorter for partners, and a stronger
+    // charge so that unrelated people do not crowd each other.
     const linkForce = handle.d3Force('link') as LinkForce | undefined;
     linkForce?.distance?.((link) =>
       (link as PaintedLink).kind === 'marriage' ? MARRIAGE_LINK_DISTANCE : PARENT_LINK_DISTANCE,
     );
+    const chargeForce = handle.d3Force('charge') as ChargeForce | undefined;
+    chargeForce?.strength?.(CHARGE_STRENGTH);
     handleRef.current = handle;
 
     const observer =
